@@ -11,8 +11,8 @@ import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-import Verification.AdditiveCombinatorics.Basic
-import Verification.Common
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.Common
 
 /-!
 # Freiman-isomorphism classes
@@ -27,7 +27,7 @@ needed by Section 4 are developed alongside the relation encodings they use.
 The source of version 2 is available at <https://arxiv.org/e-print/math/0304183>.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped Pointwise
 
@@ -2540,4 +2540,4 @@ theorem card_boundedFreimanDimSets (n r t : ℕ) (ht : 0 < t) :
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

@@ -41,8 +41,8 @@ When writing or refactoring proofs:
     6. Use `suffices` only when the intermediate proposition has genuine mathematical or logical meaning, not merely as a one-use rewrite equality.
     Use `nth_rewrite` when only a particular occurrence should change, and `conv` when a rewrite must target a precise subexpression.
 14. After refactoring, build the affected Lean module with Lake, for example
-    `lake build Verification.RuzsaSumOfSets`, rather than relying only on
-    `lake env lean Verification/RuzsaSumOfSets.lean`. The direct Lean command
+    `lake build DenseSetsWithoutLargeSumsets.RuzsaSumOfSets`, rather than relying only on
+    `lake env lean DenseSetsWithoutLargeSumsets/RuzsaSumOfSets.lean`. The direct Lean command
     may compile successfully without running the project linters used by
     `lake build`. Inspect the complete Lake output and resolve every warning
     and associated `info:` message attributed to the affected file. In

@@ -6,8 +6,8 @@ Authors: Gabriel Dahia
 import Mathlib.Tactic.SetNotationForOrder
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.Data.Nat.Choose.Cast
-import Verification.AdditiveCombinatorics.Basic
-import Verification.AdditiveCombinatorics.SumOfSetsInSeveralDimensions
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.SumOfSetsInSeveralDimensions
 
 /-!
 # Sumset bounds from Freiman dimension
@@ -16,7 +16,7 @@ This file transports geometric sumset bounds through rational Freiman models and
 bounds for the sumset of two sets from the Freiman dimension of their union.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped Pointwise Affine
 
@@ -410,4 +410,4 @@ lemma card_add_sum_min_le_of_freimanDim_union {G : Type*} [DecidableEq G] [AddCo
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

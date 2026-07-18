@@ -7,7 +7,7 @@ import Mathlib.Algebra.Order.Group.PiLex
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 import Mathlib.LinearAlgebra.AffineSpace.Pointwise
 import Mathlib.Tactic.SetNotationForOrder
-import Verification.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
 
 /-!
 # Sum of sets in several dimensions
@@ -16,7 +16,7 @@ This file proves the sharp lower bound from Imre Ruzsa's *Sum of sets in several
 dimensions*.  The nonemptiness assumption is the positive-cardinality assumption in the paper.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped Pointwise
 
@@ -1193,4 +1193,4 @@ theorem card_add_lower_bound_of_affineDim {D d : ℕ} (A B : Finset (Fin D → �
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

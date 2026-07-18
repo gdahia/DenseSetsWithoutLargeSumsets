@@ -15,7 +15,7 @@ Additive-combinatorics infrastructure
 
 open scoped BigOperators Pointwise
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 noncomputable section
 
@@ -45,4 +45,4 @@ noncomputable def freimanDim {G : Type*} [DecidableEq G] [AddCommMonoid G] (X : 
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

@@ -3,10 +3,10 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.RandomSetContainsNoSmallSumset
-import Verification.CountingSumsetsOfModerateSize
-import Verification.SimpleBoundForVeryLargeSumsets
-import Verification.BinomialRandomVariable
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset
+import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize
+import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
+import DenseSetsWithoutLargeSumsets.BinomialRandomVariable
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 /-!
@@ -16,7 +16,7 @@ The three preceding files estimate disjoint ranges of `#(A+B)`.  This file conta
 the bookkeeping which combines them into the final probability estimate.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open MeasureTheory
 open Filter
@@ -379,4 +379,4 @@ theorem dense_subset_without_large_sumsets
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

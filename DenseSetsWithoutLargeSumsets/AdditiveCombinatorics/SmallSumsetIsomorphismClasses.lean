@@ -7,8 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.SpecialFunctions.Log.Monotone
 import Mathlib.Analysis.SpecialFunctions.Stirling
-import Verification.AdditiveCombinatorics.FreimanIsomorphismClasses
-import Verification.Common
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanIsomorphismClasses
+import DenseSetsWithoutLargeSumsets.Common
 
 /-!
 # Isomorphism classes with small self-sumsets
@@ -18,7 +18,7 @@ the small-core proposition, the extension and restricted-sumset lemmas, and the 
 Freiman-isomorphism classes with small restricted sumsets.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped Pointwise
 
@@ -1931,4 +1931,4 @@ theorem smallSumsetFreimanDimSets_ncard_le_of_class_cover (n r s t : ℕ)
 end
 
 
-end Verification
+end DenseSetsWithoutLargeSumsets

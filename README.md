@@ -7,12 +7,12 @@ João Pedro Marciano, and Victor Souza.
 The main result constructs dense subsets of `[n]` which contain no sumset `A + B` when both
 summands are sufficiently large. The formalization includes the probabilistic construction and
 the estimates for small, moderate, and very large sumsets which are combined in the final
-theorem `Verification.dense_subset_without_large_sumsets`.
+theorem `DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets`.
 
 ## Axioms
 
 The development is built on Mathlib, except for two external additive-combinatorics inputs which
-are currently stated axiomatically in `Verification/ExtraAxioms.lean`:
+are currently stated axiomatically in `DenseSetsWithoutLargeSumsets/ExtraAxioms.lean`:
 
 - Theorem 2 of Bollobás, Leader, and Tiba's
   [*Large sumsets from medium-sized subsets*](https://arxiv.org/abs/2206.09366), in a finite

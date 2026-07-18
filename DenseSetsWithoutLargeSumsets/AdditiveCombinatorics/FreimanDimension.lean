@@ -3,7 +3,7 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.AdditiveCombinatorics.FreimanDimensionSumsetBounds
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimensionSumsetBounds
 
 /-!
 # A self-sumset bound for the Freiman dimension
@@ -12,7 +12,7 @@ This file derives the Freiman-dimension bound used in the small-sumset argument 
 lower bound for a union of two finite sets.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped Pointwise
 
@@ -87,4 +87,4 @@ theorem freimanDim_le_two_mul_sub_one_of_card_add_le {q κ : ℕ} (X : Finset (Z
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

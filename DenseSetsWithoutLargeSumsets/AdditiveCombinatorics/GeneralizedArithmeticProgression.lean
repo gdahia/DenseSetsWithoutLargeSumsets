@@ -14,7 +14,7 @@ import Mathlib.Algebra.Order.BigOperators.GroupWithZero.Finset
 GAPs
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open Filter Nat
 open scoped Pointwise
@@ -144,4 +144,4 @@ lemma properGAPsZModOfDim_card {q d s : ℕ} (_hs : 0 < s) (hq : 0 < q) :
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

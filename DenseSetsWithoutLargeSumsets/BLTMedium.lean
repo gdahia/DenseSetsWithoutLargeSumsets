@@ -3,13 +3,13 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.ExtraAxioms
+import DenseSetsWithoutLargeSumsets.ExtraAxioms
 
 /-!
 The symmetric medium-sized-subset consequence of the original Bollobás--Leader--Tiba theorem.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped BigOperators Pointwise
 
@@ -170,7 +170,7 @@ private lemma blt_unbalanced_left {G : Type*} [DecidableEq G] [AddCommGroup G]
       nlinarith
 
 /--
-The symmetric square-root form used in the rest of the verification, derived from the original
+The symmetric square-root form used in the rest of the formalization, derived from the original
 expected-value theorem above.
 -/
 theorem exists_blt_subsets {G : Type*} [DecidableEq G] [AddCommGroup G] {σ ε : ℝ} {A B : Finset G}
@@ -226,4 +226,4 @@ theorem exists_blt_subsets {G : Type*} [DecidableEq G] [AddCommGroup G] {σ ε :
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

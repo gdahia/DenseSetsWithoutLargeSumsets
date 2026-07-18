@@ -3,11 +3,11 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.AdditiveCombinatorics.FreimanDimension
-import Verification.Probability
-import Verification.Common
-import Verification.AdditiveCombinatorics.GeneralizedArithmeticProgression
-import Verification.BLTMedium
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
+import DenseSetsWithoutLargeSumsets.Probability
+import DenseSetsWithoutLargeSumsets.Common
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
+import DenseSetsWithoutLargeSumsets.BLTMedium
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.NumberTheory.Bertrand
 
@@ -15,7 +15,7 @@ import Mathlib.NumberTheory.Bertrand
 Probability estimates showing that a random set contains no small sumset.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open Filter Nat
 open scoped Pointwise
@@ -2862,4 +2862,4 @@ theorem small_sumset_pair_probability_le {γ C c : ℝ} {n : ℕ} {δ : unitInte
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

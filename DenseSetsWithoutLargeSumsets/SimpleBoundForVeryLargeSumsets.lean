@@ -3,14 +3,14 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.Probability
+import DenseSetsWithoutLargeSumsets.Probability
 import Mathlib.Combinatorics.Additive.RuzsaCovering
 
 /-!
 Bounds effective for very large sumsets.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped Pointwise
 
@@ -797,4 +797,4 @@ theorem very_large_sumset_probability_le
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

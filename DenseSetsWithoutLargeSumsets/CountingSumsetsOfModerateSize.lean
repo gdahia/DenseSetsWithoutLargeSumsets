@@ -3,10 +3,10 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.RandomSetContainsNoSmallSumset
-import Verification.SimpleBoundForVeryLargeSumsets
-import Verification.ExtraAxioms
-import Verification.AdditiveCombinatorics.SmallSumsetIsomorphismClasses
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset
+import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
+import DenseSetsWithoutLargeSumsets.ExtraAxioms
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.SmallSumsetIsomorphismClasses
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.SpecialFunctions.Log.Monotone
 
@@ -14,7 +14,7 @@ import Mathlib.Analysis.SpecialFunctions.Log.Monotone
 Bounds for counting sumsets of moderate size.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped Pointwise
 
@@ -1567,4 +1567,4 @@ theorem moderate_sumset_probability_le
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

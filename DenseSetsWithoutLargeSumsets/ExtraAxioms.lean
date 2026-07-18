@@ -7,17 +7,17 @@ import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Algebra.Order.BigOperators.Expect
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Set.Card
-import Verification.AdditiveCombinatorics.Basic
-import Verification.AdditiveCombinatorics.GeneralizedArithmeticProgression
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
 
 /-!
-The additional mathematical assumptions used by the verification.
+The additional mathematical assumptions used by the formalization.
 
 This file is deliberately self-contained apart from Mathlib and the project's definitions of
 `freimanDim` and `ProperGAP`.
 -/
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open scoped BigOperators Pointwise
 
@@ -62,4 +62,4 @@ axiom exists_properGAP_of_small_sumset
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

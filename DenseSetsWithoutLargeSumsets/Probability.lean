@@ -3,7 +3,7 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.Common
+import DenseSetsWithoutLargeSumsets.Common
 import Mathlib.Probability.Distributions.SetBernoulli
 
 /-!
@@ -12,7 +12,7 @@ Finite Bernoulli random-subset model used by the probability statements.
 
 open scoped BigOperators
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open MeasureTheory
 
@@ -276,4 +276,4 @@ lemma binomialFinsetSubset_real_singleton_nat_of_subset
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

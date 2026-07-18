@@ -14,7 +14,7 @@ Common definitions
 
 open scoped BigOperators Pointwise
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 noncomputable section
 
@@ -125,4 +125,4 @@ def pairEventDecayExponent (γ : ℝ) : ℝ := γ / (8 * (γ + 3))
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets

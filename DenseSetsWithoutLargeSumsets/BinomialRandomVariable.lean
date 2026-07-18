@@ -3,7 +3,7 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Verification.Probability
+import DenseSetsWithoutLargeSumsets.Probability
 import Mathlib.Probability.Distributions.Binomial
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
@@ -20,7 +20,7 @@ random finset.
 
 open scoped BigOperators ENNReal
 
-namespace Verification
+namespace DenseSetsWithoutLargeSumsets
 
 open MeasureTheory
 
@@ -1077,4 +1077,4 @@ theorem binomialFinsetSubset_real_dense_event_ge_quarter (n : ℕ) (δ : unitInt
 
 end
 
-end Verification
+end DenseSetsWithoutLargeSumsets
