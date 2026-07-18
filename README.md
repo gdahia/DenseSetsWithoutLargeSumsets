@@ -4,7 +4,7 @@ This repository contains the Lean 4 formalization of
 [**Dense sets without large sumsets**](https://arxiv.org/abs/2607.15269), by Gabriel Dahia,
 João Pedro Marciano, and Victor Souza.
 
-The main result constructs dense subsets of `[n]` which contain no sumset `A + B` when both
+The main result constructs dense subsets of $[n]$ which contain no sumset $A + B$ when both
 summands are sufficiently large. The formalization includes the probabilistic construction and
 the estimates for small, moderate, and very large sumsets which are combined in the final
 theorem `DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets`.
