@@ -47,5 +47,6 @@ The repository also develops a substantial amount of reusable additive combinato
 Build the project:
 
 ```bash
+lake exe cache get
 lake build
 ```
