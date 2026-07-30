@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Probability
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimensionSumsetBounds

@@ -6,7 +6,7 @@ Authors: Gabriel Dahia
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem
 import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize
 import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
-import DenseSetsWithoutLargeSumsets.BinomialRandomVariable
+import DenseSetsWithoutLargeSumsets.Probability
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 /-!
