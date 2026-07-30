@@ -11,7 +11,7 @@ import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
 import DenseSetsWithoutLargeSumsets.Common
 
 /-!

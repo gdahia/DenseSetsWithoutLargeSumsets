@@ -7,7 +7,7 @@ import Mathlib.Algebra.Order.Group.PiLex
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 import Mathlib.LinearAlgebra.AffineSpace.Pointwise
 import Mathlib.Tactic.SetNotationForOrder
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
 
 /-!
 # Sum of sets in several dimensions

@@ -6,7 +6,7 @@ Authors: Gabriel Dahia
 import Mathlib.Tactic.SetNotationForOrder
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.Data.Nat.Choose.Cast
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.SumOfSetsInSeveralDimensions
 
 /-!
@@ -407,6 +407,24 @@ lemma card_add_sum_min_le_of_freimanDim_union {G : Type*} [DecidableEq G] [AddCo
     · dsimp [A₁, B₁]
       rw [hAcard, hBcard]
       exact hBA
+
+/-- If `#(X + X) ≤ κ #X`, then `X` has Freiman dimension at most `2 * κ - 1`. -/
+theorem freimanDim_le_two_mul_sub_one_of_card_add_le {q κ : ℕ} (X : Finset (ZMod q))
+    (_hq : Nat.Prime q)
+    (hXX : (X + X).card ≤ κ * X.card) : freimanDim X ≤ 2 * κ - 1 := by
+  classical
+  let r := freimanDim X
+  have hrX : r ≤ X.card := by
+    dsimp [r, freimanDim]
+    exact Nat.findGreatest_le X.card
+  by_cases hr0 : r = 0
+  · simp [r, hr0]
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.mpr hr0
+  have hX : X.Nonempty := Finset.card_pos.mp (hr.trans hrX)
+  refine Nat.le_sub_one_of_lt (lt_two_mul_of_truncated_bound hr hrX ?_)
+  rw [← truncated_sum_eq hr hrX]
+  refine (card_add_sum_min_le_of_freimanDim_union r X X hr hX hX le_rfl ?_).trans hXX
+  · simp [r]
 
 end
 

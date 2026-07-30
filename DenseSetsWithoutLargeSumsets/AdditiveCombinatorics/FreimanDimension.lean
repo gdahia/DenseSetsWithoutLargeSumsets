@@ -3,7 +3,13 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimensionSumsetBounds
+import Mathlib.Data.Real.Basic
+import Mathlib.Data.Nat.Choose.Cast
+import Mathlib.LinearAlgebra.AffineSpace.Combination
+import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
+import Mathlib.LinearAlgebra.Dimension.Finrank
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.Combinatorics.Additive.FreimanHom
 
 /-!
 # A self-sumset bound for the Freiman dimension
@@ -14,11 +20,34 @@ lower bound for a union of two finite sets.
 
 namespace DenseSetsWithoutLargeSumsets
 
-open scoped Pointwise
+open scoped BigOperators Pointwise
 
 noncomputable section
+noncomputable def finsetAffineDim {d : ℕ} (S : Finset (Fin d → ℝ)) : ℕ :=
+  Module.finrank ℝ (affineSpan ℝ (S : Set (Fin d → ℝ))).direction
 
-private lemma truncated_sum_eq {b r : ℕ} (hr : 1 ≤ r) (hrb : r ≤ b) :
+/-- Affine dimension is monotone under inclusion of finite sets. -/
+lemma finsetAffineDim_mono {D : ℕ} {S T : Finset (Fin D → ℝ)}
+    (hST : S ⊆ T) : finsetAffineDim S ≤ finsetAffineDim T := by
+  unfold finsetAffineDim
+  apply Submodule.finrank_mono
+  apply AffineSubspace.direction_le
+  apply affineSpan_mono
+  simpa using hST
+
+def rationalVectorToReal {d : ℕ} (v : Fin d → ℚ) : Fin d → ℝ :=
+  fun i => (v i : ℝ)
+
+def freimanModelDim {G : Type*} [DecidableEq G] [AddCommMonoid G] (X : Finset G) (d : ℕ) : Prop :=
+  ∃ f : G → (Fin d → ℚ),
+    IsAddFreimanIso 2 (X : Set G) ((X.image f : Finset (Fin d → ℚ)) : Set (Fin d → ℚ)) f ∧
+      finsetAffineDim ((X.image f).image rationalVectorToReal) = d
+
+noncomputable def freimanDim {G : Type*} [DecidableEq G] [AddCommMonoid G] (X : Finset G) : ℕ := by
+    classical
+    exact Nat.findGreatest (freimanModelDim X) X.card
+
+lemma truncated_sum_eq {b r : ℕ} (hr : 1 ≤ r) (hrb : r ≤ b) :
     (Finset.Icc 1 (b - 1)).sum (fun t => min (r - 1) (b - t)) =
       Nat.choose r 2 + (b - r) * (r - 1) := by
   classical
@@ -55,7 +84,7 @@ private lemma truncated_bound_contradiction {b r κ : ℚ} (hr : 0 < r) (hrb : r
   nlinarith [mul_nonneg (sub_nonneg.mpr hκr) (hr.le.trans hrb),
     mul_nonneg hr.le (sub_nonneg.mpr hrb)]
 
-private lemma lt_two_mul_of_truncated_bound {b r κ : ℕ} (hr : 1 ≤ r) (hrb : r ≤ b)
+lemma lt_two_mul_of_truncated_bound {b r κ : ℕ} (hr : 1 ≤ r) (hrb : r ≤ b)
     (hbound : b + (Nat.choose r 2 + (b - r) * (r - 1)) ≤ κ * b) :
     r < 2 * κ := by
   by_contra hnot
@@ -66,25 +95,31 @@ private lemma lt_two_mul_of_truncated_bound {b r κ : ℕ} (hr : 1 ≤ r) (hrb :
   · exact_mod_cast Nat.le_of_not_gt hnot
   · rw [← Nat.cast_choose_two, ← Nat.cast_sub hrb]
     exact_mod_cast hbound
-
-/-- If `#(X + X) ≤ κ #X`, then `X` has Freiman dimension at most `2 * κ - 1`. -/
-theorem freimanDim_le_two_mul_sub_one_of_card_add_le {q κ : ℕ} (X : Finset (ZMod q))
-    (_hq : Nat.Prime q)
-    (hXX : (X + X).card ≤ κ * X.card) : freimanDim X ≤ 2 * κ - 1 := by
-  classical
-  let r := freimanDim X
-  have hrX : r ≤ X.card := by
-    dsimp [r, freimanDim]
-    exact Nat.findGreatest_le X.card
-  by_cases hr0 : r = 0
-  · simp [r, hr0]
-  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.mpr hr0
-  have hX : X.Nonempty := Finset.card_pos.mp (hr.trans hrX)
-  refine Nat.le_sub_one_of_lt (lt_two_mul_of_truncated_bound hr hrX ?_)
-  rw [← truncated_sum_eq hr hrX]
-  refine (card_add_sum_min_le_of_freimanDim_union r X X hr hX hX le_rfl ?_).trans hXX
-  · simp [r]
-
 end
+
+lemma le_freimanDim_of_model {G : Type*} [DecidableEq G] [AddCommMonoid G]
+    (X : Finset G) {d : ℕ} (hd : d ≤ X.card) (hmodel : freimanModelDim X d) :
+    d ≤ freimanDim X := by
+  classical
+  exact Nat.le_findGreatest hd hmodel
+
+/-- A nonempty finite set of affine dimension `d` contains at least `d + 1` points. -/
+lemma finsetAffineDim_add_one_le_card {d : ℕ} (S : Finset (Fin d → ℝ))
+    (hS : S.Nonempty) : finsetAffineDim S + 1 ≤ S.card := by
+  classical
+  letI : Nonempty S := hS.to_subtype
+  let p : S → (Fin d → ℝ) := Subtype.val
+  have hp : Set.range p = (S : Set (Fin d → ℝ)) := by
+    ext x
+    simp [p]
+  unfold finsetAffineDim
+  rw [direction_affineSpan, ← hp]
+  simpa only [Fintype.card_coe] using finrank_vectorSpan_range_add_one_le ℝ p
+
+lemma finsetAffineDim_le_card {d : ℕ} (S : Finset (Fin d → ℝ)) :
+    finsetAffineDim S ≤ S.card := by
+  by_cases hS : S.Nonempty
+  · exact (Nat.le_add_right _ _).trans (finsetAffineDim_add_one_le_card S hS)
+  · simp [Finset.not_nonempty_iff_eq_empty.mp hS, finsetAffineDim]
 
 end DenseSetsWithoutLargeSumsets

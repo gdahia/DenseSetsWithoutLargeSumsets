@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.GapToolkit
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
 import Mathlib.Analysis.Convex.Basic
 
 /-! # Symmetric convex progressions
