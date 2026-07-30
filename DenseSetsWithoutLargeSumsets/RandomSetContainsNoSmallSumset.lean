@@ -7,7 +7,7 @@ import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
 import DenseSetsWithoutLargeSumsets.Probability
 import DenseSetsWithoutLargeSumsets.Common
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.BLTMedium
+import DenseSetsWithoutLargeSumsets.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Reduction
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.NumberTheory.Bertrand
@@ -2615,7 +2615,8 @@ lemma pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ C 
   intro S hS
   rcases hS with ⟨A, B, hAint, hBint, hAcard, hBcard, _hAB_lower, hAB, hAB_subset⟩
   obtain ⟨A', A'', B', B'', hblt⟩ :=
-    exists_blt_subsets (G := ℤ) (σ := 2 * C) (ε := ε γ) (by positivity) (ε_pos hγ_pos)
+    exists_medium_sized_subsets_with_large_sumset_subsets (G := ℤ) (σ := 2 * C) (ε := ε γ)
+      (by positivity) (ε_pos hγ_pos)
       (natCastImage_nonempty_of_card_eq hAcard
         (pairCardThreshold_pos_of_lower_density hγ_pos hn hδ_lower hδ_upper))
       (natCastImage_nonempty_of_card_eq hBcard

@@ -9,21 +9,9 @@ summands are sufficiently large. The formalization includes the probabilistic co
 the estimates for small, moderate, and very large sumsets which are combined in the final
 theorem `DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets`.
 
-## Axioms and dependencies
-
-The development is built on Mathlib and the [`APAP` project](https://yaeldillies.github.io/apap/)
-for additive combinatorics / discrete Fourier analysis machinery.
-
-A single mathematical input is assumed rather than proved:
-
-- Theorem 2 of Bollobás, Leader, and Tiba's
-  [*Large sumsets from medium-sized subsets*](https://arxiv.org/abs/2206.09366), in a finite
-  uniform-expectation form. Its unspecified constant is represented by
-  `originalBltConstant`, and the theorem by `exists_blt_sample`.
-
-Everything else used by the main theorem is proved in Lean from that input, Mathlib, and APAP;
-`#print axioms DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets` lists
-`exists_blt_sample` and Lean's own three axioms.
+The only dependencies are Mathlib and the [`APAP` project](https://yaeldillies.github.io/apap/),
+where the latter is used for additive combinatorics / discrete Fourier analysis machinery
+in Chang's theorem.
 
 ## Other formalized results
 
@@ -40,6 +28,8 @@ The repository also develops a substantial amount of reusable additive combinato
   [*Sum of sets in several dimensions*](https://doi.org/10.1007/BF01302969), together with the
   transport of this geometric bound through rational Freiman models and its consequences for
   Freiman dimension.
+- Theorem 2 of Bollobás, Leader, and Tiba's
+  [*Large sumsets from medium-sized subsets*](https://arxiv.org/abs/2206.09366).
 - Supporting results about generalized arithmetic progressions, finite probability spaces,
   binomial random finite sets, and concentration estimates needed for the main argument.
 
