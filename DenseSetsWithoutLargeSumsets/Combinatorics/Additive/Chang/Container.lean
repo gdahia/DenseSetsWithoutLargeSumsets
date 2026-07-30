@@ -5,11 +5,11 @@ Authors: Gabriel Dahia
 -/
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.BohrProgression
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Fourier
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.FreimanRigidity
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Packing
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.RuzsaModel
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.BohrProgression
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Fourier
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.FreimanRigidity
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Packing
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.RuzsaModel
 
 /-! # The coarse cyclic container in Chang's theorem
 

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import Mathlib.Algebra.Group.Pointwise.Finset.Basic
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.GapToolkit
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
 
 /-! # Stage T of Chang's theorem: transport across a Freiman isomorphism
 

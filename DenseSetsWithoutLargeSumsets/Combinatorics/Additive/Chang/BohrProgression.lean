@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import Mathlib.Analysis.Real.Pi.Bounds
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Fourier
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Properization
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Fourier
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization
 
 /-! # A large progression inside a chord neighborhood
 

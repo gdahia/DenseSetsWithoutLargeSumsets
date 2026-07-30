@@ -6,7 +6,7 @@ Authors: Gabriel Dahia
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.Combinatorics.Additive.RuzsaCovering
 import Mathlib.Algebra.BigOperators.Fin
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Properization
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization
 
 /-! # Chang's batch packing argument
 

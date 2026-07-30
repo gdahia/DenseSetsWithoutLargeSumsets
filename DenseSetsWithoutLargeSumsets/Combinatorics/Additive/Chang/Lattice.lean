@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import Mathlib.Algebra.Module.ZLattice.Basic
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.ConvexProgression
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.ConvexProgression
 
 /-! # Lattices in coordinate subspaces
 

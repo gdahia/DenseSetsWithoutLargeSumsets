@@ -7,7 +7,7 @@ import Mathlib.Algebra.Module.Defs
 import Mathlib.Combinatorics.Additive.FreimanHom
 import Mathlib.Data.Pi.Interval
 import Mathlib.Data.Int.Interval
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
 
 /-! # Generalized arithmetic progressions (proper and non-proper)
 

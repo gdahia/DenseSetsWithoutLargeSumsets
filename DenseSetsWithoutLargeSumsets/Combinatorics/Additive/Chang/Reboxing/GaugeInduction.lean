@@ -3,7 +3,7 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Reboxing.GaugeBox
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.GaugeBox
 
 /-! # Shortest-direction induction for adapted lattice boxes
 

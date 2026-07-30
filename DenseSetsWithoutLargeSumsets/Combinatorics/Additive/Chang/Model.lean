@@ -3,8 +3,8 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Lattice
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Lattice
 
 /-! # The full-rank Freiman model of a 2-proper GAP's subset
 

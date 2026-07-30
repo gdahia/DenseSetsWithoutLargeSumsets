@@ -7,7 +7,7 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.SpecialFunctions.Log.Monotone
 import Mathlib.Analysis.SpecialFunctions.Stirling
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanIsomorphismClasses
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanIsomorphismClasses
 import DenseSetsWithoutLargeSumsets.Common
 
 /-!

@@ -10,7 +10,7 @@ import Mathlib.GroupTheory.Index
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.GapToolkit
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
 
 /-! # Geometry of numbers for the relation lattice of a progression
 

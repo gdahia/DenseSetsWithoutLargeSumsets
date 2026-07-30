@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import Mathlib.Analysis.Complex.ExponentialBounds
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Container
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Transport
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Container
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Transport
 
 /-! # Chang's theorem
 

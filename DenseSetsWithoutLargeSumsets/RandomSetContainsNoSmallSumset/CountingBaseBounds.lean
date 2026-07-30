@@ -3,15 +3,15 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.LargeSubsetsGAP
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Reduction
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.NumberTheory.Bertrand
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.LargeSubsetsGAP
+import DenseSetsWithoutLargeSumsets.Probability
+import DenseSetsWithoutLargeSumsets.Common
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
 
 /-!
 Bookkeeping constants for counting proper GAPs and BLT pairs.

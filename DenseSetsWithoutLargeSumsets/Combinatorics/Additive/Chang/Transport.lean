@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import Mathlib.Data.Pi.Interval
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Model
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Properization
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Reboxing.EffectiveLattice
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Model
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.EffectiveLattice
 
 /-! # The coordinate-and-lattice transport of Appendix A
 

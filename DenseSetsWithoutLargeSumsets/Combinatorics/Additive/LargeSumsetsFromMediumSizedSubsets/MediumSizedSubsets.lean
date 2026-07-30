@@ -3,10 +3,10 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.LargeSumsetsFromMediumSizedSubsets.Constants
-import DenseSetsWithoutLargeSumsets.LargeSumsetsFromMediumSizedSubsets.Potential
-import DenseSetsWithoutLargeSumsets.LargeSumsetsFromMediumSizedSubsets.Sampling
 import Mathlib.Analysis.Real.Sqrt
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Constants
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Potential
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Sampling
 
 /-!
 # Large sumsets from medium-sized subsets

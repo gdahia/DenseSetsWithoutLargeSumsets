@@ -9,11 +9,11 @@ import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Data.ZMod.Basic
 import Mathlib.LinearAlgebra.FreeModule.PID
 import Mathlib.LinearAlgebra.LinearIndependent.BaseChange
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Reboxing.GaugeInduction
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.BoxLatticePoints
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.GapToolkit
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.GeometryOfNumbers
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Lattice
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.GaugeInduction
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.BoxLatticePoints
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GeometryOfNumbers
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Lattice
 
 /-! # Properization of generalized arithmetic progressions
 

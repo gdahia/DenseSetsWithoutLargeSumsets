@@ -6,8 +6,8 @@ Authors: Gabriel Dahia
 import Mathlib.Tactic.SetNotationForOrder
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.Data.Nat.Choose.Cast
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.FreimanDimension
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.SumOfSetsInSeveralDimensions
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumOfSetsInSeveralDimensions
 
 /-!
 # Sumset bounds from Freiman dimension
