@@ -9,27 +9,28 @@ summands are sufficiently large. The formalization includes the probabilistic co
 the estimates for small, moderate, and very large sumsets which are combined in the final
 theorem `DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets`.
 
-## Axioms
+## Axioms and dependencies
 
-The development is built on Mathlib, except for two external additive-combinatorics inputs which
-are currently stated axiomatically in `DenseSetsWithoutLargeSumsets/ExtraAxioms.lean`:
+The development is built on Mathlib and the [`APAP` project](https://yaeldillies.github.io/apap/)
+for additive combinatorics / discrete Fourier analysis machinery.
+
+A single mathematical input is assumed rather than proved:
 
 - Theorem 2 of Bollobás, Leader, and Tiba's
   [*Large sumsets from medium-sized subsets*](https://arxiv.org/abs/2206.09366), in a finite
   uniform-expectation form. Its unspecified constant is represented by
   `originalBltConstant`, and the theorem by `exists_blt_sample`.
-- The proper-generalized-arithmetic-progression consequence of Mei-Chu Chang's
-  [*A polynomial bound in Freiman's theorem*](https://doi.org/10.1215/S0012-7094-02-11331-3).
-  Its absolute positive constant is represented by `changConstant`, with assumptions
-  `changConstant_pos` and `exists_properGAP_of_small_sumset`.
 
-All other ingredients used by the main theorem are proved in Lean from these assumptions and
-Mathlib.
+Everything else used by the main theorem is proved in Lean from that input, Mathlib, and APAP;
+`#print axioms DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets` lists
+`exists_blt_sample` and Lean's own three axioms.
 
 ## Other formalized results
 
 The repository also develops a substantial amount of reusable additive combinatorics, including:
 
+- A weak version of proper-generalized-arithmetic-progression consequence of Mei-Chu Chang's
+  [*A polynomial bound in Freiman's theorem*](https://doi.org/10.1215/S0012-7094-02-11331-3).
 - Sections 3 and 4 of Ben Green's
   [*Counting sets with small sumset, and the clique number of random Cayley graphs*](https://arxiv.org/abs/math/0304183):
   Freiman-relation systems and isomorphism classes, restricted sumsets, core decompositions,

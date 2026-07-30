@@ -11,8 +11,14 @@ weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 
 [[require]]
+name = "APAP"
+git = "https://github.com/YaelDillies/apap.git"
+rev = "c1d84416f68bb14a4ada9b79f284a0478c6f0bf5"
+
+[[require]]
 name = "mathlib"
-scope = "leanprover-community"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "24fff1c8867e78ff5160257c95219b399508236d"
 
 [[lean_lib]]
 name = "DenseSetsWithoutLargeSumsets"

@@ -5,7 +5,6 @@ Authors: Gabriel Dahia
 -/
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset
 import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
-import DenseSetsWithoutLargeSumsets.ExtraAxioms
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.SmallSumsetIsomorphismClasses
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.SpecialFunctions.Log.Monotone

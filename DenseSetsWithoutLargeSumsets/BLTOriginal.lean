@@ -5,16 +5,17 @@ Authors: Gabriel Dahia
 -/
 import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Algebra.Order.BigOperators.Expect
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Data.Set.Card
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Basic
-import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
+import Mathlib.Data.Real.Basic
 
-/-!
-The additional mathematical assumptions used by the formalization.
+/-! # The original Bollobás--Leader--Tiba theorem
 
-This file is deliberately self-contained apart from Mathlib and the project's definitions of
-`freimanDim` and `ProperGAP`.
+Theorem 2 of Bollobás, Leader, and Tiba's *Large sumsets from medium-sized subsets*, in a finite
+uniform-expectation form. This is the only mathematical input of the formalization that is assumed
+rather than proved, and this file is the only one that introduces an axiom; everything else is
+derived from it, from Mathlib, and from APAP. The symmetric square-root corollary actually consumed
+downstream is proved from it in `DenseSetsWithoutLargeSumsets.BLTMedium`.
+
+This file is deliberately self-contained apart from Mathlib.
 -/
 
 namespace DenseSetsWithoutLargeSumsets
@@ -47,18 +48,6 @@ axiom exists_blt_sample {G : Type*} [DecidableEq G] [AddCommGroup G] {σ ε : �
           (σ * (B₀.card : ℝ)) <
         𝔼 ab : (Fin c₁ → ↑A₀) × (Fin c₂ → ↑B₀),
           ((bltSample A₀ ab.1 + bltSample B₀ ab.2).card : ℝ)
-
-opaque changConstant : ℝ
-
-axiom changConstant_pos : 0 < changConstant
-
-axiom exists_properGAP_of_small_sumset
-    {q : ℕ} {κ : ℝ} (X : Finset (ZMod q)) (hq : Nat.Prime q) (hκ : 2 ≤ κ)
-    (hXX : (X + X).card ≤ κ * X.card)
-    (hX_lower : changConstant * κ ^ 3 * (Real.log κ) ^ 2 < X.card)
-    (hX_upper : X.card < Real.exp (-changConstant * κ ^ 4 * (Real.log κ) ^ 2) * q) :
-    ∃ P : ProperGAP (ZMod q), X ⊆ P ∧ P.dim ≤ freimanDim X ∧
-      P.carrier.card ≤ Real.exp (changConstant * κ ^ 4 * (Real.log κ) ^ 2) * X.card
 
 end
 

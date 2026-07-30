@@ -8,6 +8,7 @@ import DenseSetsWithoutLargeSumsets.Probability
 import DenseSetsWithoutLargeSumsets.Common
 import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.GeneralizedArithmeticProgression
 import DenseSetsWithoutLargeSumsets.BLTMedium
+import DenseSetsWithoutLargeSumsets.AdditiveCombinatorics.Chang.Reduction
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.NumberTheory.Bertrand
 
@@ -22,8 +23,7 @@ open scoped Pointwise
 
 noncomputable section
 
-def changCarrierBound (k : ℕ) (κ : ℝ) : ℝ := Real.exp (changConstant * (κ ^ 4) * (Real.log κ) ^
-  2) * k
+def changCarrierBound (k : ℕ) (κ : ℝ) : ℝ := Real.exp (changTheoremExponent κ) * k
 
 lemma exists_zmod_model (n : ℕ) (hn : 0 < n) : ∃ q : ℕ, Nat.Prime q ∧ 2 * n ≤ q ∧ q ≤ 4 * n ∧
     ∃ ψ : ℕ → ZMod q, IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ := by
@@ -61,7 +61,7 @@ def ε (γ : ℝ) : ℝ := γ / (4 * (γ + 2))
 
 def κ (C : ℝ) : ℝ := 6 * C ^ (2 : ℕ)
 
-def changExponent (C : ℝ) : ℝ := changConstant * κ C ^ (4 : ℕ) * Real.log (κ C) ^ (2 : ℕ)
+def changExponent (C : ℝ) : ℝ := changTheoremExponent (κ C)
 
 def lowerBltConstant (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
   bltConstant (2 * C) (ε γ) hC hε
@@ -104,7 +104,7 @@ private lemma one_le_lowerConstant {C γ : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε �
 
 private lemma lowerConstant_eq (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) :
     lowerConstant C γ hC hε =
-      max (Real.exp (changConstant * κ C ^ (4 : ℕ) * Real.log (κ C) ^ (2 : ℕ)))
+      max (Real.exp (changTheoremExponent (κ C)))
         (4 * lowerBltConstant C γ hC hε) := by
   simp [lowerConstant, changExponent]
 
@@ -158,7 +158,7 @@ def lowerAnalyticThreshold (C γ : ℝ) : ℝ :=
 
 def lowerDensityExponent (C γ : ℝ) : ℝ := min
     ((2 + γ) * ε γ / (12 * C ^ (2 : ℕ)))
-    ((2 + γ) / (2 * changConstant * κ C ^ (3 : ℕ) * Real.log (κ C) ^ (2 : ℕ))) / 2
+    ((2 + γ) / (2 * Real.exp (changContainerExponent (κ C)))) / 2
 
 lemma ε_pos {γ : ℝ} (hγ : 0 < γ) : 0 < ε γ := by
   unfold ε
@@ -855,16 +855,9 @@ private lemma two_le_κ_of_one_le {C : ℝ} (hC : 1 ≤ C) : 2 ≤ κ C := by
 private lemma one_lt_κ_of_one_le {C : ℝ} (hC : 1 ≤ C) : 1 < κ C := by
   exact (by norm_num : (1 : ℝ) < 6).trans_le (κ_ge_six_of_one_le hC)
 
-private lemma chang_size_threshold_pos {C : ℝ} (hC : 1 ≤ C) :
-    0 < changConstant * κ C ^ (3 : ℕ) * Real.log (κ C) ^ (2 : ℕ) := by
-  apply mul_pos
-  · apply mul_pos
-    · exact changConstant_pos
-    · apply pow_pos
-      exact zero_lt_one.trans (one_lt_κ_of_one_le hC)
-  · apply sq_pos_of_pos
-    apply Real.log_pos
-    exact one_lt_κ_of_one_le hC
+private lemma chang_size_threshold_pos (C : ℝ) :
+    0 < Real.exp (changContainerExponent (κ C)) :=
+  Real.exp_pos _
 
 private lemma lowerDensityExponent_pos_of_one_le {C γ : ℝ} (hγ : 0 < γ) (hC : 1 ≤ C) :
     0 < lowerDensityExponent C γ := by
@@ -881,7 +874,7 @@ private lemma lowerDensityExponent_pos_of_one_le {C γ : ℝ} (hγ : 0 < γ) (hC
           exact zero_lt_one.trans_le hC
     · apply _root_.div_pos
       · linarith
-      · nlinarith [chang_size_threshold_pos hC]
+      · positivity
   · norm_num
 
 private lemma lowerDensityExponent_le_first_component_half (C γ : ℝ) :
@@ -893,8 +886,7 @@ private lemma lowerDensityExponent_le_first_component_half (C γ : ℝ) :
 
 private lemma lowerDensityExponent_le_second_component_half (C γ : ℝ) :
     lowerDensityExponent C γ ≤
-      ((2 + γ) / (2 * changConstant * κ C ^ (3 : ℕ) *
-        Real.log (κ C) ^ (2 : ℕ))) / 2 := by
+      ((2 + γ) / (2 * Real.exp (changContainerExponent (κ C)))) / 2 := by
   unfold lowerDensityExponent
   apply div_le_div_of_nonneg_right
   · apply min_le_right
@@ -1065,43 +1057,31 @@ private lemma pairCardThreshold_gt_of_mul_lowerDensityExponent_lt {γ C R : ℝ}
       · exact hδ_lower
 
 private lemma two_mul_chang_size_threshold_mul_lowerDensityExponent_lt {γ C : ℝ}
-    (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) :
-    (2 * (changConstant * κ C ^ (3 : ℕ) * Real.log (κ C) ^ (2 : ℕ))) * lowerDensityExponent C γ <
+    (hγ_pos : 0 < γ) :
+    (2 * (Real.exp (changContainerExponent (κ C)))) * lowerDensityExponent C γ <
       3 + γ := by
-  refine lt_of_le_of_lt (b := (2 + γ) / 2) ?_ ?_
-  · refine le_trans (b :=
-      (2 * (changConstant * κ C ^ (3 : ℕ) * Real.log (κ C) ^ (2 : ℕ))) *
-        ((2 + γ) /
-          (4 * (changConstant * κ C ^ (3 : ℕ) * Real.log (κ C) ^ (2 : ℕ))))) ?_ ?_
-    · apply mul_le_mul_of_nonneg_left
-      · refine (lowerDensityExponent_le_second_component_half C γ).trans_eq ?_
-        ring
-      · apply mul_nonneg
-        · norm_num
-        · exact (chang_size_threshold_pos hC_one).le
-    · field_simp [(chang_size_threshold_pos hC_one).ne', changConstant_pos.ne',
-        (ne_of_gt (zero_lt_one.trans (one_lt_κ_of_one_le hC_one))),
-        (ne_of_gt (Real.log_pos (one_lt_κ_of_one_le hC_one)))]
-      ring_nf
-      exact le_refl (4 : ℝ)
-  · nlinarith
+  have hT : (0 : ℝ) < Real.exp (changContainerExponent (κ C)) := chang_size_threshold_pos C
+  refine lt_of_le_of_lt (mul_le_mul_of_nonneg_left
+    (lowerDensityExponent_le_second_component_half C γ) (by positivity)) ?_
+  rw [div_div, ← mul_div_assoc, div_lt_iff₀ (by positivity)]
+  nlinarith
 
 private lemma two_mul_chang_size_threshold_lt_pairCardThreshold {γ C : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    2 * (changConstant * κ C ^ (3 : ℕ) * Real.log (κ C) ^ (2 : ℕ)) <
+    2 * (Real.exp (changContainerExponent (κ C))) <
       (pairCardThreshold (3 + γ) n δ : ℝ) := by
   apply pairCardThreshold_gt_of_mul_lowerDensityExponent_lt
   · apply mul_pos
     · norm_num
-    · exact chang_size_threshold_pos hC_one
+    · exact chang_size_threshold_pos C
   · exact hγ_pos
   · exact hC_one
   · exact hn_one
   · exact hδ_lower
   · exact hδ_upper
-  · exact two_mul_chang_size_threshold_mul_lowerDensityExponent_lt hγ_pos hC_one
+  · exact two_mul_chang_size_threshold_mul_lowerDensityExponent_lt hγ_pos
 
 private lemma fourteen_mul_sq_div_ε_mul_lowerDensityExponent_lt {γ C : ℝ}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) :
@@ -1548,7 +1528,7 @@ private lemma image_union_card_lt_chang_exp_mul_q {γ C c : ℝ} {n q : ℕ}
     (hBcard : B.card = pairCardThreshold (3 + γ) n δ)
     (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
     ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) <
-      Real.exp (-changConstant * κ C ^ (4 : ℕ) * Real.log (κ C) ^ (2 : ℕ)) * q := by
+      Real.exp (-changTheoremExponent (κ C)) * q := by
   simpa [changExponent, neg_mul, mul_assoc] using
     image_union_card_lt_exp_neg_mul_q hγ_pos hc_pos hc_lt hn hq_lower hδ_lower hδ_upper hψ
       hAint hBint hAcard hBcard hA₀A hB₀B
@@ -1581,7 +1561,7 @@ private lemma chang_threshold_lt_image_union_card {γ C : ℝ} {n q : ℕ}
     (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
     (hAint : A ⊆ interval n) (hA₀A : A₀ ⊆ A)
     (hA₀large : (1 - ε γ) * (pairCardThreshold (3 + γ) n δ : ℝ) ≤ (A₀.card : ℝ)) :
-    changConstant * κ C ^ (3 : ℕ) * Real.log (κ C) ^ (2 : ℕ) <
+    Real.exp (changContainerExponent (κ C)) <
       ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) := by
   nlinarith [two_mul_chang_size_threshold_lt_pairCardThreshold hγ_pos hC_one
     (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper,
@@ -1926,24 +1906,23 @@ private lemma changCarrierBound_ceil_succ_le_three_mul_lowerConstant {γ C : ℝ
       3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
   simp [changCarrierBound]
   nlinarith [Nat.ceil_lt_add_one
-    (a := Real.exp (changConstant * κ C ^ (4 : ℕ) * Real.log (κ C) ^ (2 : ℕ)) *
+    (a := Real.exp (changTheoremExponent (κ C)) *
       (2 * (pairCardThreshold (3 + γ) n δ : ℝ)))
     (mul_nonneg (Real.exp_pos _).le (by positivity :
       0 ≤ 2 * (pairCardThreshold (3 + γ) n δ : ℝ))),
-    le_max_left (Real.exp (changConstant * κ C ^ (4 : ℕ) * Real.log (κ C) ^ (2 : ℕ)))
+    le_max_left (Real.exp (changTheoremExponent (κ C)))
       (4 * lowerBltConstant C γ hC_two hε),
     mul_le_mul_of_nonneg_right
-      (le_max_left (Real.exp (changConstant * κ C ^ (4 : ℕ) * Real.log (κ C) ^ (2 : ℕ)))
+      (le_max_left (Real.exp (changTheoremExponent (κ C)))
         (4 * lowerBltConstant C γ hC_two hε))
       (by positivity : 0 ≤ 2 * (pairCardThreshold (3 + γ) n δ : ℝ)),
     (by
       rw [lowerConstant_eq C γ hC_two hε]
       exact (mul_le_mul_of_nonneg_right
-        (le_max_left (Real.exp (changConstant * κ C ^ (4 : ℕ) *
-          Real.log (κ C) ^ (2 : ℕ)))
+        (le_max_left (Real.exp (changTheoremExponent (κ C)))
           (4 * lowerBltConstant C γ hC_two hε))
         (by positivity : 0 ≤ 2 * (pairCardThreshold (3 + γ) n δ : ℝ))).trans_eq (by ring) :
-      Real.exp (changConstant * κ C ^ (4 : ℕ) * Real.log (κ C) ^ (2 : ℕ)) *
+      Real.exp (changTheoremExponent (κ C)) *
           (2 * (pairCardThreshold (3 + γ) n δ : ℝ)) ≤
         2 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)),
     one_le_lowerConstant hC_two hε,
