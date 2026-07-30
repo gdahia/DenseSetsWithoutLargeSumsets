@@ -25,11 +25,10 @@ This wraps mathlib's `ProbabilityTheory.setBernoulli`, whose samples are sets, a
 finite sampled set to the corresponding finset.
 -/
 noncomputable def binomialFinsetSubset {α : Type*} (Ω : Set α) (p : unitInterval) :
-    Measure (Finset α) :=
-  by
-    classical
-    exact (ProbabilityTheory.setBernoulli Ω p).map fun S =>
-      if hS : S.Finite then hS.toFinset else ∅
+    Measure (Finset α) := by
+  classical
+  exact (ProbabilityTheory.setBernoulli Ω p).map fun S =>
+    if hS : S.Finite then hS.toFinset else ∅
 
 instance instIsFiniteMeasureBinomialFinsetSubset {α : Type*} (Ω : Set α) (p : unitInterval) :
     IsFiniteMeasure (binomialFinsetSubset Ω p) := by

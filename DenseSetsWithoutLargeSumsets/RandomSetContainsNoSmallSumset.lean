@@ -18,7 +18,7 @@ Probability estimates showing that a random set contains no small sumset.
 
 namespace DenseSetsWithoutLargeSumsets
 
-open Filter Nat
+open Nat hiding div_pos
 open scoped Pointwise
 
 noncomputable section
@@ -817,7 +817,7 @@ private lemma pairCardThreshold_pos_of_density {τ : ℝ} {n : ℕ} {δ : unitIn
     (hτ : 0 < τ) (hδ : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) (hn : 1 < n) :
     0 < pairCardThreshold τ n δ := by
   rw [pairCardThreshold, Nat.ceil_pos]
-  apply _root_.div_pos
+  apply div_pos
   · apply mul_pos
     · exact hτ
     · apply Real.log_pos
@@ -862,9 +862,9 @@ private lemma chang_size_threshold_pos (C : ℝ) :
 private lemma lowerDensityExponent_pos_of_one_le {C γ : ℝ} (hγ : 0 < γ) (hC : 1 ≤ C) :
     0 < lowerDensityExponent C γ := by
   unfold lowerDensityExponent
-  apply _root_.div_pos
+  apply div_pos
   · apply lt_min
-    · apply _root_.div_pos
+    · apply div_pos
       · apply mul_pos
         · linarith
         · exact ε_pos hγ
@@ -872,7 +872,7 @@ private lemma lowerDensityExponent_pos_of_one_le {C γ : ℝ} (hγ : 0 < γ) (hC
         · norm_num
         · apply sq_pos_of_pos
           exact zero_lt_one.trans_le hC
-    · apply _root_.div_pos
+    · apply div_pos
       · linarith
       · positivity
   · norm_num
@@ -966,7 +966,7 @@ private lemma log_one_div_unitInterval_lt_lowerDensityExponent_mul_log {γ C : �
     (hn_pos : 0 < n) (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) :
     Real.log (1 / δ) < lowerDensityExponent C γ * Real.log (n : ℝ) := by
   refine (Real.log_lt_log (by
-    apply _root_.div_pos
+    apply div_pos
     · norm_num
     · exact (Real.rpow_pos_of_pos (by exact_mod_cast hn_pos : 0 < (n : ℝ)) _).trans hδ_lower)
     (one_div_unitInterval_lt_rpow_lowerDensityExponent hn_pos hδ_lower)).trans_eq ?_
@@ -1109,7 +1109,7 @@ private lemma fourteen_mul_sq_lt_ε_mul_pairCardThreshold {γ C : ℝ} {n : ℕ}
   rw [mul_comm (ε γ) ((pairCardThreshold (3 + γ) n δ : ℕ) : ℝ)]
   rw [← div_lt_iff₀ (ε_pos hγ_pos)]
   apply pairCardThreshold_gt_of_mul_lowerDensityExponent_lt
-  · apply _root_.div_pos
+  · apply div_pos
     · apply mul_pos
       · norm_num
       · apply pow_pos
