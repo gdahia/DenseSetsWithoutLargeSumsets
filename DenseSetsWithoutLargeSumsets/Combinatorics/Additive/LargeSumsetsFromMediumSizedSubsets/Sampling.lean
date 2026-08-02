@@ -51,7 +51,7 @@ lemma bltSample_subset (A : Finset G) {k : ℕ} (f : Fin k → ↥A) : bltSample
   exact (f i).2
 
 lemma card_bltSample_le (A : Finset G) {k : ℕ} (f : Fin k → ↥A) : #(bltSample A f) ≤ k := by
-  refine card_image_le.trans ?_
+  apply card_image_le.trans
   simp
 
 namespace Sampling
@@ -227,17 +227,24 @@ lemma mem_reprs {X Y : Finset G} {s : G} {p : G × G} :
 lemma repr_ne_of_ne {X Y : Finset G} {s : G} {p q : G × G} (hp : p ∈ reprs X Y s)
     (hq : q ∈ reprs X Y s) (hpq : p ≠ q) : p.1 ≠ q.1 ∧ p.2 ≠ q.2 := by
   rw [mem_reprs] at hp hq
-  refine ⟨fun h => hpq (Prod.ext h ?_), fun h => hpq (Prod.ext ?_ h)⟩
-  · rw [← hq.2.2, ← h] at hp
+  constructor
+  · intro h
+    refine hpq (Prod.ext h ?_)
+    rw [← hq.2.2, ← h] at hp
     exact add_left_cancel hp.2.2
-  · rw [← hq.2.2, ← h] at hp
+  · intro h
+    refine hpq (Prod.ext ?_ h)
+    rw [← hq.2.2, ← h] at hp
     exact add_right_cancel hp.2.2
 
 /-- The representations of `s` inject into `X`, hence there are at most `#X` of them. -/
 lemma reprCount_le_left (X Y : Finset G) (s : G) : reprCount X Y s ≤ #X := by
-  refine card_le_card_of_injOn Prod.fst (fun p hp => (mem_reprs.1 hp).1) fun p hp q hq h => ?_
-  by_contra hpq
-  exact (repr_ne_of_ne hp hq hpq).1 h
+  apply card_le_card_of_injOn Prod.fst
+  · intro _ hp
+    exact (mem_reprs.1 hp).1
+  · intro p hp q hq h
+    by_contra hpq
+    exact (repr_ne_of_ne hp hq hpq).1 h
 
 /-- The representations of `s` inject into `Y`, hence there are at most `#Y` of them. -/
 lemma reprCount_le_right (X Y : Finset G) (s : G) : reprCount X Y s ≤ #Y := by
@@ -248,15 +255,22 @@ lemma reprCount_le_right (X Y : Finset G) (s : G) : reprCount X Y s ≤ #Y := by
 /-- Summing the representation function over a set of sums counts the pairs with sum there. -/
 lemma sum_reprCount (X Y T : Finset G) :
     ∑ s ∈ T, reprCount X Y s = #((X ×ˢ Y).filter fun p => p.1 + p.2 ∈ T) := by
-  refine Eq.trans (sum_congr rfl fun s hs => ?_)
+  refine Eq.trans (sum_congr rfl ?_)
     (card_eq_sum_card_fiberwise (f := fun p : G × G => p.1 + p.2)
       (s := (X ×ˢ Y).filter fun p => p.1 + p.2 ∈ T) (t := T)
       fun p hp => (mem_filter.1 hp).2).symm
+  intro s hs
   unfold reprCount reprs
   congr 1
   ext p
   simp only [mem_filter, mem_product, and_assoc]
-  exact ⟨fun h => ⟨h.1, h.2.1, by rw [h.2.2]; exact hs, h.2.2⟩, fun h => ⟨h.1, h.2.1, h.2.2.2⟩⟩
+  constructor
+  · intro h
+    refine ⟨h.1, h.2.1, ?_, h.2.2⟩
+    rw [h.2.2]
+    exact hs
+  · intro h
+    exact ⟨h.1, h.2.1, h.2.2.2⟩
 
 /-! ### The probability that a sum is seen -/
 
@@ -267,7 +281,8 @@ noncomputable def hitProb (X Y : Finset G) (k₁ k₂ : ℕ) (s : G) : ℝ :=
 
 lemma hitProb_nonneg (X Y : Finset G) (k₁ k₂ : ℕ) (s : G) : 0 ≤ hitProb X Y k₁ k₂ s := by
   rw [hitProb, Fintype.expect_eq_sum_div_card]
-  refine div_nonneg (sum_nonneg fun ω _ => ?_) (Nat.cast_nonneg _)
+  refine div_nonneg (sum_nonneg ?_) (Nat.cast_nonneg _)
+  intros ω
   split_ifs <;> norm_num
 
 /-- The expected size of the sumset of the two samples. -/
@@ -357,7 +372,7 @@ private lemma sum_sq_sampledReprs :
           (if q.2 ∈ bltSample Y ω.2 then (1 : ℝ) else 0)) := by
     intro ω
     rw [sq, sampledReprs, Finset.sum_mul_sum]
-    exact sum_congr rfl fun p _ => sum_congr rfl fun q _ => by ring
+    apply sum_congr rfl fun p _ => sum_congr rfl fun q _ => by ring
   simp only [hexp]
   rw [Finset.sum_comm]
   refine sum_congr rfl fun p _ => ?_
