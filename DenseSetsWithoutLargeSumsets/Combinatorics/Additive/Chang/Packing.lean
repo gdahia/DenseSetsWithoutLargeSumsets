@@ -63,25 +63,6 @@ lemma add_nsmul_mem_consGenerator (P : GAP G) (originShift step : G)
   rw [hcoeff]
   abel
 
-/-- Add a symmetric coefficient `-a, 0, a` to a GAP. -/
-def consSymmetric (P : GAP G) (a : G) : GAP G :=
-  P.consGenerator (-a) a 3 (by omega)
-
-lemma sub_mem_consSymmetric (P : GAP G) (a : G) {x : G} (hx : x ∈ P.carrier) :
-    x - a ∈ (P.consSymmetric a).carrier := by
-  simpa [consSymmetric, sub_eq_add_neg] using
-    P.add_nsmul_mem_consGenerator (-a) a 3 (by omega) hx 0 (by omega)
-
-lemma mem_consSymmetric (P : GAP G) (a : G) {x : G} (hx : x ∈ P.carrier) :
-    x ∈ (P.consSymmetric a).carrier := by
-  simpa [consSymmetric, one_nsmul] using
-    P.add_nsmul_mem_consGenerator (-a) a 3 (by omega) hx 1 (by omega)
-
-lemma add_mem_consSymmetric (P : GAP G) (a : G) {x : G} (hx : x ∈ P.carrier) :
-    x + a ∈ (P.consSymmetric a).carrier := by
-  simpa [consSymmetric, two_nsmul] using
-    P.add_nsmul_mem_consGenerator (-a) a 3 (by omega) hx 2 (by omega)
-
 /-- Add a binary coefficient `0, a` to a GAP. -/
 def consBinary (P : GAP G) (a : G) : GAP G :=
   P.consGenerator 0 a 2 (by omega)
@@ -160,68 +141,15 @@ lemma sub_carrier_subset_differenceHull (P : GAP G) :
 
 lemma differenceHull_dim (P : GAP G) : P.differenceHull.dim = P.dim := rfl
 
-lemma differenceHull_length (P : GAP G) :
-    P.differenceHull.length = fun i ↦ 2 * P.length i := rfl
-
-lemma card_differenceHull_le (P : GAP G) (hP : P.Proper) :
-    P.differenceHull.carrier.card ≤ 2 ^ P.dim * P.carrier.card := by
-  refine P.differenceHull.card_le_prod_length.trans ?_
-  change (∏ i : Fin P.dim, 2 * P.length i) ≤
-    2 ^ P.dim * P.carrier.card
-  rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ,
-    Fintype.card_fin, P.card_eq_prod_length hP]
-
-/-- Repeatedly add symmetric ternary generators. -/
-def consSymmetricList (P : GAP G) : List G → GAP G
-  | [] => P
-  | a :: l => (P.consSymmetricList l).consSymmetric a
-
 /-- Repeatedly add binary generators. -/
 def consBinaryList (P : GAP G) : List G → GAP G
   | [] => P
   | a :: l => (P.consBinaryList l).consBinary a
 
-/-- All sums with coefficients in `{-1,0,1}` along a list. -/
-def signedListSum : List G → Finset G
-  | [] => {0}
-  | a :: l => ({-a, 0, a} : Finset G) + signedListSum l
-
 /-- All subset sums along a list. -/
 def binaryListSum : List G → Finset G
   | [] => {0}
   | a :: l => ({0, a} : Finset G) + binaryListSum l
-
-lemma add_signedListSum_subset_consSymmetricList (P : GAP G) (l : List G) :
-    P.carrier + signedListSum l ⊆ (P.consSymmetricList l).carrier := by
-  induction l with
-  | nil =>
-      intro z hz
-      rw [signedListSum, Finset.mem_add] at hz
-      obtain ⟨x, hx, y, hy, rfl⟩ := hz
-      rw [Finset.mem_singleton] at hy
-      simpa [consSymmetricList, hy] using hx
-  | cons a l ih =>
-      intro z hz
-      rw [Finset.mem_add] at hz
-      obtain ⟨x, hx, y, hy, rfl⟩ := hz
-      rw [signedListSum, Finset.mem_add] at hy
-      obtain ⟨e, he, s, hs, rfl⟩ := hy
-      simp only [Finset.mem_insert, Finset.mem_singleton] at he
-      rcases he with he | he | he
-      · have hxs : x + s ∈ (P.consSymmetricList l).carrier :=
-          ih (Finset.mem_add.mpr ⟨x, hx, s, hs, rfl⟩)
-        subst e
-        simpa [consSymmetricList, sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using
-          (P.consSymmetricList l).sub_mem_consSymmetric a hxs
-      · subst e
-        simpa [consSymmetricList] using
-          (P.consSymmetricList l).mem_consSymmetric a
-            (ih (Finset.mem_add.mpr ⟨x, hx, s, hs, rfl⟩))
-      · have hxs : x + s ∈ (P.consSymmetricList l).carrier :=
-          ih (Finset.mem_add.mpr ⟨x, hx, s, hs, rfl⟩)
-        subst e
-        simpa [consSymmetricList, add_assoc, add_comm, add_left_comm] using
-          (P.consSymmetricList l).add_mem_consSymmetric a hxs
 
 lemma add_binaryListSum_subset_consBinaryList (P : GAP G) (l : List G) :
     P.carrier + binaryListSum l ⊆ (P.consBinaryList l).carrier := by
@@ -267,15 +195,6 @@ lemma boxVolume_consGenerator (P : GAP G) (originShift step : G)
   rw [boxVolume, boxVolume, consGenerator, Fin.prod_univ_succ]
   rfl
 
-lemma dim_consSymmetricList (P : GAP G) (l : List G) :
-    (P.consSymmetricList l).dim = P.dim + l.length := by
-  induction l with
-  | nil => rfl
-  | cons a l ih =>
-      rw [consSymmetricList]
-      change (P.consSymmetricList l).dim + 1 = P.dim + (l.length + 1)
-      omega
-
 lemma dim_consBinaryList (P : GAP G) (l : List G) :
     (P.consBinaryList l).dim = P.dim + l.length := by
   induction l with
@@ -285,15 +204,6 @@ lemma dim_consBinaryList (P : GAP G) (l : List G) :
       change (P.consBinaryList l).dim + 1 = P.dim + (l.length + 1)
       omega
 
-lemma boxVolume_consSymmetricList (P : GAP G) (l : List G) :
-    (P.consSymmetricList l).boxVolume = 3 ^ l.length * P.boxVolume := by
-  induction l with
-  | nil => simp [consSymmetricList]
-  | cons a l ih =>
-      rw [consSymmetricList, consSymmetric, boxVolume_consGenerator, ih,
-        List.length_cons, pow_succ]
-      ring
-
 lemma boxVolume_consBinaryList (P : GAP G) (l : List G) :
     (P.consBinaryList l).boxVolume = 2 ^ l.length * P.boxVolume := by
   induction l with
@@ -302,11 +212,6 @@ lemma boxVolume_consBinaryList (P : GAP G) (l : List G) :
       rw [consBinaryList, consBinary, boxVolume_consGenerator, ih,
         List.length_cons, pow_succ]
       ring
-
-lemma card_consSymmetricList_le (P : GAP G) (l : List G) :
-    (P.consSymmetricList l).carrier.card ≤ 3 ^ l.length * P.boxVolume := by
-  rw [← P.boxVolume_consSymmetricList l, boxVolume]
-  exact (P.consSymmetricList l).card_le_prod_length
 
 lemma card_consBinaryList_le (P : GAP G) (l : List G) :
     (P.consBinaryList l).carrier.card ≤ 2 ^ l.length * P.boxVolume := by

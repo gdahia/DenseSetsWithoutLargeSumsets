@@ -31,18 +31,6 @@ def pairSumsetsFamily (n k m : ℕ) : Set (Finset ℕ) :=
 def moderateSumsetAuxExponent : ℝ :=
   1 / (2 : ℝ) ^ (8 : ℕ)
 
-/-- The constant multiplying `k` at the lower edge of the moderate-sumset range. -/
-def moderateSumsetLinearConstant (γ : ℝ) : ℝ :=
-  (2 : ℝ) ^ (14 : ℕ) * γ⁻¹ ^ (2 : ℕ)
-
-/--
-The explicit logarithmic threshold from the moderate-sumset estimate.
--/
-def moderateSumsetLogThreshold (γ : ℝ) : ℝ :=
-  max (((4 : ℝ) / moderateSumsetAuxExponent) ^ ((4 : ℝ) / moderateSumsetAuxExponent))
-    ((((96 : ℝ) * (16 : ℝ) ^ (1 - moderateSumsetAuxExponent)) / γ) ^
-      ((2 : ℝ) / moderateSumsetAuxExponent))
-
 private lemma sum_Icc_sub_eq_choose (k : ℕ) :
     (Finset.Icc 1 (k - 1)).sum (fun t => k - t) = Nat.choose k 2 := by
   classical

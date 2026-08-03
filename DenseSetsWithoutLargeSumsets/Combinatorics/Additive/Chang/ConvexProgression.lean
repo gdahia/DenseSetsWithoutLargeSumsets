@@ -38,23 +38,6 @@ lemma intVectorToReal_injective {d : ℕ} :
   ext i
   simp [intVectorToReal, Pi.add_apply]
 
-@[simp] lemma intVectorToReal_neg {d : ℕ} (a : Fin d → ℤ) :
-    intVectorToReal (-a) = -intVectorToReal a := by
-  ext i
-  simp [intVectorToReal, Pi.neg_apply]
-
-@[simp] lemma intVectorToReal_sub {d : ℕ} (a b : Fin d → ℤ) :
-    intVectorToReal (a - b) = intVectorToReal a - intVectorToReal b := by
-  ext i
-  simp [intVectorToReal, Pi.sub_apply]
-
-/-- The finite lattice points of a symmetric convex body of affine dimension at most `r`. -/
-def IsSymmetricConvexProgression {d r : ℕ} (D : Finset (Fin d → ℤ)) : Prop :=
-  ∃ K : Set (Fin d → ℝ),
-    Convex ℝ K ∧ (∀ x, x ∈ K ↔ -x ∈ K) ∧
-      (∀ v : Fin d → ℤ, v ∈ D ↔ intVectorToReal v ∈ K) ∧
-      finsetAffineDim (D.image intVectorToReal) ≤ r
-
 end
 
 end DenseSetsWithoutLargeSumsets

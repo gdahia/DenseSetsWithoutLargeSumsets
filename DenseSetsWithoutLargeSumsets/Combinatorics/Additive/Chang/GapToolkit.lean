@@ -129,14 +129,6 @@ lemma coordinateMap_bijOn (h : P.Proper) :
   unfold coordinateMap
   rw [P.coefficientsFin_eq_of_proper h hx (w := w) (by simp [x])]
 
-lemma card_box : P.box.card = ∏ i, P.length i := by
-  rw [box, Finset.card_image_of_injective]
-  · simp [Fintype.card_pi]
-  · intro w₁ w₂ h
-    funext i
-    apply Fin.ext
-    simpa using congr_fun h i
-
 /-- Add two coefficient vectors inside the doubled box. -/
 def sumCoefficients (w₁ w₂ : (i : Fin P.dim) → Fin (P.length i)) :
     (i : Fin P.dim) → Fin (2 * P.length i) :=
@@ -341,9 +333,6 @@ variable {G : Type*} [DecidableEq G] [AddCommGroup G]
 /-- The homomorphism `ℤᵈ →+ G` given by the steps of a GAP. -/
 def stepHom (P : GAP G) : (Fin P.dim → ℤ) →+ G := stepsHom P.step
 
-lemma stepHom_apply (P : GAP G) (v : Fin P.dim → ℤ) :
-    stepHom P v = ∑ i, v i • P.step i := rfl
-
 lemma stepHom_coordinateMap (P : GAP G) {x : G} (hx : x ∈ P.carrier) :
     stepHom P (P.coordinateMap x) = x - P.origin := by
   rw [eq_sub_iff_add_eq, add_comm]
@@ -358,12 +347,6 @@ lemma mem_symBox {P : GAP G} {v : Fin P.dim → ℤ} :
     v ∈ symBox P ↔ ∀ i, |v i| < (P.length i : ℤ) := by
   simp only [symBox, Finset.mem_Icc, Pi.le_def, abs_lt, ← forall_and]
   exact forall_congr' fun i ↦ by omega
-
-lemma zero_mem_symBox (P : GAP G) : (0 : Fin P.dim → ℤ) ∈ symBox P := by
-  refine mem_symBox.mpr fun i ↦ ?_
-  have hpos := P.length_pos i
-  simp only [Pi.zero_apply, abs_zero]
-  exact_mod_cast hpos
 
 lemma card_symBox (P : GAP G) :
     (symBox P).card ≤ 2 ^ P.dim * ∏ i, P.length i := by

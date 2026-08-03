@@ -35,8 +35,7 @@ The main pieces are:
   `le_successiveMinimum_one` for the positivity of the first minimum and
   `successiveMinimum_one_le_of_index_lt` for Minkowski's first theorem in that language.
 
-`Chang.Properization` reads all of this through the coefficient box of a progression, as
-`GAP.exists_ne_zero_mem_relations` and `GAP.card_twoBoxRelations_le_of_proper`.
+`Chang.Properization` reads all of this through the coefficient box of a progression.
 
 Minkowski's *second* theorem, `λ₁ ⋯ λ_d vol K ≤ 2 ^ d covol Λ`, is **not** proved here, and it is
 not needed: what properization consumes is the lattice point count `|Λ ∩ B| ≲ ∏ᵢ max (1, C / λᵢ)`,
@@ -86,13 +85,6 @@ lemma card_natBox (m : Fin d → ℕ) : (natBox m).card = ∏ i, (m i + 1) := by
   refine Finset.prod_congr rfl fun i _ ↦ ?_
   rw [Int.card_Icc]
   simp
-
-lemma natBox_subset_intBox (m : Fin d → ℕ) : natBox m ⊆ intBox m := by
-  intro v hv
-  rw [mem_natBox] at hv
-  refine mem_intBox.mpr fun i ↦ ?_
-  rw [abs_of_nonneg (hv i).1]
-  exact (hv i).2
 
 /-- A difference of two points of a box lies in the symmetric box of the same half-widths. -/
 lemma sub_mem_intBox {m : Fin d → ℕ} {v w : Fin d → ℤ} (hv : v ∈ natBox m) (hw : w ∈ natBox m) :

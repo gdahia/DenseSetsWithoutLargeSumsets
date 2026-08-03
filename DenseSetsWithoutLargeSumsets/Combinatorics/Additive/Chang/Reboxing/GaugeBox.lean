@@ -191,18 +191,6 @@ lemma gauge_sum_zsmul_le_card_mul
   refine (Finset.sum_le_sum fun i _ ↦ hterm i).trans_eq ?_
   simp
 
-/-- The same estimate as membership in a dilate of the body. -/
-lemma sum_zsmul_mem_card_mul_smul
-    (hconv : Convex ℝ K) (hclosed : IsClosed K) (hK₀ : K ∈ 𝓝 0)
-    (hbdd : Bornology.IsVonNBounded ℝ K) (hsymm : ∀ x ∈ K, -x ∈ K)
-    (step : Fin s → E) (m : Fin s → ℕ) {A : ℝ} (hA : 0 ≤ A)
-    (hend : ∀ i, (m i : ℝ) * gauge K (step i) ≤ A)
-    {c : Fin s → ℤ} (hc : c ∈ intBox m) :
-    (∑ i, (c i : ℝ) • step i) ∈ (s * A) • K := by
-  refine (mem_smul_iff_gauge_le hconv hclosed hK₀ hbdd
-    (mul_nonneg (Nat.cast_nonneg _) hA) _).mpr ?_
-  exact gauge_sum_zsmul_le_card_mul hconv hK₀ hsymm step m hend hc
-
 lemma GaugeControlledLatticeBox.gauge_sum_le
     {L : AddSubgroup E} {A : ℝ} (B : GaugeControlledLatticeBox L K s A)
     (hconv : Convex ℝ K) (hK₀ : K ∈ 𝓝 0) (hsymm : ∀ x ∈ K, -x ∈ K)
@@ -210,13 +198,6 @@ lemma GaugeControlledLatticeBox.gauge_sum_le
     gauge K (∑ i, (c i : ℝ) • B.step i) ≤ s * A :=
   gauge_sum_zsmul_le_card_mul hconv hK₀ hsymm B.step B.halfWidth
     B.endpoint_gauge hc
-
-lemma GaugeControlledLatticeBox.sum_mem_lattice
-    {L : AddSubgroup E} {A : ℝ} (B : GaugeControlledLatticeBox L K s A)
-    (c : Fin s → ℤ) :
-    ∑ i, (c i : ℝ) • B.step i ∈ L := by
-  simp_rw [Int.cast_smul_eq_zsmul]
-  exact AddSubgroup.sum_mem L fun i _ ↦ L.zsmul_mem (B.step_mem i) (c i)
 
 lemma GaugeControlledLatticeBox.sum_injective
     {L : AddSubgroup E} {A : ℝ} (B : GaugeControlledLatticeBox L K s A) :
@@ -239,20 +220,6 @@ lemma endpoint_gauge_lift_le_two_mul {m : ℕ} {A lam μ ν : ℝ}
     (m : ℝ) * ν ≤ 2 * A := by
   have hm : (0 : ℝ) ≤ m := Nat.cast_nonneg m
   nlinarith
-
-/-- Subtracting a controlled lifted coefficient box from a point of the body leaves a controlled
-multiple of the shortest direction. -/
-lemma gauge_sub_sum_le_one_add_card_mul
-    (hconv : Convex ℝ K) (hK₀ : K ∈ 𝓝 0) (hsymm : ∀ y ∈ K, -y ∈ K)
-    {L : AddSubgroup E} {x : E} (hx : gauge K x ≤ 1) {A : ℝ}
-    (B : GaugeControlledLatticeBox L K s (2 * A))
-    {c : Fin s → ℤ} (hc : c ∈ intBox B.halfWidth) :
-    gauge K (x - ∑ i, (c i : ℝ) • B.step i) ≤ 1 + s * (2 * A) := by
-  rw [sub_eq_add_neg]
-  refine (gauge_add_le hconv (absorbent_nhds_zero hK₀) x
-    (-∑ i, (c i : ℝ) • B.step i)).trans ?_
-  rw [gauge_neg hsymm]
-  exact add_le_add hx (B.gauge_sum_le hconv hK₀ hsymm hc)
 
 lemma intVectorToReal_stepsHom (step : Fin s → (Fin s → ℤ)) (c : Fin s → ℤ) :
     intVectorToReal (stepsHom step c) =

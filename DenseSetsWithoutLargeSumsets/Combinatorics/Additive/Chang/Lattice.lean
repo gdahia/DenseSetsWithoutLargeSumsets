@@ -25,10 +25,6 @@ instance standardIntegerLattice_discrete (d : ℕ) :
     DiscreteTopology (standardIntegerLattice d) := by
   exact ZSpan.discreteTopology_pi_basisFun
 
-lemma standardIntegerLattice_span_top (d : ℕ) :
-    Submodule.span ℝ (standardIntegerLattice d : Set (Fin d → ℝ)) = ⊤ := by
-  simp [standardIntegerLattice]
-
 lemma intVectorToReal_mem_standardIntegerLattice {d : ℕ} (v : Fin d → ℤ) :
     intVectorToReal v ∈ standardIntegerLattice d := by
   rw [standardIntegerLattice]
@@ -54,13 +50,6 @@ lemma subspaceIntegerLattice_discrete {d : ℕ} (H : Submodule ℝ (Fin d → �
     DiscreteTopology (subspaceIntegerLattice H) := by
   exact ZLattice.comap_discreteTopology ℝ (standardIntegerLattice d)
     H.subtype.continuous_of_finiteDimensional H.subtype_injective
-
-lemma subspaceIntegerLattice_isZLattice {d : ℕ} (H : Submodule ℝ (Fin d → ℝ))
-    (hspan : Submodule.span ℝ (subspaceIntegerLattice H : Set H) = ⊤) :
-    @IsZLattice ℝ _ H _ _ (subspaceIntegerLattice H)
-      (subspaceIntegerLattice_discrete H) := by
-  letI : DiscreteTopology (subspaceIntegerLattice H) := subspaceIntegerLattice_discrete H
-  exact ⟨hspan⟩
 
 lemma integerGeneratedSubspace_lattice_span_top {d : ℕ} (S : Finset (Fin d → ℤ)) :
     Submodule.span ℝ

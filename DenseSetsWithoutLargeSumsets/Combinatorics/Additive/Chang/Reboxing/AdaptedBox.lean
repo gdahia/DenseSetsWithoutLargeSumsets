@@ -87,9 +87,6 @@ lemma mem_centeredBoxGAP_of_mem_intBox (step : Fin s → (Fin s → ℤ)) (m : F
   rw [Int.toNat_of_nonneg (by omega)]
   omega
 
-@[simp] lemma centeredBoxGAP_dim (step : Fin s → (Fin s → ℤ)) (m : Fin s → ℕ) :
-    (centeredBoxGAP step m).dim = s := rfl
-
 lemma centeredBoxGAP_card (step : Fin s → (Fin s → ℤ)) (m : Fin s → ℕ)
     (hinj : Function.Injective (stepsHom step)) :
     (centeredBoxGAP step m).carrier.card = ∏ i, (2 * m i + 1) := by

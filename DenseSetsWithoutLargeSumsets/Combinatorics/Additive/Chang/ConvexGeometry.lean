@@ -117,12 +117,6 @@ lemma HasIndependentShort.of_le {k' : ℕ} {t : ℝ} (h : HasIndependentShort L 
   obtain ⟨v, hindep, hv⟩ := h
   exact ⟨v ∘ Fin.castLE hk, hindep.comp _ (Fin.castLE_injective hk), fun j ↦ hv _⟩
 
-lemma HasIndependentShort.mono (hconv : Convex ℝ K) (hclosed : IsClosed K) (hK₀ : K ∈ 𝓝 0)
-    (hbdd : Bornology.IsVonNBounded ℝ K) {s t : ℝ} (hs : 0 ≤ s) (hst : s ≤ t)
-    (h : HasIndependentShort L K k s) : HasIndependentShort L K k t := by
-  obtain ⟨v, hindep, hv⟩ := h
-  exact ⟨v, hindep, fun j ↦ ⟨(hv j).1, mem_smul_of_le hconv hclosed hK₀ hbdd hs hst (hv j).2⟩⟩
-
 lemma bddBelow_dilations (L : AddSubgroup E) (K : Set E) (k : ℕ) :
     BddBelow {t : ℝ | 0 ≤ t ∧ HasIndependentShort L K k t} :=
   ⟨0, fun _ ht ↦ ht.1⟩

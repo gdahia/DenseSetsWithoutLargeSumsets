@@ -118,9 +118,6 @@ lemma lowerConstant_pos (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : 0 < lo
 
 def lowerLogScale (γ : ℝ) : ℝ := 8 / ε γ
 
-def lowerSqrtScale (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
-  8 * lowerBltConstant C γ hC hε * Real.sqrt 14 / ε γ
-
 def lowerSqrtScaleDefault (C γ : ℝ) : ℝ :=
   8 * lowerBltConstantDefault C γ * Real.sqrt 14 / ε γ
 
@@ -131,10 +128,6 @@ def lowerGapSqrtScaleDefault (C γ c : ℝ) : ℝ :=
 def lowerGapSqrtScale (C γ c : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
   8 * lowerBltConstant C γ hC hε *
     Real.sqrt (densityCoefficient (3 + γ) c) / ε γ
-
-lemma lowerSqrtScaleDefault_eq (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    lowerSqrtScaleDefault C γ = lowerSqrtScale C γ hC hε := by
-  simp [lowerSqrtScaleDefault, lowerSqrtScale, lowerBltConstantDefault_eq C γ hC hε]
 
 lemma lowerGapSqrtScaleDefault_eq (C γ c : ℝ) (hC : 0 < 2 * C)
     (hε : 0 < ε γ) :
@@ -247,7 +240,6 @@ lemma lowerSizeThreshold_lt_nat_pos {C γ : ℝ} {n : ℕ} (_hγ : 0 < γ) (_hC 
     · norm_num
     · exact two_le_lowerSizeThreshold C γ
   exact_mod_cast hnpos
-
 
 end
 

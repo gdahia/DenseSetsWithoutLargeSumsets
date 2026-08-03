@@ -54,19 +54,6 @@ lemma properGAP_length_le_card {G : Type*} [DecidableEq G] [AddCommMonoid G] (P 
       Finset.prod_eq_mul_prod_sdiff_singleton_of_mem (Finset.mem_univ i)]
   exact Nat.le_mul_of_pos_right _ (Finset.prod_pos fun j _ => P.length_pos j)
 
-lemma properGAP_dim_lt_card {G : Type*} [DecidableEq G] [AddCommMonoid G] (P : ProperGAP G) :
-    P.dim < P.carrier.card := by
-  rw [properGAP_card_eq_prod_length P]
-  refine (Nat.lt_pow_self (n := P.dim) (a := 2) (by norm_num)).trans_le ?_
-  suffices ∏ _ : Fin P.dim, (2 : ℕ) ≤ ∏ i, P.length i by simpa using this
-  apply Finset.prod_le_prod'
-  intro i _
-  exact P.length_one_lt i
-
-lemma properGAP_dim_lt_zmod_card {q : ℕ} (hq : 0 < q) (P : ProperGAP (ZMod q)) : P.dim < q := by
-  haveI : NeZero q := ⟨Nat.ne_of_gt hq⟩
-  exact (properGAP_dim_lt_card P).trans_le (by simpa [ZMod.card] using P.carrier.card_le_univ)
-
 def properGAPsZModOfDimSet (q d : ℕ) (s : ℝ) : Set (ProperGAP (ZMod q)) :=
   {P : ProperGAP (ZMod q) | P.dim = d ∧ P.carrier.card ≤ s}
 

@@ -135,9 +135,6 @@ lemma κ_ge_six_of_one_le {C : ℝ} (hC : 1 ≤ C) : 6 ≤ κ C := by
 lemma two_le_κ_of_one_le {C : ℝ} (hC : 1 ≤ C) : 2 ≤ κ C := by
   exact (by norm_num : (2 : ℝ) ≤ 6).trans (κ_ge_six_of_one_le hC)
 
-private lemma one_lt_κ_of_one_le {C : ℝ} (hC : 1 ≤ C) : 1 < κ C := by
-  exact (by norm_num : (1 : ℝ) < 6).trans_le (κ_ge_six_of_one_le hC)
-
 private lemma chang_size_threshold_pos (C : ℝ) :
     0 < Real.exp (changContainerExponent (κ C)) :=
   Real.exp_pos _
@@ -614,7 +611,6 @@ lemma lowerGapSqrtScale_log_bound {C γ c : ℝ} {n : ℕ}
       nlinarith [hthreshold,
         lower_log_le_quarter_self_of_sixteen_le (by nlinarith [hfour, hthreshold])]
   · exact (lowerGapSqrtScale_pos hC hε hK_pos).le
-
 
 end
 

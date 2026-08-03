@@ -38,13 +38,6 @@ def changTheoremExponent (κ : ℝ) : ℝ :=
   changContainerExponent κ +
     (properizationConstant + coordinateReductionConstant) * (changContainerExponent κ + 2) ^ 4
 
-lemma changTheoremExponent_pos {κ : ℝ} (hκ : 2 ≤ κ) : 0 < changTheoremExponent κ := by
-  rw [changTheoremExponent]
-  nlinarith [changContainerExponent_pos hκ, properizationConstant_pos,
-    coordinateReductionConstant_pos,
-    pow_nonneg (by nlinarith [changContainerExponent_pos hκ] :
-      (0 : ℝ) ≤ changContainerExponent κ + 2) 4]
-
 /-- **Chang's theorem** in the cyclic form used here: a set of small doubling in `ZMod q` which is
 neither too small nor too dense is contained in a proper GAP of comparable size. The dimension of
 the container is bounded by the Freiman dimension of `X`, as in Green and Tao's form of the

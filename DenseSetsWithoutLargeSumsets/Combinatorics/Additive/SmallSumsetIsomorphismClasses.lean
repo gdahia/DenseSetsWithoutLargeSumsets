@@ -239,7 +239,6 @@ lemma samplingFailureProbability_le {t : ℕ}
   apply Real.exp_le_exp.mpr
   nlinarith [rpow_one_fifteenth_le_six_mul_log_bound ht]
 
-
 theorem exists_core_decomposition_with_budget (A : Finset ℕ) {t m : ℕ}
     (hA : A.card = t) (ht : smallSumsetClassCountThreshold ≤ t)
     (hm : (restrictedSumset A).card ≤ m) :
@@ -252,29 +251,6 @@ theorem exists_core_decomposition_with_budget (A : Finset ℕ) {t m : ℕ}
   simpa only [coreDecompositionBudget] using exists_core_decomposition A hA hA0 hm
     (popularSumThreshold t) (coreSamplingRate_pos ht)
     (coreSamplingRate_lt_one ht) (exceptionPenalty_nonneg t)
-
-private structure CoreDecompositionWitness (A : Finset ℕ) (t m : ℕ) where
-  anchor : ℕ
-  core : Finset ℕ
-  exceptions : Finset ℕ
-  anchor_mem : anchor ∈ A
-  core_subset : core ⊆ A
-  exceptions_subset : exceptions ⊆ A
-  translate_subset : (A \ exceptions).image (anchor + ·) ⊆ restrictedSumset core
-  budget : (core.card : ℝ) + exceptionPenalty t * exceptions.card ≤
-    coreDecompositionBudget t m
-
-private lemma coreDecompositionWitness_nonempty (A : Finset ℕ) {t m : ℕ}
-    (hA : A.card = t) (ht : smallSumsetClassCountThreshold ≤ t)
-    (hm : (restrictedSumset A).card ≤ m) : Nonempty (CoreDecompositionWitness A t m) := by
-  obtain ⟨a, A₀, Z, ha, hA₀, hZ, htranslate, hbudget⟩ :=
-    exists_core_decomposition_with_budget A hA ht hm
-  exact ⟨⟨a, A₀, Z, ha, hA₀, hZ, htranslate, hbudget⟩⟩
-
-private noncomputable def coreDecompositionWitness (A : Finset ℕ) {t m : ℕ}
-    (hA : A.card = t) (ht : smallSumsetClassCountThreshold ≤ t)
-    (hm : (restrictedSumset A).card ≤ m) : CoreDecompositionWitness A t m :=
-  Classical.choice (coreDecompositionWitness_nonempty A hA ht hm)
 
 def FreimanEquivalent (order : ℕ) (A B : Finset ℕ) : Prop :=
   ∃ f : ℕ → ℕ, IsAddFreimanIso order (A : Set ℕ) (B : Set ℕ) f
@@ -1929,6 +1905,5 @@ theorem smallSumsetFreimanDimSets_ncard_le_of_class_cover (n r s t : ℕ)
       ring
 
 end
-
 
 end DenseSetsWithoutLargeSumsets
