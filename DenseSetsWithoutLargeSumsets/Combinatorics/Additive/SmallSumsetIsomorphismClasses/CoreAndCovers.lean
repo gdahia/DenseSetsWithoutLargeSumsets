@@ -1043,16 +1043,14 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
   have hcore_cover (l : ℕ) (hl : 0 < l) :
       CoversFreimanClasses 8
         {A | A.card = l ∧ (restrictedSumset A).card ≤ m} (coreReps l) := by
-    simp only [coreReps, dif_pos hl]
-    exact (coreCover l hl).2.1
+    simpa only [coreReps, dif_pos hl] using (coreCover l hl).2.1
   have hcore_spec (l : ℕ) (hl : 0 < l) (C : Finset ℕ) (hC : C ∈ coreReps l) :
       C.card = l ∧ (restrictedSumset C).card ≤ m := by
     simp only [coreReps, dif_pos hl] at hC
     exact (coreCover l hl).2.2.1 C hC
   have hcore_card (l : ℕ) (hl : 0 < l) :
       (coreReps l).card ≤ l ^ (16 * l) := by
-    simp only [coreReps, dif_pos hl]
-    exact (coreCover l hl).2.2.2
+    simpa only [coreReps, dif_pos hl] using (coreCover l hl).2.2.2
   let RemainderCover (C : Finset ℕ) (u : ℕ) := { representatives : Finset (Finset ℕ) //
     CoversFreimanClasses 4 (remaindersFromCoreClass C u) representatives ∧
       (∀ R ∈ representatives, R.card = u) ∧
@@ -1067,8 +1065,7 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
     else ∅
   have hremainder_cover (C : Finset ℕ) (u : ℕ) (hC : C.Nonempty) :
       CoversFreimanClasses 4 (remaindersFromCoreClass C u) (remainderReps C u) := by
-    simp only [remainderReps, dif_pos hC]
-    exact (remainderCover C u hC).2.1
+    simpa only [remainderReps, dif_pos hC] using (remainderCover C u hC).2.1
   have hremainder_spec (C : Finset ℕ) (u : ℕ) (hC : C.Nonempty)
       (R : Finset ℕ) (hR : R ∈ remainderReps C u) : R.card = u := by
     simp only [remainderReps, dif_pos hC] at hR
@@ -1092,8 +1089,7 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
     else ∅
   have hextension_cover (R : Finset ℕ) (d : ℕ) (hR : R.Nonempty) :
       CoversFreimanClasses 2 (extensionsOfFreimanClass R d) (extensionReps R d) := by
-    simp only [extensionReps, dif_pos hR]
-    exact (extensionCover R d hR).2.1
+    simpa only [extensionReps, dif_pos hR] using (extensionCover R d hR).2.1
   have hextension_card (R : Finset ℕ) (d : ℕ) :
       (extensionReps R d).card ≤ (1 + R.card ^ 4) ^ ((d + 1) ^ 4) := by
     by_cases hR : R.Nonempty

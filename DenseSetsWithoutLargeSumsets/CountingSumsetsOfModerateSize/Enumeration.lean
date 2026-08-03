@@ -715,7 +715,8 @@ theorem pairSumsetsFamily_ncard_le (n k m : ℕ)
         constructor
         · intro hY
           rcases hY with ⟨_hYint, A, _B, hAint, _hBint, hAcard, _hBcard, _hYeq, _hYcard⟩
-          apply False.elim (hkn ?_)
+          exfalso
+          apply hkn
           rw [← hAcard]
           simpa [interval, Nat.card_Icc] using Finset.card_le_card hAint
         · simp
@@ -828,7 +829,8 @@ theorem pairSumsetsFamily_ncard_le_of_small_sumset (n k m : ℕ) (c : ℝ)
         constructor
         · intro hY
           rcases hY with ⟨_hYint, A, B, _hAint, _hBint, hAcard, hBcard, hYeq, hYcard⟩
-          apply False.elim (hkm ?_)
+          exfalso
+          apply hkm
           apply le_trans (b := (A + B).card)
           · rw [← hAcard]
             apply Finset.card_le_card_add_right
@@ -843,7 +845,8 @@ theorem pairSumsetsFamily_ncard_le_of_small_sumset (n k m : ℕ) (c : ℝ)
       constructor
       · intro hY
         rcases hY with ⟨_hYint, A, _B, hAint, _hBint, hAcard, _hBcard, _hYeq, _hYcard⟩
-        apply False.elim (hkn ?_)
+        exfalso
+        apply hkn
         rw [← hAcard]
         simpa [interval, Nat.card_Icc] using Finset.card_le_card hAint
       · simp

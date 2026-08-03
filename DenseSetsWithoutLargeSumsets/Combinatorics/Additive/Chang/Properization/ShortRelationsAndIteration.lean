@@ -161,8 +161,7 @@ lemma exists_hasIndependentShort_shortRelationRank {q : ℕ} (hq : q ≠ 0)
     rw [hrdef]
     exact hr
   have hmin : P.relationMinimum r ≤ t := by
-    by_contra hcon
-    push Not at hcon
+    by_contra! hcon
     have hrle : P.shortRelationRank t ≤ r - 1 :=
       P.shortRelationRank_le_of_lt_relationMinimum hq hlen (k := r - 1) (by
         rwa [Nat.sub_add_cancel hrone])
@@ -665,8 +664,7 @@ lemma card_smithQuotientCoords_fiber_le {q : ℕ} (hq : q ≠ 0)
     rw [hZ, Finset.mem_image] at hu hw
     obtain ⟨a, haF, rfl⟩ := hu
     obtain ⟨b, hbF, rfl⟩ := hw
-    by_contra hcon
-    push Not at hcon
+    by_contra! hcon
     have hdiffrel : z a - z b ∈ P.relations :=
       P.relations.sub_mem (hz a haF).1 (hz b hbF).1
     have hdiffshort : IsShort P.halfWidth 3 (z a - z b) := by
@@ -856,7 +854,7 @@ theorem exists_twoProperGAP_container {q : ℕ} (P : GAP (ZMod q))
       have hstepRoom : (2 * (3 * P₂.dim) + 1) ^ P₂.dim * P₂.carrier.card < q := by
         have hfactor := saturation_room_factor_le_exp_cube d
         have hfactorCard :
-            ((((2 * (3 * d) + 1) ^ d * P₂.carrier.card : ℕ) : ℝ)) ≤
+            (((2 * (3 * d) + 1) ^ d * P₂.carrier.card : ℕ) : ℝ) ≤
               Real.exp (13 * ((d : ℝ) + 2) ^ 3) * P.carrier.card := by
           rw [Nat.cast_mul]
           apply (mul_le_mul_of_nonneg_left (Nat.cast_le.mpr hP₂cardNat)
@@ -881,7 +879,7 @@ theorem exists_twoProperGAP_container {q : ℕ} (P : GAP (ZMod q))
                 P.carrier.card := by
           exact mul_lt_mul_of_pos_right hexp (by exact_mod_cast P.nonempty.card_pos)
         have hreal :
-            ((((2 * (3 * d) + 1) ^ d * P₂.carrier.card : ℕ) : ℝ)) < (q : ℝ) :=
+            (((2 * (3 * d) + 1) ^ d * P₂.carrier.card : ℕ) : ℝ) < (q : ℝ) :=
           hfactorCard.trans_lt (hstrict.trans_le (by simpa only [hdimP] using hroom))
         simpa only [hdim] using (show
           (2 * (3 * d) + 1) ^ d * P₂.carrier.card < q by exact_mod_cast hreal)

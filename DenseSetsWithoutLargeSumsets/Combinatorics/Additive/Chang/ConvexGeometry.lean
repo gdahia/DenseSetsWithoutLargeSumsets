@@ -177,8 +177,7 @@ lemma le_successiveMinimum_one [DiscreteTopology L] {R r t : ℝ} (hR : K ⊆ cl
     (hne : ∃ s, 0 ≤ s ∧ HasIndependentShort L K 1 s) : t ≤ successiveMinimum L K 1 := by
   apply le_successiveMinimum hne
   intro s hs hshort
-  by_contra hlt
-  push Not at hlt
+  by_contra! hlt
   obtain ⟨v, hindep, hv⟩ := hshort
   obtain ⟨y, hy, hyv⟩ := (hv 0).2
   refine hindep.ne_zero 0 (hr _ (hv 0).1 ?_)
@@ -584,8 +583,7 @@ minimum `sInf ∅ = 0`. This is what lets the count ignore the indices beyond th
 lattice instead of tracking that rank. -/
 lemma exists_of_successiveMinimum_pos (hpos : 0 < successiveMinimum L K k) :
     ∃ t, 0 ≤ t ∧ HasIndependentShort L K k t := by
-  by_contra hcon
-  push Not at hcon
+  by_contra! hcon
   have hempty : {t : ℝ | 0 ≤ t ∧ HasIndependentShort L K k t} = ∅ :=
     Set.eq_empty_iff_forall_notMem.mpr fun t ht ↦ hcon t ht.1 ht.2
   refine absurd hpos (not_lt.mpr (le_of_eq ?_))
@@ -635,7 +633,7 @@ theorem ncard_inter_le_prod_aux :
           (gauge_le_one_of_mem hv₀K)⟩⟩
     obtain ⟨w, hwindep, hw⟩ :=
       exists_witness_successiveMinimum (k := 1) (L := L) hconv hclosed hK₀ hbdd hne1
-    set v : E := w 0 with hvdef
+    let v : E := w 0
     have hvL : v ∈ L := (hw 0).1
     have hvne : v ≠ 0 := hwindep.ne_zero 0
     have hgaugele : gauge K v ≤ successiveMinimum L K 1 :=
@@ -660,8 +658,8 @@ theorem ncard_inter_le_prod_aux :
     -- Project along the line through it.
     obtain ⟨W, hWcompl⟩ := (Submodule.span ℝ {v}).exists_isCompl
     have hcompl : IsCompl W (Submodule.span ℝ {v}) := hWcompl.symm
-    set π : E →ₗ[ℝ] W := Submodule.projectionOnto W (Submodule.span ℝ {v}) hcompl with hπdef
-    set p : E →ₗ[ℝ] E := Submodule.projection W (Submodule.span ℝ {v}) hcompl with hpdef
+    let π : E →ₗ[ℝ] W := Submodule.projectionOnto W (Submodule.span ℝ {v}) hcompl
+    let p : E →ₗ[ℝ] E := Submodule.projection W (Submodule.span ℝ {v}) hcompl
     have hπv : π v = 0 :=
       Submodule.projectionOnto_apply_of_mem_right hcompl (Submodule.mem_span_singleton_self v)
     have hker : ∀ x : E, π x = 0 → ∃ s : ℝ, x = s • v := by
@@ -801,9 +799,7 @@ theorem ncard_inter_le_prod_aux :
     simp only [Fin.val_zero, Fin.val_succ, zero_add]
     have hcountR : ((K ∩ (L : Set E)).ncard : ℝ) ≤ (2 * (⌊2 / gauge K v⌋₊ : ℝ) + 1) *
         (((π '' K) ∩ ((L.map (π : E →+ W)) : Set W)).ncard : ℝ) := by
-      have hc := (Nat.cast_le (α := ℝ)).mpr hcount
-      push_cast at hc
-      exact hc
+      exact_mod_cast hcount
     refine hcountR.trans (mul_le_mul ?_ ?_ (Nat.cast_nonneg _)
       (le_trans zero_le_one (one_le_div_successiveMinimum_add_one L K (by positivity) 1)))
     · rw [← hgauge]
@@ -876,8 +872,7 @@ theorem ofReal_pow_successiveMinimum_one_mul_measure_le [MeasurableSpace E] [Bor
   have hstep : ∀ t : ℝ, 0 ≤ t → t < successiveMinimum L K 1 →
       ENNReal.ofReal (t ^ finrank ℝ E) * μ K ≤ 2 ^ finrank ℝ E * μ F := by
     intro t ht hlt
-    by_contra hcon
-    push Not at hcon
+    by_contra! hcon
     refine absurd (successiveMinimum_one_le_of_measure_lt fund hsymm hconv ht ?_) (not_le.mpr hlt)
     rw [μ.addHaar_smul_of_nonneg ht K, mul_comm (μ F)]
     exact hcon

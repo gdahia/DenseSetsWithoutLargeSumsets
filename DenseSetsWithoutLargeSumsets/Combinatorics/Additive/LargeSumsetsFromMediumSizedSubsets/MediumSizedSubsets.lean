@@ -145,15 +145,13 @@ private lemma popular_facts {K ε : ℝ} (hK : 1 ≤ K) (hε : 0 < ε) (hε1 : �
     rw [sum_const, nsmul_eq_mul]
     ring
   have hPsmall : (#P : ℝ) < 2 * K * n := by
-    by_contra hcon
-    push Not at hcon
+    by_contra! hcon
     have hKn : (0 : ℝ) < K * n := mul_pos hKpos hnpos
     linarith only [mul_le_mul_of_nonneg_left hcon (by linarith : (0 : ℝ) ≤ 1 - ε / 4), hEpop, hEK,
       hKn, mul_le_mul_of_nonneg_right hε1 hKn.le]
   have hPgap : (#P : ℝ) < (1 - ε / 2) * (#(X + Y) : ℝ) := by
     have hSpos : (0 : ℝ) < #(X + Y) := by exact_mod_cast card_pos.2 (hXne.add hYne)
-    by_contra hcon
-    push Not at hcon
+    by_contra! hcon
     have hquad : (1 - ε) * (#(X + Y) : ℝ) ≤ (1 - ε / 4) * ((1 - ε / 2) * (#(X + Y) : ℝ)) := by
       nlinarith only [mul_nonneg hε.le hSpos.le,
         mul_nonneg (mul_nonneg hε.le hε.le) hSpos.le]
@@ -165,12 +163,15 @@ private lemma popular_facts {K ε : ℝ} (hK : 1 ≤ K) (hε : 0 < ε) (hε1 : �
     have hset : (X ×ˢ Y).filter (fun p => p.1 + p.2 ∈ (X + Y) \ P) = Cleanup.badPairs X Y P := by
       ext p
       simp only [mem_filter, mem_product, mem_sdiff, Cleanup.mem_badPairs, and_assoc]
-      exact ⟨fun h => ⟨h.1, h.2.1, h.2.2.2⟩, fun h => ⟨h.1, h.2.1, add_mem_add h.1 h.2.1, h.2.2⟩⟩
+      constructor
+      · rintro ⟨hpX, hpY, -, hpP⟩
+        exact ⟨hpX, hpY, hpP⟩
+      · rintro ⟨hpX, hpY, hpP⟩
+        exact ⟨hpX, hpY, add_mem_add hpX hpY, hpP⟩
     rw [hset] at h
-    exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) h.symm
+    exact_mod_cast h.symm
   have hbadsmall : (#(Cleanup.badPairs X Y P) : ℝ) ≤ bltDelta K ε * ((#X : ℝ) * #Y) := by
-    by_contra hcon
-    push Not at hcon
+    by_contra! hcon
     have hdenpos : (0 : ℝ) < 9 * ((#X : ℝ) * #Y) + bltAlpha K ε * n * ((c₁ : ℝ) * c₂) := by
       positivity
     have hunpop : ∀ s ∈ (X + Y) \ P, (Sampling.reprCount X Y s : ℝ)
@@ -230,7 +231,7 @@ private lemma popular_facts {K ε : ℝ} (hK : 1 ≤ K) (hε : 0 < ε) (hε1 : �
     have h3 : ∑ s ∈ P, Sampling.reprCount X Y s + #(Cleanup.badPairs X Y P) = #X * #Y := by
       rw [h1, Cleanup.badPairs]
       exact h2
-    exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) h3
+    exact_mod_cast h3
   have hsum : ∑ s ∈ P, (Sampling.reprCount X Y s : ℝ) ≤ (#P : ℝ) * n := by
     have hbound : ∀ s ∈ P, (Sampling.reprCount X Y s : ℝ) ≤ n := by
       intro s _
@@ -243,8 +244,7 @@ private lemma popular_facts {K ε : ℝ} (hK : 1 ≤ K) (hε : 0 < ε) (hε1 : �
   have hgood : (1 - bltDelta K ε) * (n * m) ≤ (#P : ℝ) * n := by
     rw [hnm]
     linarith only [hsplit, hsum, hbadsmall]
-  by_contra hcon
-  push Not at hcon
+  by_contra! hcon
   have hhalf : (1 : ℝ) / 2 * (n * m) ≤ (1 - bltDelta K ε) * (n * m) :=
     mul_le_mul_of_nonneg_right (by linarith only [bltDelta_le_half (K := K) (ε := ε)])
       (by positivity)
@@ -291,8 +291,7 @@ theorem exists_medium_sized_subsets_with_large_sumset_core {K ε : ℝ} (hK : 1 
     linarith only [hdelsmall, hXleA,
       mul_le_mul_of_nonneg_left (min_le_right (#A : ℝ) (#B : ℝ)) hε.le]
   refine ⟨X, hXA, Y, hYB, hXne, hYne, hXcard, hYcard, ?_⟩
-  by_contra hfail
-  push Not at hfail
+  by_contra! hfail
   set n : ℝ := min (#X : ℝ) (#Y : ℝ) with hn
   set m : ℝ := max (#X : ℝ) (#Y : ℝ) with hm
   have hnpos : 0 < n := lt_min hxpos hypos

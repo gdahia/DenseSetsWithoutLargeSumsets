@@ -246,7 +246,7 @@ private theorem exists_model_gap {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
   have hYcard : (X₁.image φ).card = X₁.card := Finset.card_image_of_injOn hφ.bijOn.injOn
   have hYne : (X₁.image φ).Nonempty := Finset.image_nonempty.2 hX₁ne
   have hYpos : (0 : ℝ) < ((X₁.image φ).card : ℝ) := by rw [hYcard]; exact hX₁pos
-  have hYm : (((X₁.image φ).card : ℕ) : ℝ) ≤ m := by
+  have hYm : ((X₁.image φ).card : ℝ) ≤ m := by
     have h := Finset.card_le_univ (X₁.image φ)
     rw [ZMod.card] at h
     exact_mod_cast h
@@ -260,8 +260,8 @@ private theorem exists_model_gap {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
       simpa only [show 2 * 8 = 16 from rfl] using hmle
     nlinarith [pow_pos hκ0 16]
   -- the doubling constant transports to the model group
-  have hYY : (((X₁.image φ + X₁.image φ).card : ℕ) : ℝ) ≤ (8 * κ) * (X₁.image φ).card := by
-    have h3 : (((X₁.image φ + X₁.image φ).card : ℕ) : ℝ) ≤ ((X + X).card : ℝ) := by
+  have hYY : ((X₁.image φ + X₁.image φ).card : ℝ) ≤ (8 * κ) * (X₁.image φ).card := by
+    have h3 : ((X₁.image φ + X₁.image φ).card : ℝ) ≤ ((X + X).card : ℝ) := by
       refine Nat.cast_le.2 (le_trans ?_ (Finset.card_le_card (Finset.add_subset_add hX₁X hX₁X)))
       exact card_add_le_of_isAddFreimanIso (IsAddFreimanIso.mono (hmn := by norm_num) hφ.invFunOn)
     rw [hYcard]
@@ -388,7 +388,7 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
         (batchSum_subset_nsmul batches X (fun S hS ↦ (hbatches S hS).1.trans hX₁X) hv)
       rwa [two_nsmul]
     · rwa [two_nsmul]
-  have hPR : ((((batches.length + 2) • X - 2 • X).card : ℕ) : ℝ) ≤
+  have hPR : (((batches.length + 2) • X - 2 • X).card : ℝ) ≤
       κ ^ (batches.length + 4) * X.card := by
     have hcast := (NNRat.cast_le (K := ℝ)).2
       (Finset.pluennecke_ruzsa_inequality_nsmul_sub_nsmul_add hXne X (batches.length + 2) 2)
@@ -436,23 +436,23 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
   -- Ruzsa covering recovers `X` from `X₁`
   obtain ⟨F', -, hF'card, hXcov⟩ := Finset.ruzsa_covering_add (K := 8 * κ) hX₁ne
     (by
-      have h1 : (((X + X₁).card : ℕ) : ℝ) ≤ ((X + X).card : ℝ) :=
+      have h1 : ((X + X₁).card : ℝ) ≤ ((X + X).card : ℝ) :=
         Nat.cast_le.2 (Finset.card_le_card (Finset.add_subset_add_left hX₁X))
       nlinarith)
   have hFm : (F.card : ℝ) ≤ (changBatchSize κ : ℝ) := Nat.cast_le.2 hFcard.le
   have hWnat : (F' + (F - F)).card ≤ F'.card * (F.card * F.card) :=
     Finset.card_add_le.trans (Nat.mul_le_mul le_rfl Finset.card_sub_le)
-  have hWcast : (((F' + (F - F)).card : ℕ) : ℝ) ≤ (F'.card : ℝ) * (F.card : ℝ) * (F.card : ℝ) := by
+  have hWcast : ((F' + (F - F)).card : ℝ) ≤ (F'.card : ℝ) * (F.card : ℝ) * (F.card : ℝ) := by
     refine le_trans (Nat.cast_le.2 hWnat) (le_of_eq ?_)
     push_cast
     ring
-  have hWcard : (((F' + (F - F)).card : ℕ) : ℝ) ≤ changCoverBound κ := by
+  have hWcard : ((F' + (F - F)).card : ℝ) ≤ changCoverBound κ := by
     apply hWcast.trans
     rw [changCoverBound, sq, ← mul_assoc]
     exact mul_le_mul (mul_le_mul hF'card hFm (Nat.cast_nonneg _) (by positivity)) hFm
       (Nat.cast_nonneg _) (by positivity)
   -- the container
-  set W := F' + (F - F) with hWdef
+  let W := F' + (F - F)
   set S := Q₁.carrier + batchSum batches with hSdef
   set R := Q₁.consBinaryList (batchElements batches) with hRdef
   set U := R.differenceHull.differenceHull with hUdef

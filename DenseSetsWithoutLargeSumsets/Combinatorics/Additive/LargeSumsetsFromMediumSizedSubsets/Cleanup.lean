@@ -300,7 +300,10 @@ lemma sum_card_bad_left (X Y P : Finset G) :
       exact (Prod.mk_inj.1 h).2
     · intro p hp
       rw [mem_filter, mem_badPairs] at hp
-      exact ⟨p.2, mem_filter.2 ⟨hp.1.2.1, by rw [← hp.2]; exact hp.1.2.2⟩, by rw [← hp.2]⟩
+      refine ⟨p.2, mem_filter.2 ⟨hp.1.2.1, ?_⟩, ?_⟩
+      · rw [← hp.2]
+        exact hp.1.2.2
+      · rw [← hp.2]
 
 /-- Counting the bad pairs one second coordinate at a time. -/
 lemma sum_card_bad_right (X Y P : Finset G) :
@@ -317,7 +320,10 @@ lemma sum_card_bad_right (X Y P : Finset G) :
       exact (Prod.mk_inj.1 h).1
     · intro p hp
       rw [mem_filter, mem_badPairs] at hp
-      exact ⟨p.1, mem_filter.2 ⟨hp.1.1, by rw [← hp.2]; exact hp.1.2.2⟩, by rw [← hp.2]⟩
+      refine ⟨p.1, mem_filter.2 ⟨hp.1.1, ?_⟩, ?_⟩
+      · rw [← hp.2]
+        exact hp.1.2.2
+      · rw [← hp.2]
 
 omit [AddCommGroup G] in
 /-- The fibres of a map over a set of values are disjoint subsets of the domain. -/
@@ -330,7 +336,11 @@ lemma sum_card_fiber_le {α : Type*} (Q : Finset α) (φ : α → G) (T : Finset
   congr 1
   ext q
   simp only [mem_filter, and_assoc]
-  exact ⟨fun h => ⟨h.1, by rw [h.2]; exact hz, h.2⟩, fun h => ⟨h.1, h.2.2⟩⟩
+  constructor
+  · rintro ⟨hq, rfl⟩
+    exact ⟨hq, hz, rfl⟩
+  · rintro ⟨hq, -, hqz⟩
+    exact ⟨hq, hqz⟩
 
 /-- **The covering bound.** If all but a `δ` proportion of the pairs of `X ×ˢ Y` have their sum in
 `P`, then after deleting a `ρ`-fraction of `X` and of `Y` every remaining sum has at least
@@ -372,7 +382,7 @@ theorem exists_covering {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
       apply le_trans (sum_le_sum_of_subset_of_nonneg sdiff_subset fun _ _ _ => by positivity)
       have := sum_card_bad_left X Y P
       have hcast : ∑ u ∈ X, ((#(Y.filter fun w => u + w ∉ P) : ℝ)) = (#(badPairs X Y P) : ℝ) := by
-        exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) this
+        exact_mod_cast this
       rw [hcast]
       exact hbad
     have hkey : (#(X \ X₁) : ℝ) * (δ / ρ * #Y) ≤ δ * ((#X : ℝ) * #Y) := hlow.trans hup
@@ -398,7 +408,7 @@ theorem exists_covering {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
       apply le_trans (sum_le_sum_of_subset_of_nonneg sdiff_subset fun _ _ _ => by positivity)
       have := sum_card_bad_right X Y P
       have hcast : ∑ v ∈ Y, ((#(X.filter fun w => w + v ∉ P) : ℝ)) = (#(badPairs X Y P) : ℝ) := by
-        exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) this
+        exact_mod_cast this
       rw [hcast]
       exact hbad
     have hkey : (#(Y \ Y₁) : ℝ) * (δ / ρ * #X) ≤ δ * ((#X : ℝ) * #Y) := hlow.trans hup

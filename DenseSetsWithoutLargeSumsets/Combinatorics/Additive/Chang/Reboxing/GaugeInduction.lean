@@ -46,14 +46,13 @@ theorem exists_gaugeControlledLatticeBox_aux :
   induction n with
   | zero =>
       intro E _ _ _ L _ K hrank _ _ _ _ _ _
-      exact ⟨by simpa [gaugeReboxingDilation] using
-        gaugeControlledLatticeBoxZero L K hrank⟩
+      constructor
+      simpa [gaugeReboxingDilation] using gaugeControlledLatticeBoxZero L K hrank
   | succ m ih =>
       intro E _ _ _ L _ K hrank hconv hclosed hK₀ hbdd hsymm hspan
       haveI : Nontrivial E := Module.nontrivial_of_finrank_eq_succ hrank
       have hex : ∃ x, x ∈ K ∧ x ∈ L ∧ x ≠ 0 := by
-        by_contra hcon
-        push Not at hcon
+        by_contra! hcon
         have hbot : Submodule.span ℝ (K ∩ (L : Set E)) = ⊥ := by
           apply le_antisymm
           · refine Submodule.span_le.mpr ?_

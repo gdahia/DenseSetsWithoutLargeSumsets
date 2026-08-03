@@ -326,8 +326,7 @@ theorem exists_proper_gap_of_freqLattice {q k : ℕ} [NeZero q] (r : Fin k → Z
       Set.Finite.subset (intBox (freqBox q D)).finite_toSet fun z hz ↦ mem_intBox.mpr hz.2
     have hlow : ∏ i, (freqBox (k := k) q D i + 1) ≤
         (BoxLattice.latticeBoxPoints (freqLattice r) (freqBox q D)).ncard * q ^ k := by
-      by_contra hcon
-      push Not at hcon
+      by_contra! hcon
       obtain ⟨F, hFcard, hF⟩ := exists_card_lt_forall_mem_ker_of_mul_card_lt (freqHom r)
         (s := (Finset.univ : Finset (Fin k → ZMod q))) (fun _ _ ↦ Finset.mem_univ _)
         (n := (BoxLattice.latticeBoxPoints (freqLattice r) (freqBox q D)).ncard)

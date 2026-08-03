@@ -218,8 +218,7 @@ theorem card_mul_prod_le_of_eq_zero_of_mem_intBox {Λ : AddSubgroup (Fin d → �
     s.card * ∏ i, (m i + 1) ≤ ∏ i, (2 * (M i + m i) + 1) := by
   apply card_mul_prod_le_of_separated hbox
   intro u hu w hw huw
-  by_contra hcon
-  push Not at hcon
+  by_contra! hcon
   exact huw (sub_eq_zero.mp (hm _ (Λ.sub_mem (hs u hu) (hs w hw)) hcon))
 
 end Packing
@@ -317,8 +316,7 @@ lemma le_successiveMinimum_one {Λ : AddSubgroup (Fin d → ℤ)} {L : Fin d →
     (hne : ∃ s, 0 ≤ s ∧ HasIndependentShort Λ L 1 s) : t ≤ successiveMinimum Λ L 1 := by
   apply le_successiveMinimum hne
   intro s hs hshort
-  by_contra hlt
-  push Not at hlt
+  by_contra! hlt
   obtain ⟨i, hi⟩ := exists_one_le_mul_of_hasIndependentShort hshort
   have hLB : (L i : ℝ) ≤ B := Nat.cast_le.mpr (hB i)
   nlinarith [Nat.cast_nonneg (α := ℝ) (L i)]
@@ -419,8 +417,7 @@ a nonzero multiple of it would lie in a submodule of rank at most `i`. -/
 lemma exists_linearIndependent_snoc {i : ℕ} {v : Fin i → (Fin d → ℤ)}
     {w : Fin (i + 1) → (Fin d → ℤ)} (hv : LinearIndependent ℤ v) (hw : LinearIndependent ℤ w) :
     ∃ j, LinearIndependent ℤ (Fin.snoc v (w j)) := by
-  by_contra hcon
-  push Not at hcon
+  by_contra! hcon
   have key : ∀ j, ∃ c : ℤ, c ≠ 0 ∧ c • w j ∈ Submodule.span ℤ (Set.range v) := by
     intro j
     obtain ⟨g, hg, m, hm⟩ := Fintype.not_linearIndependent_iff.mp (hcon j)
