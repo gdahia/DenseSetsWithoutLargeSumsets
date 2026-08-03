@@ -72,6 +72,7 @@ automation:
     - method: "agent"
       models:
         - "gpt-5.6 sol high"
+        - "claude opus 5"
       framework: "Codex"
       tool_setup: >-
         Codex agents guided by the repository's AGENTS.md instructions, with
@@ -117,6 +118,7 @@ review:
   status: "self-assessed"
   reviewers:
     - "Gabriel Dahia"
+    - "claude opus 5"
   notes: >-
     The declarations compile without sorries and their axiom dependencies have
     been checked. No independent mathematical peer review is recorded here.
