@@ -32,7 +32,7 @@ private lemma natCast_pow_le_exp_log_of_le {a m : ℕ} {B : ℝ}
     (hB_pos : 0 < B) (ha : (a : ℝ) ≤ B) :
     ((a ^ m : ℕ) : ℝ) ≤ Real.exp ((m : ℝ) * Real.log B) := by
   rw [Nat.cast_pow]
-  refine (pow_le_pow_left₀ (by positivity : 0 ≤ (a : ℝ)) ha m).trans_eq ?_
+  apply (pow_le_pow_left₀ (by positivity : 0 ≤ (a : ℝ)) ha m).trans_eq
   rw [← Real.rpow_natCast, Real.rpow_def_of_pos hB_pos]
   ring_nf
 
@@ -200,12 +200,12 @@ private lemma lower_fingerprint_factor_le_exp {γ C : ℝ} {n : ℕ} {δ : unitI
       (((M + 1) * (s + 1) ^ M : ℕ) : ℝ) ≤
         Real.exp (((M + 1 : ℕ) : ℝ) * Real.log B) := by
     rw [Nat.cast_mul]
-    refine (mul_le_mul hMexp hpow (by positivity) (by positivity)).trans_eq ?_
+    apply (mul_le_mul hMexp hpow (by positivity) (by positivity)).trans_eq
     rw [← Real.exp_add]
     congr 1
     rw [Nat.cast_add, Nat.cast_one]
     ring
-  refine (mul_le_mul hone hone (by positivity) (by positivity)).trans ?_
+  apply (mul_le_mul hone hone (by positivity) (by positivity)).trans
   rw [← Real.exp_add]
   apply Real.exp_le_exp.mpr
   nlinarith [hMsucc_le_T, hlogB_nonneg]
@@ -240,7 +240,7 @@ private lemma lower_gap_count_le_exp {γ C : ℝ} {n : ℕ} {δ : unitInterval} 
   have hs_le : (s : ℝ) ≤ B := by
     dsimp [s, B]
     exact changCarrierBound_ceil_le_lower_counting_base hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε
-  refine (by
+  apply (by
     dsimp [q, s]
     exact_mod_cast properGAPsZModOfDim_card
       (lower_chang_carrier_ceil_pos hγ_pos hC_one hn hδ_lower hδ_upper)
@@ -248,7 +248,7 @@ private lemma lower_gap_count_le_exp {γ C : ℝ} {n : ℕ} {δ : unitInterval} 
     ((properGAPsZModOfDim d
         ⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊
         (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).pos).card : ℝ) ≤
-      ((q ^ (d + 1) * s ^ d : ℕ) : ℝ)).trans ?_
+      ((q ^ (d + 1) * s ^ d : ℕ) : ℝ)).trans
   have hqpow :
       (((q ^ (d + 1) : ℕ) : ℝ)) ≤
         Real.exp (((d + 1 : ℕ) : ℝ) * Real.log ((n : ℝ) * B)) :=
@@ -256,12 +256,12 @@ private lemma lower_gap_count_le_exp {γ C : ℝ} {n : ℕ} {δ : unitInterval} 
   have hspow :
       (((s ^ d : ℕ) : ℝ)) ≤ Real.exp ((d : ℝ) * Real.log B) :=
     natCast_pow_le_exp_log_of_le hB_pos hs_le
-  refine (by
+  apply (by
     rw [Nat.cast_mul]
     exact mul_le_mul hqpow hspow (by positivity) (by positivity) :
     ((q ^ (d + 1) * s ^ d : ℕ) : ℝ) ≤
       Real.exp (((d + 1 : ℕ) : ℝ) * Real.log ((n : ℝ) * B)) *
-        Real.exp ((d : ℝ) * Real.log B)).trans ?_
+        Real.exp ((d : ℝ) * Real.log B)).trans
   rw [← Real.exp_add]
   apply Real.exp_le_exp.mpr
   rw [Real.log_mul hn_pos.ne' hB_pos.ne']
@@ -292,14 +292,14 @@ lemma lower_gap_dim_summand_le {γ C c : ℝ} {n : ℕ} {δ : unitInterval} {d :
         Real.exp (-((1 - 3 * ε γ) * (d : ℝ) *
             (pairCardThreshold (3 + γ) n δ : ℝ)) * Real.log (1 / δ)) ≤
       (n : ℝ) ^ (-(ε γ / 2)) := by
-  refine (mul_le_mul_of_nonneg_right
+  apply (mul_le_mul_of_nonneg_right
       (mul_le_mul
         (lower_gap_count_le_exp hγ_pos C_pos hC_one hn hδ_lower hδ_upper hC_two hε)
         (lower_fingerprint_factor_le_exp hγ_pos hγ_le hC_one hn hδ_lower hδ_upper
           hC_two hε)
         (by positivity)
         (by positivity))
-      (by positivity)).trans ?_
+      (by positivity)).trans
   rw [← Real.exp_add, ← Real.exp_add]
   rw [Real.rpow_def_of_pos (old_model_threshold_nat_pos hn)]
   rw [mul_comm (Real.log (n : ℝ)) (-(ε γ / 2))]

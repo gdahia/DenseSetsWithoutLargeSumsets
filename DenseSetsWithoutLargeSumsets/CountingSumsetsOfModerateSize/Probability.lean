@@ -71,7 +71,7 @@ private def moderateSumsetCardRange (k : ℕ) (C : ℝ) : Finset ℕ :=
 
 private lemma moderateSumsetCardRange_card_le (k : ℕ) {C : ℝ} :
     (moderateSumsetCardRange k C).card ≤ k * k + 1 := by
-  refine (Finset.card_filter_le _ _).trans ?_
+  apply (Finset.card_filter_le _ _).trans
   simp [Nat.card_Icc]
 
 private lemma mem_moderateSumsetCardRange {k m : ℕ} {C : ℝ} :
@@ -98,7 +98,7 @@ private lemma moderateSumsetEvent_measure_le_sum
     ⋃ Y ∈ moderateSumsetSumsetSlice n k m, {S : Finset ℕ | Y ⊆ S}
   change ℙ.real (moderateSumsetEvent n k C) ≤
     ∑ m ∈ M, ((pairSumsetsFamily n k m).ncard : ℝ) * prob m
-  refine le_trans (b := ℙ.real (⋃ m ∈ M, E m)) ?_ ?_
+  apply le_trans (b := ℙ.real (⋃ m ∈ M, E m))
   · rw [MeasureTheory.measureReal_def, MeasureTheory.measureReal_def]
     apply ENNReal.toReal_mono (MeasureTheory.measure_ne_top ℙ _)
     apply MeasureTheory.measure_mono
@@ -109,7 +109,7 @@ private lemma moderateSumsetEvent_measure_le_sum
     · rw [mem_moderateSumsetCardRange]
       refine ⟨?_, by simpa [m] using hcond_lower, by simpa [m] using hcond_upper⟩
       dsimp [m]
-      refine Finset.card_add_le.trans ?_
+      apply Finset.card_add_le.trans
       rw [hAcard, hBcard]
     · refine Set.mem_iUnion₂.mpr ⟨A + B, ?_, hsumS⟩
       rw [mem_moderateSumsetSumsetSlice]
@@ -126,8 +126,8 @@ private lemma moderateSumsetEvent_measure_le_sum
       (s := M) (f := fun m => ℙ.real (E m))
       (g := fun m => (moderateSumsetSumsetSlice n k m).card * prob m) ?_).trans ?_
     · intro m hm
-      refine (MeasureTheory.measureReal_biUnion_finset_le (moderateSumsetSumsetSlice n k m)
-          fun Y => {S : Finset ℕ | Y ⊆ S}).trans ?_
+      apply (MeasureTheory.measureReal_biUnion_finset_le (moderateSumsetSumsetSlice n k m)
+          fun Y => {S : Finset ℕ | Y ⊆ S}).trans
       refine (Finset.sum_le_sum
         (s := moderateSumsetSumsetSlice n k m) (f := fun Y => ℙ.real {S : Finset ℕ | Y ⊆ S})
         (g := fun _ => prob m) ?_).trans_eq ?_
@@ -178,7 +178,7 @@ private lemma moderateSumsetAuxExponent_pos : 0 < moderateSumsetAuxExponent := b
 private lemma log_six_exp_one_le_three :
     Real.log (6 * Real.exp 1) ≤ (3 : ℝ) := by
   rw [Real.log_le_iff_le_exp (by positivity)]
-  refine le_trans (b := (Real.exp 1) ^ (2 : ℕ) * Real.exp 1) ?_ ?_
+  apply le_trans (b := (Real.exp 1) ^ (2 : ℕ) * Real.exp 1)
   · apply le_of_lt
     apply mul_lt_mul_of_pos_right
     · nlinarith [Real.exp_one_gt_d9]
@@ -204,7 +204,7 @@ private lemma medium_small_pack_exp_le {k : ℕ} {q c : ℝ}
     norm_num
     nlinarith [log_two_gt_half]
   have hkc : (k : ℝ) ^ (1 - 2 * c) ≤ (k : ℝ) := by
-    refine le_trans (b := (k : ℝ) ^ (1 : ℝ)) ?_ ?_
+    apply le_trans (b := (k : ℝ) ^ (1 : ℝ))
     · apply Real.rpow_le_rpow_of_exponent_le hkR_one
       nlinarith
     · rw [Real.rpow_one]
@@ -323,9 +323,9 @@ private lemma medium_log_ratio_bound_for_gap {γ c q : ℝ}
         dsimp [a] at h ⊢
         field_simp [hγ_pos.ne'] at h ⊢
         nlinarith
-      refine (mul_le_mul_of_nonneg_left
+      apply (mul_le_mul_of_nonneg_left
         (hratio.trans (mul_le_mul_of_nonneg_right hratio_C hq_pos.le))
-        (by positivity)).trans_eq ?_
+        (by positivity)).trans_eq
       field_simp [ne_of_gt hQ_gt_one]
       ring
     · rw [le_div_iff₀ (by norm_num : (0 : ℝ) < 4)]
@@ -371,7 +371,7 @@ private lemma medium_small_slice_bound {γ gap : ℝ} (hγ_pos : 0 < γ) (hγ_le
         (n : ℝ) ^ (2 * (m : ℝ) / (k : ℝ) + 1) *
           ((6 * Real.exp 1 * (m : ℝ)) / (k : ℝ)) ^ (6 * k) *
             Real.exp ((k : ℝ) ^ (1 - 2 * c)) := by
-    refine pairSumsetsFamily_ncard_le_of_small_sumset n k m c ?_ ?_ ?_ ?_
+    apply pairSumsetsFamily_ncard_le_of_small_sumset n k m c
     · exact hm_mem.2.2
     · rfl
     · exact hk_large
@@ -413,7 +413,7 @@ private lemma medium_small_slice_bound {γ gap : ℝ} (hγ_pos : 0 < γ) (hγ_le
           (n : ℝ) ^ (-(2 + γ) * q) ≤
         (n : ℝ) ^ (-(γ * C / 2)) :=
     medium_small_exponential_part_le hγ_pos hn hq_pos hCq hbudget
-  refine (mul_le_mul hcount hδpow (pow_nonneg hδ_pos.le m) (by positivity)).trans ?_
+  apply (mul_le_mul hcount hδpow (pow_nonneg hδ_pos.le m) (by positivity)).trans
   refine le_trans (b :=
     (n : ℝ) ^ (2 * q + 1) * Real.exp ((12 * (k : ℝ)) * Real.log q) *
       (n : ℝ) ^ (-(2 + γ) * q)) ?_ hexp_part
@@ -468,7 +468,7 @@ private lemma medium_large_slice_bound {γ gap : ℝ} (hγ_pos : 0 < γ)
         (n : ℝ) ^ (-(γ * C / 2)) :=
     medium_large_exponential_part_le hγ_pos hn hk hkcq (by simpa [C, c] using hkcC)
       (by simpa [c] using hlog_control)
-  refine (mul_le_mul hcount hδpow (pow_nonneg hδ_pos.le m) (by positivity)).trans ?_
+  apply (mul_le_mul hcount hδpow (pow_nonneg hδ_pos.le m) (by positivity)).trans
   convert hexp_part using 1
   all_goals
     first
@@ -514,30 +514,30 @@ private lemma moderateSumsetCardScale_bounds {γ c : ℝ} (hγ_pos : 0 < γ)
       positivity
     positivity
   have hA_le_kc : A ≤ (k : ℝ) ^ moderateSumsetAuxExponent := by
-    refine le_trans
-      (b := (A ^ ((2 : ℝ) ^ (8 : ℕ))) ^ moderateSumsetAuxExponent) ?_ ?_
+    apply le_trans
+      (b := (A ^ ((2 : ℝ) ^ (8 : ℕ))) ^ moderateSumsetAuxExponent)
     · rw [← Real.rpow_mul hA_nonneg]
       norm_num [moderateSumsetAuxExponent]
     · apply Real.rpow_le_rpow (Real.rpow_nonneg hA_nonneg _)
       · refine (le_max_left (A ^ ((2 : ℝ) ^ (8 : ℕ)))
           (B ^ ((2 : ℝ) ^ (9 : ℕ)))).trans ?_
-        refine (le_max_right (smallSumsetClassCountThreshold : ℝ)
-          (max (A ^ ((2 : ℝ) ^ (8 : ℕ))) (B ^ ((2 : ℝ) ^ (9 : ℕ))))).trans ?_
+        apply (le_max_right (smallSumsetClassCountThreshold : ℝ)
+          (max (A ^ ((2 : ℝ) ^ (8 : ℕ))) (B ^ ((2 : ℝ) ^ (9 : ℕ))))).trans
         simpa [moderateSumsetCardScale, A, B] using hscale
       · exact moderateSumsetAuxExponent_pos.le
   refine ⟨?_, (le_max_left _ _).trans hA_le_kc,
     (le_max_right _ _).trans hA_le_kc, ?_⟩
   · exact_mod_cast (le_max_left (smallSumsetClassCountThreshold : ℝ) _).trans hscale
   · change B ≤ (k : ℝ) ^ (moderateSumsetAuxExponent / 2)
-    refine le_trans
-      (b := (B ^ ((2 : ℝ) ^ (9 : ℕ))) ^ (moderateSumsetAuxExponent / 2)) ?_ ?_
+    apply le_trans
+      (b := (B ^ ((2 : ℝ) ^ (9 : ℕ))) ^ (moderateSumsetAuxExponent / 2))
     · rw [← Real.rpow_mul hB_nonneg]
       norm_num [moderateSumsetAuxExponent]
     · apply Real.rpow_le_rpow (Real.rpow_nonneg hB_nonneg _)
       · refine (le_max_right (A ^ ((2 : ℝ) ^ (8 : ℕ)))
           (B ^ ((2 : ℝ) ^ (9 : ℕ)))).trans ?_
-        refine (le_max_right (smallSumsetClassCountThreshold : ℝ)
-          (max (A ^ ((2 : ℝ) ^ (8 : ℕ))) (B ^ ((2 : ℝ) ^ (9 : ℕ))))).trans ?_
+        apply (le_max_right (smallSumsetClassCountThreshold : ℝ)
+          (max (A ^ ((2 : ℝ) ^ (8 : ℕ))) (B ^ ((2 : ℝ) ^ (9 : ℕ))))).trans
         simpa [moderateSumsetCardScale, A, B] using hscale
       · nlinarith [moderateSumsetAuxExponent_pos]
 
@@ -573,7 +573,7 @@ private lemma pairCardThreshold_ge_scale_of_density_lower {τ R α : ℝ} {n : �
     div_lt_div_of_pos_left (mul_pos hτ_pos hL_pos) hlog_inv_pos hlog_inv_lt
   rw [hα] at hdiv_lt
   field_simp [hτ_pos.ne', hR_pos.ne', hL_pos.ne'] at hdiv_lt
-  refine le_trans (b := τ * L / Real.log (1 / δ)) ?_ ?_
+  apply le_trans (b := τ * L / Real.log (1 / δ))
   · apply le_of_lt
     rw [lt_div_iff₀ hlog_inv_pos]
     nlinarith [hdiv_lt]
@@ -604,7 +604,7 @@ private lemma medium_log_control_of_scale {γ gap : ℝ} (hγ_pos : 0 < γ)
     nlinarith [moderateSumsetAuxExponent_pos]
   have ha_nonneg : 0 ≤ a := by dsimp [a]; positivity
   have hlog_le : Real.log (k : ℝ) ≤ 512 * a := by
-    refine (Real.log_le_rpow_div hkR_pos.le hc_half_pos).trans_eq ?_
+    apply (Real.log_le_rpow_div hkR_pos.le hc_half_pos).trans_eq
     dsimp [a, c]
     norm_num [moderateSumsetAuxExponent]
     field_simp
@@ -618,9 +618,9 @@ private lemma medium_log_control_of_scale {γ gap : ℝ} (hγ_pos : 0 < γ)
   have hBmul : 49152 * q ≤ γ * a := by
     simpa [a, c, q, mul_comm] using hB
   have hlog_gamma : (96 * q) * Real.log (k : ℝ) ≤ γ * kc := by
-    refine (mul_le_mul_of_nonneg_left hlog_le
-      (mul_nonneg (by norm_num) hq_pos.le)).trans ?_
-    refine le_trans (b := (49152 * q) * a) ?_ ?_
+    apply (mul_le_mul_of_nonneg_left hlog_le
+      (mul_nonneg (by norm_num) hq_pos.le)).trans
+    apply le_trans (b := (49152 * q) * a)
     · ring_nf
       exact le_rfl
     · refine (mul_le_mul_of_nonneg_right hBmul ha_nonneg).trans_eq ?_

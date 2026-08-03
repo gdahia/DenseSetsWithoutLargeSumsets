@@ -51,7 +51,8 @@ lemma centeredBoxGAP_gapMap (step : Fin s → (Fin s → ℤ)) (m : Fin s → �
   have hsum :
       (∑ i, ((w i : ℤ) - (m i : ℤ)) • step i) =
         ∑ i, ((w i : ℕ) • step i - m i • step i) := by
-    refine Finset.sum_congr rfl fun i _ ↦ ?_
+    apply Finset.sum_congr rfl
+    intro i _
     rw [sub_zsmul, natCast_zsmul, natCast_zsmul, sub_eq_add_neg]
   rw [hsum, Finset.sum_sub_distrib]
   abel

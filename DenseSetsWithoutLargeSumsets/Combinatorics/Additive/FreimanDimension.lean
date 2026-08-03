@@ -88,8 +88,7 @@ lemma lt_two_mul_of_truncated_bound {b r κ : ℕ} (hr : 1 ≤ r) (hrb : r ≤ b
     (hbound : b + (Nat.choose r 2 + (b - r) * (r - 1)) ≤ κ * b) :
     r < 2 * κ := by
   by_contra hnot
-  refine truncated_bound_contradiction (b := (b : ℚ)) (r := (r : ℚ)) (κ := (κ : ℚ))
-    ?_ ?_ ?_ ?_
+  apply truncated_bound_contradiction (b := (b : ℚ)) (r := (r : ℚ)) (κ := (κ : ℚ))
   · exact_mod_cast hr
   · exact_mod_cast hrb
   · exact_mod_cast Nat.le_of_not_gt hnot

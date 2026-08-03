@@ -47,14 +47,14 @@ private lemma mul_log_Ax_le_self_of_two_mul_log {A T x : ℝ}
 
 private lemma lower_log_le_quarter_self_of_sixteen_le {x : ℝ} (hx : 16 ≤ x) :
     Real.log x ≤ x / 4 := by
-  refine (by
+  apply (by
     have hlog_eq : Real.log x = 2 * Real.log (Real.sqrt x) := by
       nth_rw 1 [← Real.sq_sqrt (by nlinarith : 0 ≤ x)]
       rw [Real.log_pow]
       norm_num
     rw [hlog_eq]
     nlinarith [log_le_half_self (Real.sqrt_pos.2 (by nlinarith : 0 < x))] :
-    Real.log x ≤ Real.sqrt x).trans ?_
+    Real.log x ≤ Real.sqrt x).trans
   rw [Real.sqrt_le_left (by nlinarith : 0 ≤ x / 4)]
   nlinarith [mul_nonneg (by nlinarith : 0 ≤ x) (by nlinarith : 0 ≤ x - 16)]
 
@@ -89,8 +89,8 @@ private lemma log_eightyfour_gt_four : (4 : ℝ) < Real.log (84 : ℝ) := by
 lemma fifteen_lt_log_of_lowerAnalyticThreshold {C γ : ℝ} {n : ℕ}
     (hn : lowerSizeThreshold C γ < n) :
     (15 : ℝ) < Real.log (n : ℝ) := by
-  refine (by nlinarith [log_fiftysix_gt_seven_div_two] :
-    (15 : ℝ) < 4 * Real.log (56 : ℝ) + 1).trans ?_
+  apply (by nlinarith [log_fiftysix_gt_seven_div_two] :
+    (15 : ℝ) < 4 * Real.log (56 : ℝ) + 1).trans
   rw [← Real.log_exp (4 * Real.log (56 : ℝ) + 1)]
   apply Real.log_lt_log (Real.exp_pos _)
   exact (Real.exp_le_exp.mpr (le_max_left _ _)).trans_lt
@@ -195,7 +195,7 @@ lemma freiman_image_sum_card {G H : Type*} [DecidableEq G] [DecidableEq H]
     (hAX : A ⊆ X) (hBX : B ⊆ X) :
     (A.image f + B.image f).card = (A + B).card := by
   classical
-  refine Eq.trans (b := ((A ×ˢ B).image (fun p : G × G => f p.1 + f p.2)).card) ?_ ?_
+  apply Eq.trans (b := ((A ×ˢ B).image (fun p : G × G => f p.1 + f p.2)).card)
   · apply congrArg Finset.card
     ext y
     constructor
@@ -245,11 +245,11 @@ private lemma log_one_div_unitInterval_lt_lowerDensityExponent_mul_log {γ C : �
   unitInterval}
     (hn_pos : 0 < n) (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) :
     Real.log (1 / δ) < lowerDensityExponent C γ * Real.log (n : ℝ) := by
-  refine (Real.log_lt_log (by
+  apply (Real.log_lt_log (by
     apply div_pos
     · norm_num
     · exact (Real.rpow_pos_of_pos (by exact_mod_cast hn_pos : 0 < (n : ℝ)) _).trans hδ_lower)
-    (one_div_unitInterval_lt_rpow_lowerDensityExponent hn_pos hδ_lower)).trans_eq ?_
+    (one_div_unitInterval_lt_rpow_lowerDensityExponent hn_pos hδ_lower)).trans_eq
   rw [Real.log_rpow (by exact_mod_cast hn_pos : 0 < (n : ℝ))]
 
 lemma log_one_div_unitInterval_pos {γ C : ℝ} {n : ℕ} {δ : unitInterval}
@@ -270,7 +270,7 @@ lemma pairCardThreshold_arg_le {γ : ℝ} {n : ℕ} {δ : unitInterval} :
 private lemma lowerDensityExponent_le_gamma_div_ninetysix_sq {C γ : ℝ}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) :
     lowerDensityExponent C γ ≤ γ / (96 * C ^ (2 : ℕ)) := by
-  refine (lowerDensityExponent_le_first_component_half C γ).trans_eq ?_
+  apply (lowerDensityExponent_le_first_component_half C γ).trans_eq
   unfold ε
   field_simp [(sq_pos_of_pos (zero_lt_one.trans_le hC_one)).ne', (by linarith : γ + 2 ≠ 0)]
   ring
@@ -284,19 +284,19 @@ private lemma two_mul_ceil_κ_sub_one_pos {C : ℝ} (hC_one : 1 ≤ C) :
 
 private lemma two_mul_ceil_κ_sub_one_le_fourteen_sq {C : ℝ} (hC_one : 1 ≤ C) :
     ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ) ≤ 14 * C ^ (2 : ℕ) := by
-  refine (by exact_mod_cast (Nat.sub_le (2 * ⌈κ C⌉₊) 1) :
-    ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ) ≤ 2 * (⌈κ C⌉₊ : ℝ)).trans ?_
-  refine (mul_le_mul_of_nonneg_left
+  apply (by exact_mod_cast (Nat.sub_le (2 * ⌈κ C⌉₊) 1) :
+    ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ) ≤ 2 * (⌈κ C⌉₊ : ℝ)).trans
+  apply (mul_le_mul_of_nonneg_left
     (le_of_lt (Nat.ceil_lt_add_one
       ((by norm_num : (0 : ℝ) ≤ 6).trans (κ_ge_six_of_one_le hC_one))))
-    (by norm_num : (0 : ℝ) ≤ 2)).trans ?_
+    (by norm_num : (0 : ℝ) ≤ 2)).trans
   unfold κ
   nlinarith [sq_nonneg (C - 1)]
 
 private lemma two_mul_ceil_κ_sub_one_mul_lowerDensityExponent_lt {C γ : ℝ}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) :
     ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ) * lowerDensityExponent C γ < 3 + γ := by
-  refine lt_of_le_of_lt (b := (7 / 48) * γ) ?_ ?_
+  apply lt_of_le_of_lt (b := (7 / 48) * γ)
   · refine le_trans (b := (14 * C ^ (2 : ℕ)) * lowerDensityExponent C γ) ?_ ?_
     · apply mul_le_mul_of_nonneg_right
       · exact two_mul_ceil_κ_sub_one_le_fourteen_sq hC_one
@@ -317,8 +317,8 @@ private lemma pairCardThreshold_gt_of_mul_lowerDensityExponent_lt {γ C R : ℝ}
     (hRα_lt : R * lowerDensityExponent C γ < 3 + γ) :
     R < (pairCardThreshold (3 + γ) n δ : ℝ) := by
   refine lt_of_lt_of_le ?_ pairCardThreshold_arg_le
-  refine lt_trans (b := (3 + γ) * Real.log (n : ℝ) /
-      (lowerDensityExponent C γ * Real.log (n : ℝ))) ?_ ?_
+  apply lt_trans (b := (3 + γ) * Real.log (n : ℝ) /
+      (lowerDensityExponent C γ * Real.log (n : ℝ)))
   · rw [lt_div_iff₀ (mul_pos (lowerDensityExponent_pos_of_one_le hγ_pos hC_one)
       (Real.log_pos (by exact_mod_cast hn_one : (1 : ℝ) < n)))]
     nlinarith [mul_lt_mul_of_pos_right hRα_lt
@@ -341,8 +341,8 @@ private lemma two_mul_chang_size_threshold_mul_lowerDensityExponent_lt {γ C : �
     (2 * (Real.exp (changContainerExponent (κ C)))) * lowerDensityExponent C γ <
       3 + γ := by
   have hT : (0 : ℝ) < Real.exp (changContainerExponent (κ C)) := chang_size_threshold_pos C
-  refine lt_of_le_of_lt (mul_le_mul_of_nonneg_left
-    (lowerDensityExponent_le_second_component_half C γ) (by positivity)) ?_
+  apply lt_of_le_of_lt (mul_le_mul_of_nonneg_left
+    (lowerDensityExponent_le_second_component_half C γ) (by positivity))
   rw [div_div, ← mul_div_assoc, div_lt_iff₀ (by positivity)]
   nlinarith
 
@@ -366,7 +366,7 @@ lemma two_mul_chang_size_threshold_lt_pairCardThreshold {γ C : ℝ} {n : ℕ}
 private lemma fourteen_mul_sq_div_ε_mul_lowerDensityExponent_lt {γ C : ℝ}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) :
     (14 * C ^ (2 : ℕ) / ε γ) * lowerDensityExponent C γ < 3 + γ := by
-  refine lt_of_le_of_lt (b := 14 * (2 + γ) / 24) ?_ ?_
+  apply lt_of_le_of_lt (b := 14 * (2 + γ) / 24)
   · refine le_trans (b :=
       (14 * C ^ (2 : ℕ) / ε γ) *
         (((2 + γ) * ε γ) / (24 * C ^ (2 : ℕ)))) ?_ ?_
@@ -462,13 +462,13 @@ lemma density_coeff_log_lt_exp_neg_mul_q {C γ c : ℝ} {n q : ℕ}
   have hfactor : 2 * K * Real.exp (changExponent C) < Real.sqrt (n : ℝ) := by
     simpa [Real.sqrt_sq (by positivity : 0 ≤ 2 * K * Real.exp (changExponent C))] using
       Real.sqrt_lt_sqrt (sq_nonneg (2 * K * Real.exp (changExponent C))) hsquare
-  refine (mul_le_mul_of_nonneg_left (log_nat_le_two_sqrt_of_old_model_threshold hn_old)
-    (mul_nonneg (by norm_num) hK_pos.le)).trans_lt ?_
+  apply (mul_le_mul_of_nonneg_left (log_nat_le_two_sqrt_of_old_model_threshold hn_old)
+    (mul_nonneg (by norm_num) hK_pos.le)).trans_lt
   have hsqrt : 4 * K * Real.sqrt (n : ℝ) <
       2 * Real.exp (-(changExponent C)) * (n : ℝ) := by
-    refine lt_of_eq_of_lt (b :=
+    apply lt_of_eq_of_lt (b :=
       (2 * K * Real.exp (changExponent C)) *
-        (2 * (Real.exp (-(changExponent C)) * Real.sqrt (n : ℝ)))) ?_ ?_
+        (2 * (Real.exp (-(changExponent C)) * Real.sqrt (n : ℝ))))
     · rw [Real.exp_neg]
       field_simp
       ring
@@ -498,17 +498,17 @@ lemma lowerLogScale_log_bound_of_gap {C γ c : ℝ} {n : ℕ}
   · exact (by norm_num : (0 : ℝ) < 15).trans
       (fifteen_lt_log_of_lowerAnalyticThreshold hn_old)
   rw [← lowerConstantDefault_eq C γ hC hε]
-  refine le_of_lt ?_
+  apply le_of_lt
   rw [← Real.log_exp (2 * lowerLogScale γ * Real.log
     (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
       lowerLogScale γ))]
   apply Real.log_lt_log (Real.exp_pos _)
-  refine (Real.exp_le_exp.mpr (le_max_left
+  apply (Real.exp_le_exp.mpr (le_max_left
     (2 * lowerLogScale γ * Real.log
       (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
     ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
       (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
-        lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ)))).trans_lt ?_
+        lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ)))).trans_lt
   exact ((le_max_right
     ((2 * densityCoefficient (3 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ))
     (Real.exp (max
@@ -528,17 +528,17 @@ private lemma lowerGapSqrtScale_threshold_bound {C γ c : ℝ} {n : ℕ}
       Real.sqrt (Real.log (n : ℝ)) := by
   apply Real.le_sqrt_of_sq_le
   rw [← lowerConstantDefault_eq C γ hC hε, ← lowerGapSqrtScaleDefault_eq C γ c hC hε]
-  refine le_of_lt ?_
+  apply le_of_lt
   rw [← Real.log_exp ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
     (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
       lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ))]
   apply Real.log_lt_log (Real.exp_pos _)
-  refine (Real.exp_le_exp.mpr (le_max_right
+  apply (Real.exp_le_exp.mpr (le_max_right
     (2 * lowerLogScale γ * Real.log
       (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
     ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
       (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
-        lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ)))).trans_lt ?_
+        lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ)))).trans_lt
   exact ((le_max_right
     ((2 * densityCoefficient (3 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ))
     (Real.exp (max
@@ -600,7 +600,7 @@ lemma lowerGapSqrtScale_log_bound {C γ c : ℝ} {n : ℕ}
           lowerGapSqrtScale_threshold_bound (C := C) (γ := γ) (c := c) hC hε hn
       have hfour : (4 : ℝ) ≤ Real.log
           (2 * M * lowerConstant C γ hC hε * lowerGapSqrtScale C γ c hC hε) := by
-        refine (le_of_lt log_eightyfour_gt_four).trans ?_
+        apply (le_of_lt log_eightyfour_gt_four).trans
         apply Real.log_le_log (by norm_num)
         nlinarith [one_le_lowerConstant hC hε,
           one_le_lowerGapSqrtScale hγ_pos hγ_le hC hε hc_pos hc_lt,

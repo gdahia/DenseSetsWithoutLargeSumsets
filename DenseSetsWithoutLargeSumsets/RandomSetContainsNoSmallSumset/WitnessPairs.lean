@@ -186,10 +186,12 @@ lemma bltDimSmallWitnessPairs_card_le (P : Finset ℕ) (D k : ℕ) (C γ : ℝ)
     rw [Finset.mem_product]
     constructor
     · rw [mem_subsetsUpToCard]
-      refine ⟨Finset.mem_powerset.mp hprod.1, ?_⟩
+      constructor
+      · exact Finset.mem_powerset.mp hprod.1
       exact_mod_cast hp₁.trans hceil
     · rw [mem_subsetsUpToCard]
-      refine ⟨Finset.mem_powerset.mp hprod.2, ?_⟩
+      constructor
+      · exact Finset.mem_powerset.mp hprod.2
       exact_mod_cast hp₂.trans hceil
   · rw [Finset.card_product]
     apply Nat.mul_le_mul

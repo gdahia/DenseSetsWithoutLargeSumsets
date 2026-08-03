@@ -171,7 +171,9 @@ lemma exists_intVectorToReal_of_mem_standardIntegerLattice {d : ℕ} {x : Fin d 
     (hx : x ∈ standardIntegerLattice d) : ∃ v : Fin d → ℤ, intVectorToReal v = x := by
   rw [standardIntegerLattice, (Pi.basisFun ℝ (Fin d)).mem_span_iff_repr_mem ℤ] at hx
   choose v hv using hx
-  refine ⟨v, funext fun i ↦ ?_⟩
+  use v
+  apply funext
+  intro i
   simpa [intVectorToReal] using hv i
 
 lemma mem_standardIntegerLattice_of_mem_subspaceIntegerLattice {d : ℕ}

@@ -67,10 +67,10 @@ theorem exists_properGAP_of_small_sumset {q : ℕ} {κ : ℝ} (X : Finset (ZMod 
         changTheoremExponent κ →
       Real.exp (A * ((P.dim : ℝ) + 2) ^ 4) * P.carrier.card ≤ q := by
     intro A hA hAC
-    refine le_trans (mul_le_mul (Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left hfourth hA))
-      hPcard (Nat.cast_nonneg _) (Real.exp_nonneg _)) ?_
+    apply le_trans (mul_le_mul (Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left hfourth hA))
+      hPcard (Nat.cast_nonneg _) (Real.exp_nonneg _))
     rw [← mul_assoc, ← Real.exp_add]
-    refine le_trans (mul_le_mul_of_nonneg_left hXupper.le (Real.exp_nonneg _)) ?_
+    apply le_trans (mul_le_mul_of_nonneg_left hXupper.le (Real.exp_nonneg _))
     rw [← mul_assoc, ← Real.exp_add]
     refine le_trans (mul_le_mul_of_nonneg_right (Real.exp_le_one_iff.mpr (by linarith))
       (Nat.cast_nonneg q)) (le_of_eq (one_mul _))
@@ -89,7 +89,7 @@ theorem exists_properGAP_of_small_sumset {q : ℕ} {κ : ℝ} (X : Finset (ZMod 
         P₂.carrier.card ≤
       Real.exp ((coordinateReductionConstant + properizationConstant) *
         ((P.dim : ℝ) + 2) ^ 4) * P.carrier.card := by
-    refine (mul_le_mul hexp₄ hP₂card (Nat.cast_nonneg _) (Real.exp_nonneg _)).trans ?_
+    apply (mul_le_mul hexp₄ hP₂card (Nat.cast_nonneg _) (Real.exp_nonneg _)).trans
     rw [← mul_assoc, ← Real.exp_add, ← add_mul]
   obtain ⟨Q, hQtwo, hXQ, hQdim, hQlen, hQcard⟩ :=
     chang_coordinate_reduction X P₂ hq hXne (hXP.trans hPP₂) hP₂two
@@ -97,9 +97,9 @@ theorem exists_properGAP_of_small_sumset {q : ℕ} {κ : ℝ} (X : Finset (ZMod 
         (by rw [changTheoremExponent]; nlinarith)))
   refine ⟨Q.toProperGAP (GAP.twoProper_proper Q hQtwo) hQlen, hXQ, hQdim, ?_⟩
   -- The accumulated cost is `exp (changTheoremExponent κ) |X|`.
-  refine ((hQcard.trans hmid).trans (mul_le_mul
+  apply ((hQcard.trans hmid).trans (mul_le_mul
     (Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left hfourth (by linarith)))
-    hPcard (Nat.cast_nonneg _) (Real.exp_nonneg _))).trans ?_
+    hPcard (Nat.cast_nonneg _) (Real.exp_nonneg _))).trans
   rw [← mul_assoc, ← Real.exp_add]
   refine mul_le_mul_of_nonneg_right (Real.exp_le_exp.mpr ?_) (Nat.cast_nonneg _)
   rw [changTheoremExponent]

@@ -103,14 +103,14 @@ lemma binomialFinsetSubset_real_superset_nat
     · simp [f, g, hSfin, hxS, hSΩ hxS]
     · simp [f, g, hSfin, hxS]
   have hg_meas : Measurable g := by
-    refine measurable_to_countable' ?_
+    apply measurable_to_countable'
     intro F
     by_cases hFΩ : (F : Set ℕ) ⊆ Ω
     · let E : Set (Set ℕ) :=
         ⋂ x ∈ hΩ.toFinset,
           if x ∈ F then {S : Set ℕ | x ∈ S} else {S : Set ℕ | x ∉ S}
       have measurable_E : MeasurableSet E := by
-        refine MeasurableSet.biInter (hΩ.toFinset.countable_toSet) ?_
+        apply MeasurableSet.biInter (hΩ.toFinset.countable_toSet)
         intro x hx
         by_cases hxF : x ∈ F
         · simpa [hxF] using measurable_set_mem x
@@ -197,14 +197,14 @@ lemma binomialFinsetSubset_real_singleton_nat_of_subset
     · simp [f, g, hSfin, hxS, hSΩ hxS]
     · simp [f, g, hSfin, hxS]
   have hg_meas : Measurable g := by
-    refine measurable_to_countable' ?_
+    apply measurable_to_countable'
     intro F
     by_cases hFΩ : (F : Set ℕ) ⊆ Ω
     · let E : Set (Set ℕ) :=
         ⋂ x ∈ hΩ.toFinset,
           if x ∈ F then {S : Set ℕ | x ∈ S} else {S : Set ℕ | x ∉ S}
       have measurable_E : MeasurableSet E := by
-        refine MeasurableSet.biInter (hΩ.toFinset.countable_toSet) ?_
+        apply MeasurableSet.biInter (hΩ.toFinset.countable_toSet)
         intro x hx
         by_cases hxF : x ∈ F
         · simpa [hxF] using measurable_set_mem x
@@ -412,7 +412,7 @@ private lemma centered_boundary_cost_le (s d : ℕ) (hs : 0 < s) (hd : 0 < d) :
       (by omega : s + d - (s - 1) = d + 1)] using
         Nat.choose_mul_succ_eq (s + d - 1) (s - 1))
   change R ≤ _
-  refine hRQ.trans_eq ?_
+  apply hRQ.trans_eq
   dsimp [R, Q]
   rw [one_sub_div (by positivity : (s + d + 1 : ℝ) ≠ 0),
     one_sub_div (by positivity : (s + d : ℝ) ≠ 0)]
@@ -507,7 +507,7 @@ private lemma antitoneOn_boundaryKernel
     (n s : ℕ) (hs : 0 < s) (hns : 2 * s ≤ n) :
     AntitoneOn (boundaryKernel n s)
       (Set.Icc ((s : ℝ) / (n + 1)) ((s : ℝ) / n)) := by
-  refine antitoneOn_of_deriv_nonpos (convex_Icc _ _) ?_ ?_ ?_
+  apply antitoneOn_of_deriv_nonpos (convex_Icc _ _)
   · unfold boundaryKernel
     fun_prop
   · unfold boundaryKernel
@@ -533,9 +533,9 @@ private lemma antitoneOn_boundaryKernel
       exact mul_nonpos_of_nonpos_of_nonneg (neg_nonpos.mpr (Nat.cast_nonneg _))
         (pow_nonneg hx1 _)
     · rw [(hasDerivAt_boundaryKernel_of_two_le n s (by omega) (by omega) x).deriv]
-      refine mul_nonpos_of_nonneg_of_nonpos
+      apply mul_nonpos_of_nonneg_of_nonpos
         (mul_nonneg (pow_nonneg (le_trans (by positivity) hxa) _)
-          (pow_nonneg hx1 _)) ?_
+          (pow_nonneg hx1 _))
       rw [Nat.cast_sub (by omega : 1 ≤ s), Nat.cast_sub (by omega : s ≤ n)]
       norm_num only [Nat.cast_one]
       have hnsub : (0 : ℝ) < (n : ℝ) - 1 :=
@@ -748,14 +748,13 @@ private lemma binomialMass_reflection
         have hnu : n - u = (n - r) - j + 1 := by dsimp [u]; omega
         have hl_lt : l < n := by dsimp [l]; omega
         have hu_lt : u < n := by dsimp [u]; omega
-        refine le_of_paired_recurrences
+        apply le_of_paired_recurrences
           (x := binomialMass n l p) (y := binomialMass n (r - j) p)
           (z := binomialMass n u p) (w := binomialMass n (r + j) p)
           (A := ((n - l : ℕ) : ℝ) * (p : ℝ))
           (B := ((l + 1 : ℕ) : ℝ) * (1 - (p : ℝ)))
           (C := ((n - u : ℕ) : ℝ) * (p : ℝ))
           (D := ((u + 1 : ℕ) : ℝ) * (1 - (p : ℝ)))
-          ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_
         · rw [hl_succ]
           simpa only [hl_succ, Nat.cast_add, Nat.cast_one, mul_assoc] using
             binomialMass_mul_succ n l p hl_lt
@@ -914,7 +913,7 @@ private lemma binomialMass_le_next_add_next
     norm_num
     have hrr : (3 : ℝ) ≤ r := by exact_mod_cast hr
     nlinarith [sq_nonneg ((r : ℝ) - 3)]
-  refine (le_mul_of_one_le_left ha0 hcoeff).trans ?_
+  apply (le_mul_of_one_le_left ha0 hcoeff).trans
   nlinarith [hb, hc, mul_le_mul_of_nonneg_left hb
     (by positivity : (0 : ℝ) ≤ ((r - 1 : ℕ) : ℝ) / (r + 2))]
 
@@ -926,7 +925,7 @@ private lemma one_fourth_le_binomialUpperTail_succ_of_le_half
     (1 / 4 : ℝ) ≤ binomialUpperTail n (r + 1) p := by
   have hhalf := one_half_le_binomialUpperTail_of_le_half n r p (by omega) h2r hmean hp_half
   have hnextTail : binomialMass n r p ≤ binomialUpperTail n (r + 1) p := by
-    refine (binomialMass_le_next_add_next n r p hr h2r hmean hp_half).trans ?_
+    apply (binomialMass_le_next_add_next n r p hr h2r hmean hp_half).trans
     suffices ∑ k ∈ ({r + 1, r + 2} : Finset ℕ), binomialMass n k p ≤
         binomialUpperTail n (r + 1) p by
       simpa using this
@@ -1086,7 +1085,7 @@ private lemma one_fourth_le_binomialLower_half_at_midpoint
         nlinarith
       have hhalf := one_half_le_binomialUpperTail_of_le_half
         n (n / 2) halfParameter hr (by omega) hmean (by simp)
-      refine (by norm_num : (1 / 4 : ℝ) ≤ 1 / 2).trans ?_
+      apply (by norm_num : (1 / 4 : ℝ) ≤ 1 / 2).trans
       convert hhalf using 1
       all_goals try rfl
       congr 1

@@ -124,7 +124,7 @@ private lemma relation_iff_mem_relationSpace {t : ℕ} (a : Fin t → ℕ)
 
 private lemma finrank_relationSpace_le {t : ℕ} (a : Fin t → ℕ) :
     Module.finrank ℚ (relationSpace a) ≤ t := by
-  refine (relationSpace a).finrank_le.trans_eq ?_
+  apply (relationSpace a).finrank_le.trans_eq
   simp
 
 /-- At most `t` four-term relations span all relations of a `t`-tuple. The function is padded by
@@ -149,7 +149,7 @@ private lemma exists_relation_code {t : ℕ} (ht : 0 < t) (a : Fin t → ℕ) :
     abel
   let code : Fin t → RelationIndex t := fun i ↦
     if hi : i.val < d then index ⟨i.val, hi⟩ else zeroIndex
-  refine ⟨code, ?_⟩
+  use code
   change Submodule.span ℚ (relationVector '' Set.range code) = Submodule.span ℚ relations
   rw [← hbasis_span]
   apply le_antisymm
@@ -569,7 +569,7 @@ lemma canonicalFreimanRelationCode_eq_of_equivalent {s t : ℕ} (ht : 0 < t)
     (H := finsetFreimanRelationCodes_nonempty (s := s) ht X)
     ((finsetFreimanRelationCodes (s := s) ht Y).min'
       (finsetFreimanRelationCodes_nonempty (s := s) ht Y))).mpr
-  refine ⟨?_, ?_⟩
+  constructor
   · rw [finsetFreimanRelationCodes_eq_of_equivalent ht hXY]
     exact Finset.min'_mem _ _
   · intro code hcode
@@ -833,9 +833,9 @@ lemma ncard_restrictedSumset_subset_class_image_le {l u : ℕ}
       exact ⟨hDC, D.2⟩
     refine ⟨⟨D.1, hDmem⟩, ?_⟩
     exact hBD.symm
-  refine (Set.ncard_le_ncard hinclusion (ht := Set.toFinite _)).trans ?_
+  apply (Set.ncard_le_ncard hinclusion (ht := Set.toFinite _)).trans
   rw [← Set.image_univ]
-  refine (Set.ncard_image_le (s := Set.univ)).trans_eq ?_
+  apply (Set.ncard_image_le (s := Set.univ)).trans_eq
   rw [Set.ncard_univ, Nat.card_eq_fintype_card, Fintype.card_coe]
   unfold subsets
   exact Finset.card_powersetCard _ _
@@ -910,8 +910,8 @@ lemma relationModelDim_le_freimanDim {t : ℕ} (ht : 0 < t)
   unfold freimanDim
   apply Nat.le_findGreatest
   · rw [X.2]
-    refine (Nat.le_add_right _
-      (Module.finrank ℚ (relationSpace (finsetTuple X X.2)))).trans ?_
+    apply (Nat.le_add_right _
+      (Module.finrank ℚ (relationSpace (finsetTuple X X.2)))).trans
     rw [relationModelDim_add_relationRank ht]
     exact Nat.sub_le t 1
   · exact freimanModelDim_relationModel ht X

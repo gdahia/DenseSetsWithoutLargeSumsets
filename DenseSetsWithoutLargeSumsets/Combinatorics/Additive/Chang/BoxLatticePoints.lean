@@ -83,7 +83,7 @@ lemma convex_realBox (L : Fin d → ℕ) : Convex ℝ (realBox L) := by
   intro x hx y hy a b ha hb hab i
   rw [mem_realBox] at hx hy
   simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
-  refine le_trans (abs_add_le _ _) ?_
+  apply le_trans (abs_add_le _ _)
   rw [abs_mul, abs_mul, abs_of_nonneg ha, abs_of_nonneg hb]
   nlinarith [hx i, hy i, abs_nonneg (x i), abs_nonneg (y i)]
 
@@ -99,16 +99,19 @@ lemma isClosed_realBox (L : Fin d → ℕ) : IsClosed (realBox L) := by
   exact isClosed_iInter fun i ↦ isClosed_le ((continuous_apply i).abs) continuous_const
 
 lemma isBounded_realBox (L : Fin d → ℕ) : Bornology.IsBounded (realBox L) := by
-  refine Bornology.IsBounded.subset (Metric.isBounded_closedBall
-    (x := (0 : Fin d → ℝ)) (r := ((Finset.univ.sup L : ℕ) : ℝ))) fun x hx ↦ ?_
+  apply Bornology.IsBounded.subset (Metric.isBounded_closedBall
+    (x := (0 : Fin d → ℝ)) (r := ((Finset.univ.sup L : ℕ) : ℝ)))
+  intro x hx
   rw [mem_closedBall, dist_zero_right]
-  refine (pi_norm_le_iff_of_nonneg (Nat.cast_nonneg _)).mpr fun i ↦ ?_
+  apply (pi_norm_le_iff_of_nonneg (Nat.cast_nonneg _)).mpr
+  intro i
   refine le_trans (le_of_eq (Real.norm_eq_abs _)) (le_trans (hx i) (Nat.cast_le.mpr ?_))
   exact Finset.le_sup (Finset.mem_univ i)
 
 lemma realBox_mem_nhds {L : Fin d → ℕ} (hL : ∀ i, 0 < L i) :
     realBox L ∈ 𝓝 (0 : Fin d → ℝ) := by
-  refine Filter.mem_of_superset (Metric.ball_mem_nhds 0 zero_lt_one) fun x hx i ↦ ?_
+  apply Filter.mem_of_superset (Metric.ball_mem_nhds 0 zero_lt_one)
+  intro x hx i
   rw [mem_ball_zero_iff] at hx
   have hxi : ‖x i‖ ≤ ‖x‖ := norm_le_pi_norm x i
   have hLi : (1 : ℝ) ≤ (L i : ℝ) := by exact_mod_cast hL i
@@ -156,16 +159,24 @@ lemma ncard_inter_eq (Λ : AddSubgroup (Fin d → ℤ)) (L : Fin d → ℕ) :
       Set (Fin d → ℝ))).ncard = (latticeBoxPoints Λ L).ncard := by
   have himage : realBox L ∩ ((Λ.map (intCastHom : (Fin d → ℤ) →+ (Fin d → ℝ))) :
       Set (Fin d → ℝ)) = intCastHom '' latticeBoxPoints Λ L := by
-    refine Set.ext fun x ↦ ⟨fun hx ↦ ?_, ?_⟩
-    · obtain ⟨v, hvΛ, rfl⟩ := AddSubgroup.mem_map.mp hx.2
-      refine ⟨v, ⟨hvΛ, fun i ↦ ?_⟩, rfl⟩
-      have hi := hx.1 i
-      rw [intCastHom_apply, ← Int.cast_abs] at hi
-      exact_mod_cast hi
+    apply Set.ext
+    intro x
+    constructor
+    · intro hx
+      obtain ⟨v, hvΛ, rfl⟩ := AddSubgroup.mem_map.mp hx.2
+      refine ⟨v, ?_, rfl⟩
+      constructor
+      · exact hvΛ
+      · intro i
+        have hi := hx.1 i
+        rw [intCastHom_apply, ← Int.cast_abs] at hi
+        exact_mod_cast hi
     · rintro ⟨v, hv, rfl⟩
-      refine ⟨fun i ↦ ?_, AddSubgroup.mem_map.mpr ⟨v, hv.1, rfl⟩⟩
-      rw [intCastHom_apply, ← Int.cast_abs]
-      exact_mod_cast hv.2 i
+      constructor
+      · intro i
+        rw [intCastHom_apply, ← Int.cast_abs]
+        exact_mod_cast hv.2 i
+      · exact AddSubgroup.mem_map.mpr ⟨v, hv.1, rfl⟩
   rw [himage, Set.ncard_image_of_injective _ intCastHom_injective]
 
 /-! ## Comparison of the successive minima
@@ -183,14 +194,20 @@ lemma hasIndependentShort_of_map {Λ : AddSubgroup (Fin d → ℤ)} {L : Fin d �
     HasIndependentShort Λ L k t := by
   obtain ⟨w, hwindep, hw⟩ := h
   choose v hvΛ hvw using fun j ↦ AddSubgroup.mem_map.mp (hw j).1
-  refine ⟨v, Fintype.linearIndependent_iff.mpr fun c hc j ↦ ?_, fun j ↦ ⟨hvΛ j, fun i ↦ ?_⟩⟩
-  · have hsum := congrArg (intCastHom (d := d)) hc
+  refine ⟨v, ?_, ?_⟩
+  · refine Fintype.linearIndependent_iff.mpr ?_
+    intro c hc j
+    have hsum := congrArg (intCastHom (d := d)) hc
     rw [map_sum, map_zero] at hsum
     simp only [intCastHom_zsmul, hvw] at hsum
     exact_mod_cast Fintype.linearIndependent_iff.mp hwindep (fun j ↦ (c j : ℝ)) hsum j
-  · have hi := abs_le_of_mem_smul_realBox ht (hw j).2 i
-    rw [← hvw j, intCastHom_apply] at hi
-    exact hi
+  · intro j
+    constructor
+    · exact hvΛ j
+    · intro i
+      have hi := abs_le_of_mem_smul_realBox ht (hw j).2 i
+      rw [← hvw j, intCastHom_apply] at hi
+      exact hi
 
 /-- The first minimum of a subgroup of `ℤ ^ d` with respect to a box of positive half-widths is
 positive, hence so is every minimum realized by an independent family. -/
@@ -243,10 +260,12 @@ theorem ncard_latticeBoxPoints_le (Λ : AddSubgroup (Fin d → ℤ)) {L : Fin d 
     (Λ.map (intCastHom : (Fin d → ℤ) →+ (Fin d → ℝ))) (realBox L) (convex_realBox L)
     (isClosed_realBox L) (realBox_mem_nhds hL) (isBounded_realBox L) (neg_mem_realBox L)
   rw [Module.finrank_fin_fun, ncard_inter_eq] at hcount
-  refine hcount.trans (Finset.prod_le_prod (fun i _ ↦ ?_) fun i _ ↦ ?_)
-  · exact le_trans zero_le_one
+  refine hcount.trans (Finset.prod_le_prod ?_ ?_)
+  · intro i _
+    exact le_trans zero_le_one
       (ConvexGeometry.one_le_div_successiveMinimum_add_one _ _ (by positivity) _)
-  · have := div_successiveMinimum_le Λ L (c := (2 : ℝ) ^ (d + 1)) (k := (i : ℕ) + 1)
+  · intro i _
+    have := div_successiveMinimum_le Λ L (c := (2 : ℝ) ^ (d + 1)) (k := (i : ℕ) + 1)
       (by positivity) (Nat.le_add_left 1 (i : ℕ))
     linarith
 

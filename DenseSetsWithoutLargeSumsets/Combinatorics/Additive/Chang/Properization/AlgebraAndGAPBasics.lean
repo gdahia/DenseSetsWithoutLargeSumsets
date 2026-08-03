@@ -77,7 +77,9 @@ lemma span_image_realBox_inter_standardLattice_eq_top {d s : ℕ} (m : Fin d →
   obtain ⟨x, rfl⟩ := hπ y
   rw [← (Pi.basisFun ℝ (Fin d)).sum_repr x, map_sum]
   simp_rw [map_smul]
-  refine Submodule.sum_mem _ fun i _ ↦ Submodule.smul_mem _ _ ?_
+  apply Submodule.sum_mem
+  intro i _
+  apply Submodule.smul_mem
   apply Submodule.subset_span
   refine ⟨⟨(Pi.basisFun ℝ (Fin d)) i, ?_, rfl⟩, ?_⟩
   · rw [BoxLattice.mem_realBox]
@@ -108,8 +110,8 @@ theorem exists_proper_GAP_reboxing_image_realBox {d s : ℕ} (m : Fin d → ℕ)
       P.carrier.card ≤ boxReboxingFactor s * D.card := by
   let K := π '' BoxLattice.realBox m
   have hcompact : IsCompact K := by
-    refine (Metric.isCompact_of_isClosed_isBounded
-      (BoxLattice.isClosed_realBox m) (BoxLattice.isBounded_realBox m)).image ?_
+    apply (Metric.isCompact_of_isClosed_isBounded
+      (BoxLattice.isClosed_realBox m) (BoxLattice.isBounded_realBox m)).image
     exact LinearMap.continuous_of_finiteDimensional π
   have hsymm : ∀ x, x ∈ K ↔ -x ∈ K := by
     intro x
@@ -176,13 +178,14 @@ lemma injective_gapMap_iff {d : ℕ} (origin : G) (step : Fin d → G) (length :
       simp only [Pi.zero_apply] at hi ⊢
       omega
     · rw [gapMap_eq_stepsHom, gapMap_eq_stepsHom, add_right_inj, ← sub_eq_zero, ← map_sub, ← hv]
-      refine congr_arg (stepsHom step) (funext fun i ↦ ?_)
+      refine congr_arg (stepsHom step) (funext ?_)
+      intro i
       simp only [Pi.sub_apply]
       omega
   · intro hrel w₁ w₂ hw
     have hzero := hrel (fun i ↦ (w₁ i : ℤ) - (w₂ i : ℤ)) ?_ ?_
     · funext i
-      refine Fin.ext ?_
+      apply Fin.ext
       have hi := congr_fun hzero i
       simp only [Pi.zero_apply, sub_eq_zero] at hi
       exact_mod_cast hi
@@ -390,11 +393,14 @@ lemma exists_congr_span_isShort {d r : ℕ} {L : Fin d → ℕ} {t : ℝ}
     rwa [hset] at hx
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℝ).mp hspan
   set y : Fin d → ℤ := x - ∑ j, round (c j) • v j with hy
-  refine ⟨y, ?_, fun i ↦ ?_⟩
+  refine ⟨y, ?_, ?_⟩
   · rw [hy, sub_sub_cancel]
-    refine Submodule.sum_mem _ fun j _ ↦ Submodule.smul_mem _ _ ?_
+    apply Submodule.sum_mem
+    intro j _
+    apply Submodule.smul_mem
     exact Submodule.subset_span (Set.mem_range_self j)
-  · have hycoord : (y i : ℝ) =
+  · intro i
+    have hycoord : (y i : ℝ) =
         ∑ j, (c j - (round (c j) : ℝ)) * (v j i : ℝ) := by
       have hci := congr_fun hc i
       change ((y i : ℤ) : ℝ) =
@@ -408,9 +414,10 @@ lemma exists_congr_span_isShort {d r : ℕ} {L : Fin d → ℕ} {t : ℝ}
       rw [← Finset.sum_sub_distrib]
       exact Finset.sum_congr rfl fun j _ ↦ by ring
     rw [hycoord]
-    refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
-    refine (Finset.sum_le_sum (g := fun _ ↦ t * (L i : ℝ)) fun j _ ↦ ?_).trans ?_
-    · rw [abs_mul]
+    apply (Finset.abs_sum_le_sum_abs _ _).trans
+    refine (Finset.sum_le_sum (g := fun _ ↦ t * (L i : ℝ)) ?_).trans ?_
+    · intro j _
+      rw [abs_mul]
       have hround : |c j - (round (c j) : ℝ)| ≤ 1 := (abs_sub_round (c j)).trans (by norm_num)
       have hv := hshort j i
       exact (mul_le_mul_of_nonneg_right hround (abs_nonneg (v j i : ℝ))).trans (by
@@ -431,11 +438,14 @@ lemma exists_congr_close_isShort {d r : ℕ} {L : Fin d → ℕ} {t : ℝ}
         ∀ i, |(y i : ℝ)| ≤ |b i| + (r : ℝ) * (t * (L i : ℝ)) := by
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℝ).mp hspan
   set y : Fin d → ℤ := z - ∑ j, round (c j) • v j with hy
-  refine ⟨y, ?_, fun i ↦ ?_⟩
+  refine ⟨y, ?_, ?_⟩
   · rw [hy, sub_sub_cancel]
-    refine Submodule.sum_mem _ fun j _ ↦ Submodule.smul_mem _ _ ?_
+    apply Submodule.sum_mem
+    intro j _
+    apply Submodule.smul_mem
     exact Submodule.subset_span (Set.mem_range_self j)
-  · have hycoord : (y i : ℝ) =
+  · intro i
+    have hycoord : (y i : ℝ) =
         b i + ∑ j, (c j - (round (c j) : ℝ)) * (v j i : ℝ) := by
       have hci := congr_fun hc i
       change ((y i : ℤ) : ℝ) =
@@ -452,9 +462,10 @@ lemma exists_congr_close_isShort {d r : ℕ} {L : Fin d → ℕ} {t : ℝ}
       exact Finset.sum_congr rfl fun j _ ↦ by ring
     rw [hycoord]
     refine (abs_add_le _ _).trans (add_le_add le_rfl ?_)
-    refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
-    refine (Finset.sum_le_sum (g := fun _ ↦ t * (L i : ℝ)) fun j _ ↦ ?_).trans ?_
-    · rw [abs_mul]
+    apply (Finset.abs_sum_le_sum_abs _ _).trans
+    refine (Finset.sum_le_sum (g := fun _ ↦ t * (L i : ℝ)) ?_).trans ?_
+    · intro j _
+      rw [abs_mul]
       have hround : |c j - (round (c j) : ℝ)| ≤ 1 :=
         (abs_sub_round (c j)).trans (by norm_num)
       exact (mul_le_mul_of_nonneg_right hround (abs_nonneg (v j i : ℝ))).trans (by
@@ -481,7 +492,7 @@ lemma saturatedSpan_smithCoeff_isUnit {d n : ℕ} {S : Finset (Fin d → ℤ)}
     rw [hzero, zero_smul] at h
     exact (snf.bN.ne_zero i) (Subtype.ext h)
   have hbmem : snf.bM (snf.f i) ∈ saturatedSpan S := by
-    refine mem_saturatedSpan_of_zsmul_mem ha ?_
+    apply mem_saturatedSpan_of_zsmul_mem ha
     rw [← snf.snf]
     exact (snf.bN i).2
   let y : saturatedSpan S := ⟨snf.bM (snf.f i), hbmem⟩
@@ -539,8 +550,9 @@ lemma smithQuotientMap_lift {d n : ℕ} {S : Finset (Fin d → ℤ)}
     (f := fun k : Fin (d - n) ↦
       Finsupp.applyAddHom (↑(smithComplementEquiv snf.f i) : Fin d)
         (Finsupp.single (↑(smithComplementEquiv snf.f k) : Fin d) (y k))) i
-    (fun k _ hki ↦ ?_) (fun h ↦ absurd (Finset.mem_univ i) h)).trans ?_
-  · rw [Finsupp.applyAddHom_apply, Finsupp.single_apply,
+    ?_ (fun h ↦ absurd (Finset.mem_univ i) h)).trans ?_
+  · intro k _ hki
+    rw [Finsupp.applyAddHom_apply, Finsupp.single_apply,
       if_neg fun h ↦ hki (hinj (Subtype.ext h))]
   · rw [Finsupp.applyAddHom_apply, Finsupp.single_eq_same]
 
@@ -551,7 +563,8 @@ lemma smithQuotientMap_eq_zero_iff {d n : ℕ} {S : Finset (Fin d → ℤ)}
   constructor
   · intro hzero
     rw [← snf.bM.sum_repr x]
-    refine Submodule.sum_mem _ fun k _ ↦ ?_
+    apply Submodule.sum_mem _
+    intro k _
     rcases em (k ∈ Set.range snf.f) with ⟨i, rfl⟩ | hk
     · refine Submodule.smul_mem _ _ (mem_saturatedSpan_of_zsmul_mem
         (show snf.a i ≠ 0 by
@@ -603,7 +616,7 @@ lemma smithRealQuotientMap_surjective {d n : ℕ} {S : Finset (Fin d → ℤ)}
     (snf : Module.Basis.SmithNormalForm (saturatedSpan S) (Fin d) n) :
     Function.Surjective (smithRealQuotientMap snf) := by
   intro y
-  refine ⟨∑ k, y k • basisToReal snf.bM (smithComplementEquiv snf.f k), ?_⟩
+  use ∑ k, y k • basisToReal snf.bM (smithComplementEquiv snf.f k)
   ext i
   rw [smithRealQuotientMap, LinearMap.pi_apply, map_sum]
   simp only [map_smul, Module.Basis.coord_apply, Module.Basis.repr_self,
@@ -623,13 +636,14 @@ lemma smithRealQuotientMap_eq_zero_iff {d n : ℕ} {S : Finset (Fin d → ℤ)}
   constructor
   · intro hzero
     rw [← (basisToReal snf.bM).sum_repr x]
-    refine Submodule.sum_mem _ fun k _ ↦ ?_
+    apply Submodule.sum_mem _
+    intro k _
     rcases em (k ∈ Set.range snf.f) with ⟨i, rfl⟩ | hk
     · refine Submodule.smul_mem _ _ ?_
       rw [basisToReal_apply]
       change BoxLattice.intCastHom (snf.bM (snf.f i)) ∈ integerGeneratedSubspace S
-      refine mem_saturatedSpan_of_zsmul_mem
-        (saturatedSpan_smithCoeff_isUnit snf i).ne_zero ?_
+      apply mem_saturatedSpan_of_zsmul_mem
+        (saturatedSpan_smithCoeff_isUnit snf i).ne_zero
       rw [← snf.snf]
       exact (snf.bN i).2
     · have hcoeff : (basisToReal snf.bM).repr x k = 0 := by
@@ -643,7 +657,7 @@ lemma smithRealQuotientMap_eq_zero_iff {d n : ℕ} {S : Finset (Fin d → ℤ)}
   · intro hx
     have hle : integerGeneratedSubspace S ≤ LinearMap.ker (smithRealQuotientMap snf) := by
       rw [integerGeneratedSubspace]
-      refine Submodule.span_le.mpr ?_
+      apply Submodule.span_le.mpr
       rintro z ⟨v, hv, rfl⟩
       change smithRealQuotientMap snf (BoxLattice.intCastHom v) = 0
       rw [smithRealQuotientMap_intCast]
@@ -695,7 +709,11 @@ lemma stepHom_smithQuotientMap (P : GAP G) {n : ℕ}
 lemma twoProper_iff (P : GAP G) :
     P.TwoProper ↔ ∀ v ∈ P.relations, (∀ i, |v i| < 2 * (P.length i : ℤ)) → v = 0 := by
   rw [TwoProper, injective_gapMap_iff]
-  refine forall_congr' fun v ↦ imp_congr Iff.rfl (imp_congr (forall_congr' fun i ↦ ?_) Iff.rfl)
+  apply forall_congr'
+  intro v
+  refine imp_congr Iff.rfl (imp_congr ?_ Iff.rfl)
+  apply forall_congr'
+  intro i
   rw [Nat.cast_mul, Nat.cast_ofNat]
 
 /-! ## Replacing the steps and lengths of a progression -/
@@ -755,7 +773,7 @@ theorem card_scaleLengths_le (P : GAP G) (k : ℕ) (hk : 0 < k) :
     apply Subtype.ext
     rw [← Q.coefficientsFin_spec x.2, ← Q.coefficientsFin_spec y.2]
     rw [gapMap, gapMap]
-    refine congr_arg (Q.origin + ·) ?_
+    apply congr_arg (Q.origin + ·)
     change ∑ i, (Q.coefficientsFin x i : ℕ) • P.step i =
       ∑ i, (Q.coefficientsFin y i : ℕ) • P.step i
     have hdecomp : ∀ z : Q.carrier,
@@ -764,9 +782,10 @@ theorem card_scaleLengths_le (P : GAP G) (k : ℕ) (hk : 0 < k) :
             ∑ i, (residue z i : ℕ) • P.step i := by
       intro z
       rw [← Finset.sum_add_distrib]
-      refine Finset.sum_congr rfl fun i _ ↦ ?_
+      apply Finset.sum_congr rfl
+      intro i _
       rw [← add_nsmul]
-      refine congr_arg (· • P.step i) ?_
+      apply congr_arg (· • P.step i)
       rw [mul_comm]
       exact (Nat.div_add_mod (Q.coefficientsFin z i) (P.length i)).symm
     have holdstep : ∀ z : Q.carrier,
@@ -836,7 +855,7 @@ theorem card_boundedStepImage_le (P : GAP G) (m : ℕ) :
     intro x y hxy
     change P.origin + stepHom P shift + x = P.origin + stepHom P shift + y at hxy
     exact add_left_cancel hxy
-  refine (Finset.card_le_card_of_injOn f hmaps hinj.injOn).trans ?_
+  apply (Finset.card_le_card_of_injOn f hmaps hinj.injOn).trans
   rw [hkdef]
   exact P.card_scaleLengths_le k hk
 
@@ -859,15 +878,21 @@ lemma mem_carrier_iff_exists_intCoeffs (P : GAP G) {x : G} :
   rw [P.carrier_eq, Finset.mem_image]
   constructor
   · rintro ⟨w, -, rfl⟩
-    refine ⟨fun i ↦ ((w i : ℕ) : ℤ), fun i ↦ ⟨Int.natCast_nonneg _, ?_⟩, gapMap_eq_stepsHom _ _ _ _⟩
-    change ((w i : ℕ) : ℤ) < (P.length i : ℤ)
-    exact_mod_cast (w i).isLt
+    refine ⟨fun i ↦ ((w i : ℕ) : ℤ), ?_, gapMap_eq_stepsHom _ _ _ _⟩
+    intro i
+    constructor
+    · exact Int.natCast_nonneg _
+    · change ((w i : ℕ) : ℤ) < (P.length i : ℤ)
+      exact_mod_cast (w i).isLt
   · rintro ⟨c, hc, rfl⟩
-    refine ⟨fun i ↦ ⟨(c i).toNat, ?_⟩, Finset.mem_univ _, ?_⟩
-    · have := hc i
+    refine ⟨?_, Finset.mem_univ _, ?_⟩
+    · intro i
+      refine ⟨(c i).toNat, ?_⟩
+      have := hc i
       omega
     · rw [gapMap_eq_stepsHom]
-      refine congr_arg (P.origin + ·) (congr_arg (stepsHom P.step) (funext fun i ↦ ?_))
+      refine congr_arg (P.origin + ·) (congr_arg (stepsHom P.step) (funext ?_))
+      intro i
       exact Int.toNat_of_nonneg (hc i).1
 
 end GAP
@@ -877,9 +902,9 @@ lemma two_pow_le_exp (d : ℕ) : (2 : ℝ) ^ d ≤ Real.exp (((d : ℝ) + 2) ^ 3
   have h2 : (2 : ℝ) ≤ Real.exp 1 := by
     have h := Real.add_one_le_exp (1 : ℝ)
     linarith
-  refine (pow_le_pow_left₀ (by norm_num) h2 d).trans ?_
+  apply (pow_le_pow_left₀ (by norm_num) h2 d).trans
   rw [← Real.exp_nat_mul, mul_one]
-  refine Real.exp_le_exp.mpr ?_
+  apply Real.exp_le_exp.mpr
   nlinarith [Nat.cast_nonneg (α := ℝ) d, sq_nonneg ((d : ℝ) + 2),
     pow_nonneg (Nat.cast_nonneg (α := ℝ) d) 3]
 
@@ -889,11 +914,11 @@ lemma poly_pow_le_exp_cube {d : ℕ} {b : ℝ} (hb : 0 ≤ b)
     b ^ d ≤ Real.exp (12 * ((d : ℝ) + 2) ^ 3) := by
   have hX : 0 ≤ 12 * ((d : ℝ) + 2) ^ 2 := by positivity
   have hbexp : b ≤ Real.exp (12 * ((d : ℝ) + 2) ^ 2) := by
-    refine hbound.trans ?_
+    apply hbound.trans
     linarith [Real.add_one_le_exp (12 * ((d : ℝ) + 2) ^ 2)]
-  refine (pow_le_pow_left₀ hb hbexp d).trans ?_
+  apply (pow_le_pow_left₀ hb hbexp d).trans
   rw [← Real.exp_nat_mul]
-  refine Real.exp_le_exp.mpr ?_
+  apply Real.exp_le_exp.mpr
   have hd : (d : ℝ) ≤ (d : ℝ) + 2 := by linarith
   nlinarith [mul_le_mul_of_nonneg_right hd hX]
 
@@ -921,7 +946,7 @@ lemma boxReboxingFactor_le_exp_cube {k d : ℕ} (hkd : k ≤ d) :
     nlinarith
   refine hfactor.trans ((pow_le_pow_left₀ (by positivity) hbase _).trans ?_)
   rw [← Real.exp_nat_mul]
-  refine Real.exp_le_exp.mpr ?_
+  apply Real.exp_le_exp.mpr
   have hkdR : (k : ℝ) ≤ d := by exact_mod_cast hkd
   push_cast
   nlinarith [mul_nonneg (Nat.cast_nonneg (α := ℝ) k)
@@ -945,7 +970,7 @@ lemma saturated_quotient_factor_le_exp_cube {r d : ℕ} (hrd : r ≤ d) :
     (show (0 : ℝ) ≤ (((2 * r + 4) * (2 * (3 * r + 1) + 1) : ℕ) : ℝ) by positivity)
     hbase
   push_cast at hpoly
-  refine (mul_le_mul hrebox hpoly (by positivity) (by positivity)).trans_eq ?_
+  apply (mul_le_mul hrebox hpoly (by positivity) (by positivity)).trans_eq
   rw [← Real.exp_add]
   congr 1
   ring
@@ -960,7 +985,7 @@ lemma saturation_room_factor_le_exp_cube (d : ℕ) :
   have hsat := poly_pow_le_exp_cube
     (show (0 : ℝ) ≤ ((2 * (3 * d) + 1 : ℕ) : ℝ) by positivity) hbase
   push_cast at hsat
-  refine (mul_le_mul hsat (two_pow_le_exp d) (by positivity) (by positivity)).trans_eq ?_
+  apply (mul_le_mul hsat (two_pow_le_exp d) (by positivity) (by positivity)).trans_eq
   rw [← Real.exp_add]
   congr 1
   ring

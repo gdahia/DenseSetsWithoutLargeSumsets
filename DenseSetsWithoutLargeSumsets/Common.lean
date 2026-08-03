@@ -110,9 +110,9 @@ lemma pairCardThreshold_le_densityCoefficient_mul_log {τ c : ℝ} {n : ℕ}
     rw [one_lt_div hδ_pos]
     linarith
   · rw [add_mul]
-    refine add_le_add ?_ ?_
+    apply add_le_add
     · rw [div_mul_eq_mul_div]
-      refine div_le_div_of_nonneg_left (mul_nonneg hτ_nonneg hlogn_pos.le) ?_ ?_
+      apply div_le_div_of_nonneg_left (mul_nonneg hτ_nonneg hlogn_pos.le)
       · refine Real.log_pos ?_
         rw [one_lt_div h1c_pos]
         linarith

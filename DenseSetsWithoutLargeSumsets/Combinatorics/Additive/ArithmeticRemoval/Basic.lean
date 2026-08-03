@@ -62,7 +62,8 @@ lemma card_removedPairs_add_le (hle : H' ≤ H) {p q : ↥W → V} (hp : Functio
     #(removedPairs H H' p q) + #H'.edgeFinset ≤ #H.edgeFinset := by
   classical
   rw [← card_sdiff_add_card_eq_card (edgeFinset_mono hle)]
-  refine Nat.add_le_add_right (card_le_card_of_injOn (fun z => s(p z.1, q z.2)) ?_ ?_) _
+  apply Nat.add_le_add_right
+  apply card_le_card_of_injOn (fun z => s(p z.1, q z.2))
   · intro z hz
     simp only [removedPairs, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hz
     simp [hz.1, hz.2]
@@ -98,7 +99,7 @@ lemma card_filter_lt_removedLabelCard_mul_le (hle : H' ≤ H) {p q : ↥W → V}
   have hlab : (#{a ∈ L | m < (removedLabelCard H H' p q a : ℝ)} : ℝ) * m
       ≤ ∑ a ∈ L, (removedLabelCard H H' p q a : ℝ) := by
     rw [← nsmul_eq_mul]
-    refine le_trans (card_nsmul_le_sum _ _ _ fun a ha => (mem_filter.1 ha).2.le) ?_
+    apply le_trans (card_nsmul_le_sum _ _ _ fun a ha => (mem_filter.1 ha).2.le)
     exact sum_le_sum_of_subset_of_nonneg (filter_subset _ _) fun _ _ _ => by positivity
   rw [← Nat.cast_sum, sum_removedLabelCard hL] at hlab
   linarith
@@ -156,7 +157,7 @@ private lemma arithmetic_removal_aux {X A B C W : Finset G} {K ε δ : ℝ}
   set C' := {c ∈ C | (removedLabelCard (tripartiteGraph W A B C) H' in₀ in₂ c : ℝ) ≤ m} with hC'
   have hedge' : (#(tripartiteGraph W A B C).edgeFinset : ℝ) - #H'.edgeFinset
       ≤ ε * #X ^ 2 / 4 := by
-    refine hedge.le.trans ?_
+    apply hedge.le.trans
     push_cast
     rw [hn, div_mul_eq_mul_div, div_le_div_iff₀ (by positivity) (by norm_num)]
     nlinarith [mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by linarith : (0:ℝ) ≤ #W) hW 2) hε.le,
@@ -206,27 +207,30 @@ private lemma arithmetic_removal_aux {X A B C W : Finset G} {K ε δ : ℝ}
     exact hfree {in₀ (u x), in₁ (v x), in₂ (w x)}
       (is3Clique_triple_iff.2 ⟨hx.1.1, hx.2, hx.1.2⟩)
   have hS₁card : #S₁ ≤ removedLabelCard (tripartiteGraph W A B C) H' in₀ in₁ a := by
-    refine card_le_card_of_injOn (fun x => (u x, v x)) ?_ fun x _ y _ h => ?_
+    apply card_le_card_of_injOn (fun x => (u x, v x))
     · intro x hx
       simp only [hS₁, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hx
       simp only [mem_coe, mem_filter, removedPairs, mem_univ, true_and, hu, hv]
       exact ⟨⟨adj_in₀_in₁ (hmem x), hx⟩, add_sub_cancel_left _ _⟩
-    · exact Subtype.ext (congrArg (fun z : ↥W × ↥W => (z.1 : G)) h)
+    · intro x _ y _ h
+      exact Subtype.ext (congrArg (fun z : ↥W × ↥W => (z.1 : G)) h)
   have hS₂card : #S₂ ≤ removedLabelCard (tripartiteGraph W A B C) H' in₁ in₂ b := by
-    refine card_le_card_of_injOn (fun x => (v x, w x)) ?_ fun x _ y _ h => ?_
+    apply card_le_card_of_injOn (fun x => (v x, w x))
     · intro x hx
       simp only [hS₂, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hx
       simp only [mem_coe, mem_filter, removedPairs, mem_univ, true_and, hv, hw]
       exact ⟨⟨adj_in₁_in₂ (hmem x), hx⟩, by rw [add_sub_add_left_eq_sub, hba]⟩
-    · have h₁ : (x : G) + a = (y : G) + a := congrArg (fun z : ↥W × ↥W => (z.1 : G)) h
+    · intro x _ y _ h
+      have h₁ : (x : G) + a = (y : G) + a := congrArg (fun z : ↥W × ↥W => (z.1 : G)) h
       exact Subtype.ext (add_right_cancel h₁)
   have hS₃card : #S₃ ≤ removedLabelCard (tripartiteGraph W A B C) H' in₀ in₂ c := by
-    refine card_le_card_of_injOn (fun x => (u x, w x)) ?_ fun x _ y _ h => ?_
+    apply card_le_card_of_injOn (fun x => (u x, w x))
     · intro x hx
       simp only [hS₃, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hx
       simp only [mem_coe, mem_filter, removedPairs, mem_univ, true_and, hu, hw]
       exact ⟨⟨adj_in₀_in₂ (hmem x), hx⟩, add_sub_cancel_left _ _⟩
-    · exact Subtype.ext (congrArg (fun z : ↥W × ↥W => (z.1 : G)) h)
+    · intro x _ y _ h
+      exact Subtype.ext (congrArg (fun z : ↥W × ↥W => (z.1 : G)) h)
   have hcard : (#X : ℝ) ≤ #S₁ + #S₂ + #S₃ := by
     have : #X = #(univ : Finset ↥X) := by simp
     rw [this]

@@ -38,11 +38,11 @@ private lemma sum_Icc_sub_eq_choose (k : ℕ) :
   · simp [hk0]
   rw [← Finset.Ico_add_one_right_eq_Icc 1 (k - 1)]
   rw [Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr hk0)]
-  refine ((by
+  apply ((by
     simpa using
       (Finset.sum_Ico_reflect (fun s => s) 1 (m := k) (n := k) (by omega)) :
         (Finset.Ico 1 k).sum (fun t => k - t) =
-          (Finset.Ico 1 k).sum (fun s => s))).trans ?_
+          (Finset.Ico 1 k).sum (fun s => s))).trans
   · convert Nat.sum_Icc_choose (k - 1) 1 using 1
     · rw [← Finset.Ico_add_one_right_eq_Icc,
         Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr hk0)]
@@ -245,10 +245,10 @@ private lemma unionWitnesses_card_le (n k r t : ℕ) :
     (unionWitnesses n k r t).card ≤
       (boundedFreimanDimSets n r t).ncard * Nat.choose t k * Nat.choose t k := by
   classical
-  refine Finset.card_biUnion_le.trans ?_
-  refine (Finset.sum_le_sum fun X hX => Finset.card_image_le).trans ?_
-  refine le_trans (b := ∑ X ∈ boundedFreimanDimSetsFinset n r t,
-    Nat.choose t k * Nat.choose t k) ?_ ?_
+  apply Finset.card_biUnion_le.trans
+  apply (Finset.sum_le_sum fun X hX => Finset.card_image_le).trans
+  apply le_trans (b := ∑ X ∈ boundedFreimanDimSetsFinset n r t,
+    Nat.choose t k * Nat.choose t k)
   · apply le_of_eq
     apply Finset.sum_congr rfl
     intro X hX
@@ -298,10 +298,10 @@ private lemma smallUnionWitnesses_card_le (n k r s t : ℕ) :
     (smallUnionWitnesses n k r s t).card ≤
       (smallSumsetFreimanDimSets n r s t).ncard * Nat.choose t k * Nat.choose t k := by
   classical
-  refine Finset.card_biUnion_le.trans ?_
-  refine (Finset.sum_le_sum fun X hX => Finset.card_image_le).trans ?_
-  refine le_trans (b := ∑ X ∈ smallSumsetFreimanDimSetsFinset n r s t,
-    Nat.choose t k * Nat.choose t k) ?_ ?_
+  apply Finset.card_biUnion_le.trans
+  apply (Finset.sum_le_sum fun X hX => Finset.card_image_le).trans
+  apply le_trans (b := ∑ X ∈ smallSumsetFreimanDimSetsFinset n r s t,
+    Nat.choose t k * Nat.choose t k)
   · apply le_of_eq
     apply Finset.sum_congr rfl
     intro X hX
@@ -335,7 +335,7 @@ private lemma pairSumsetsFamily_subset_witnessSums {n k m : ℕ}
   · rw [← hAcard]
     exact Finset.card_le_card hA_X
   · rw [← hXdef]
-    refine (Finset.card_union_le A B).trans ?_
+    apply (Finset.card_union_le A B).trans
     rw [hAcard, hBcard]
     ring_nf
     omega
@@ -396,7 +396,7 @@ private lemma pairSumsetsFamily_subset_smallWitnessSums {n k m : ℕ}
   · rw [← hAcard]
     exact Finset.card_le_card hA_X
   · rw [← hXdef]
-    refine (Finset.card_union_le A B).trans ?_
+    apply (Finset.card_union_le A B).trans
     rw [hAcard, hBcard]
     ring_nf
     omega

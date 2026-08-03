@@ -393,7 +393,7 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
     have hcast := (NNRat.cast_le (K := ℝ)).2
       (Finset.pluennecke_ruzsa_inequality_nsmul_sub_nsmul_add hXne X (batches.length + 2) 2)
     push_cast [NNRat.cast_pow] at hcast
-    refine hcast.trans ?_
+    apply hcast.trans
     rw [show batches.length + 2 + 2 = batches.length + 4 from by ring]
     gcongr
     exact (div_le_iff₀ hXpos).2 hXX
@@ -403,8 +403,8 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
         (Q₁.carrier.card : ℝ) * (3 * κ) ^ batches.length from by rw [mul_pow]; ring,
       show κ ^ 4 * (X.card : ℝ) * κ ^ batches.length = κ ^ (batches.length + 4) * X.card from by
         rw [pow_add]; ring]
-    refine le_trans (mul_le_mul_of_nonneg_left
-      (pow_le_pow_left₀ (by positivity) hm₀κ batches.length) hQ₁pos.le) ?_
+    apply le_trans (mul_le_mul_of_nonneg_left
+      (pow_le_pow_left₀ (by positivity) hm₀κ batches.length) hQ₁pos.le)
     refine le_trans ?_ hPR
     rw [← Nat.cast_pow, ← Nat.cast_mul, ← hpacked]
     exact Nat.cast_le.2 (Finset.card_le_card hSsub)
@@ -447,7 +447,7 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
     push_cast
     ring
   have hWcard : (((F' + (F - F)).card : ℕ) : ℝ) ≤ changCoverBound κ := by
-    refine hWcast.trans ?_
+    apply hWcast.trans
     rw [changCoverBound, sq, ← mul_assoc]
     exact mul_le_mul (mul_le_mul hF'card hFm (Nat.cast_nonneg _) (by positivity)) hFm
       (Nat.cast_nonneg _) (by positivity)
@@ -497,12 +497,12 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
     linarith
   · have hnat : (U.consBinaryList (finsetList W)).carrier.card ≤
         2 ^ (W.card + 2 * R.dim + changBatchSize κ * batches.length) * Q₁.carrier.card := by
-      refine (GAP.card_consBinaryList_le U (finsetList W)).trans ?_
+      apply (GAP.card_consBinaryList_le U (finsetList W)).trans
       rw [finsetList_length, hUdef, GAP.boxVolume_differenceHull,
         GAP.boxVolume_differenceHull, GAP.differenceHull_dim, hRdef,
         GAP.boxVolume_consBinaryList, hbatchlen, GAP.boxVolume,
         ← Q₁.card_eq_prod_length hQ₁proper, ← hRdef]
-      refine le_of_eq ?_
+      apply le_of_eq
       rw [pow_add, pow_add, two_mul, pow_add]
       ring
     have hcardle : ((U.consBinaryList (finsetList W)).carrier.card : ℝ) ≤
@@ -514,8 +514,8 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
     refine hcardle.trans (le_trans (mul_le_mul_of_nonneg_left hQ₁le (by positivity)) ?_)
     rw [← mul_assoc]
     refine mul_le_mul_of_nonneg_right ?_ hXpos.le
-    refine le_trans (mul_le_mul (two_pow_le_exp_nat _) (pow_le_exp_mul hκ0.le 4)
-      (by positivity) (Real.exp_nonneg _)) ?_
+    apply le_trans (mul_le_mul (two_pow_le_exp_nat _) (pow_le_exp_mul hκ0.le 4)
+      (by positivity) (Real.exp_nonneg _))
     rw [← Real.exp_add]
     refine Real.exp_le_exp.2 (le_trans ?_ (changContainerExponent_size_le hκ))
     rw [hRdim]

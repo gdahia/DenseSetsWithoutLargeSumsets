@@ -66,10 +66,13 @@ lemma card_avoid (X Z : Finset G) (k : ℕ) :
     ext f
     simp [Fintype.mem_piFinset]
   have hcard : #(univ.filter fun b : ↥X => (b : G) ∉ Z) = #(X \ Z) := by
-    refine card_bij (fun b _ => (b : G)) (fun b hb => ?_) (fun b _ c _ h => Subtype.ext h)
-      fun a ha => ?_
-    · exact mem_sdiff.2 ⟨b.2, (mem_filter.1 hb).2⟩
-    · exact ⟨⟨a, (mem_sdiff.1 ha).1⟩, mem_filter.2 ⟨mem_univ _, (mem_sdiff.1 ha).2⟩, rfl⟩
+    refine card_bij (fun b _ => (b : G)) ?_ ?_ ?_
+    · intro b hb
+      exact mem_sdiff.2 ⟨b.2, (mem_filter.1 hb).2⟩
+    · intro b _ c _ h
+      exact Subtype.ext h
+    · intro a ha
+      exact ⟨⟨a, (mem_sdiff.1 ha).1⟩, mem_filter.2 ⟨mem_univ _, (mem_sdiff.1 ha).2⟩, rfl⟩
   rw [hfib, Fintype.card_piFinset, hcard]
   simp
 
@@ -173,7 +176,7 @@ private lemma add_mul_pow_le (x j : ℕ) : (x + j + 1) * x ^ j ≤ (x + 1) ^ (j 
       have hrw₂ : (x + 1) * ((x + j + 1) * x ^ j) = (x + 1) * (x + j + 1) * x ^ j := by ring
       rw [hrw₁, hrw₂]
       exact Nat.mul_le_mul_right _ hfac
-    refine hstep.trans ?_
+    apply hstep.trans
     rw [pow_succ (x + 1) (j + 1), mul_comm ((x + 1) ^ (j + 1)) (x + 1)]
     exact Nat.mul_le_mul_left _ ih
 
@@ -205,7 +208,7 @@ private lemma card_hits_lower {x k H : ℕ} (hx : 1 ≤ x) (hk : 1 ≤ k) (hkx :
     have hkey := pred_pow_mul_le hx hk
     have hxpow : x ^ (k + 1) = x ^ k * x := by ring
     nlinarith [hH, hkey, hxpow]
-  refine hmain.trans ?_
+  apply hmain.trans
   rw [mul_comm]
   exact Nat.mul_le_mul_right _ (by omega)
 
@@ -248,7 +251,8 @@ lemma reprCount_le_left (X Y : Finset G) (s : G) : reprCount X Y s ≤ #X := by
 
 /-- The representations of `s` inject into `Y`, hence there are at most `#Y` of them. -/
 lemma reprCount_le_right (X Y : Finset G) (s : G) : reprCount X Y s ≤ #Y := by
-  refine card_le_card_of_injOn Prod.snd (fun p hp => (mem_reprs.1 hp).2.1) fun p hp q hq h => ?_
+  apply card_le_card_of_injOn Prod.snd (fun p hp => (mem_reprs.1 hp).2.1)
+  intro p hp q hq h
   by_contra hpq
   exact (repr_ne_of_ne hp hq hpq).2 h
 
@@ -353,7 +357,8 @@ private lemma sum_sampledReprs :
       = ∑ p ∈ reprs X Y s, (#(hits X k₁ p.1) : ℝ) * #(hits Y k₂ p.2) := by
   unfold sampledReprs
   rw [Finset.sum_comm]
-  refine sum_congr rfl fun p _ => ?_
+  apply sum_congr rfl
+  intro p _
   rw [sum_prod_factor (fun f : Fin k₁ → ↥X => if p.1 ∈ bltSample X f then (1 : ℝ) else 0)
       (fun g : Fin k₂ → ↥Y => if p.2 ∈ bltSample Y g then (1 : ℝ) else 0),
     sum_indicator, sum_indicator]
@@ -375,9 +380,11 @@ private lemma sum_sq_sampledReprs :
     apply sum_congr rfl fun p _ => sum_congr rfl fun q _ => by ring
   simp only [hexp]
   rw [Finset.sum_comm]
-  refine sum_congr rfl fun p _ => ?_
+  apply sum_congr rfl
+  intro p _
   rw [Finset.sum_comm]
-  refine sum_congr rfl fun q _ => ?_
+  apply sum_congr rfl
+  intro q _
   rw [sum_prod_factor (fun f : Fin k₁ → ↥X => (if p.1 ∈ bltSample X f then (1 : ℝ) else 0) *
       (if q.1 ∈ bltSample X f then (1 : ℝ) else 0))
       (fun g : Fin k₂ → ↥Y => (if p.2 ∈ bltSample Y g then (1 : ℝ) else 0) *
@@ -386,7 +393,9 @@ private lemma sum_sq_sampledReprs :
 
 private lemma sampledReprs_nonneg (ω : (Fin k₁ → ↥X) × (Fin k₂ → ↥Y)) :
     0 ≤ sampledReprs X Y k₁ k₂ s ω := by
-  refine sum_nonneg fun p _ => mul_nonneg ?_ ?_ <;> split_ifs <;> norm_num
+  apply sum_nonneg
+  intro p _
+  apply mul_nonneg <;> split_ifs <;> norm_num
 
 private lemma mem_add_of_sampledReprs_pos {ω : (Fin k₁ → ↥X) × (Fin k₂ → ↥Y)}
     (hω : 0 < sampledReprs X Y k₁ k₂ s ω) : s ∈ bltSample X ω.1 + bltSample Y ω.2 := by
@@ -535,7 +544,7 @@ theorem hitProb_lower_bound (hs : s ∈ X + Y) (hk₁ : 1 ≤ k₁) (hk₂ : 1 �
   have hX : 0 < #X := card_pos.2 ⟨u, hu⟩
   have hY : 0 < #Y := card_pos.2 ⟨v, hv⟩
   refine le_trans ?_ (hitProb_ge hs hk₁ hk₂)
-  refine div_add_le_div_add (by positivity) (by positivity) (by positivity) (by positivity) ?_
+  apply div_add_le_div_add (by positivity) (by positivity) (by positivity) (by positivity)
   have hXhit : hitCount X k₁ + (#X - 1) ^ k₁ = #X ^ k₁ := by
     have hle : (#X - 1) ^ k₁ ≤ #X ^ k₁ := Nat.pow_le_pow_left (by omega) k₁
     unfold hitCount

@@ -82,8 +82,8 @@ lemma fourthEnergy_lower_bound {q : ℕ} [NeZero q] {κ : ℝ} (X : Finset (ZMod
     rw [boringEnergy_two_eq_sum_changPairCount_sq,
       show (X.card : ℝ) ^ 4 = ((X.card : ℝ) ^ 2) ^ 2 by ring,
       ← sum_changPairCount_add]
-    refine (sq_sum_le_card_mul_sum_sq
-      (s := X + X) (f := changPairCount X)).trans_eq ?_
+    apply (sq_sum_le_card_mul_sum_sq
+      (s := X + X) (f := changPairCount X)).trans_eq
     congr 1
     exact Fintype.sum_subset fun a ha ↦ by
       by_contra hmem
@@ -158,7 +158,7 @@ private lemma changFourfoldCorrelation_ne_zero_mem_sub
   have hsupport :
       Function.support (changIndicatorComplex X ∗ᵈ^ 2) ⊆
         ((X + X : Finset G) : Set G) := by
-    refine (support_iterConv_subset (changIndicatorComplex X) 2).trans ?_
+    apply (support_iterConv_subset (changIndicatorComplex X) 2).trans
     rw [changIndicatorComplex, Set.support_indicator_one]
     intro y hy
     simpa [two_nsmul] using hy
@@ -184,8 +184,9 @@ private lemma weighted_chord_error_le
   refine (Finset.expect_le_expect
     (g := fun ψ ↦ ε * ‖dft (changIndicatorComplex X) ψ‖ ^ 4 +
       2 * (η * X.card) ^ 2 * ‖dft (changIndicatorComplex X) ψ‖ ^ 2)
-    fun ψ _ ↦ ?_).trans_eq ?_
-  · by_cases hψ : ψ ∈ largeSpec (changIndicatorComplex X) η
+    ?_).trans_eq ?_
+  · intro ψ _
+    by_cases hψ : ψ ∈ largeSpec (changIndicatorComplex X) η
     · refine (mul_le_mul_of_nonneg_left (hx ψ hψ)
         (pow_nonneg (norm_nonneg _) 4)).trans ?_
       rw [mul_comm (‖dft (changIndicatorComplex X) ψ‖ ^ 4) ε]
@@ -203,11 +204,11 @@ private lemma weighted_chord_error_le
           (by linarith [norm_nonneg (dft (changIndicatorComplex X) ψ)] :
             0 ≤ η * X.card + ‖dft (changIndicatorComplex X) ψ‖)]
       have hchord : ‖1 - ψ x‖ ≤ 2 := by
-        refine (norm_sub_le _ _).trans_eq ?_
+        apply (norm_sub_le _ _).trans_eq
         rw [norm_one, AddChar.norm_apply]
         norm_num
-      refine (mul_le_mul_of_nonneg_left hchord
-        (pow_nonneg (norm_nonneg _) 4)).trans ?_
+      apply (mul_le_mul_of_nonneg_left hchord
+        (pow_nonneg (norm_nonneg _) 4)).trans
       rw [show ‖dft (changIndicatorComplex X) ψ‖ ^ 4 =
         ‖dft (changIndicatorComplex X) ψ‖ ^ 2 *
           ‖dft (changIndicatorComplex X) ψ‖ ^ 2 by ring]
@@ -228,7 +229,8 @@ private lemma spectrum_chord_subset_fourfold
     {x | ∀ ψ ∈ largeSpec (changIndicatorComplex X) η, ‖1 - ψ x‖ ≤ ε} ⊆
       ((X + X) - (X + X) : Finset G) := by
   intro x hx
-  refine changFourfoldCorrelation_ne_zero_mem_sub X fun hzero ↦ ?_
+  apply changFourfoldCorrelation_ne_zero_mem_sub X
+  intro hzero
   have hfourier :
       (𝔼 ψ, ((‖dft (changIndicatorComplex X) ψ‖ ^ 4 : ℝ) : ℂ) * ψ x) = 0 := by
     rw [expect_fourier_changFourfoldCorrelation, hzero]
@@ -351,9 +353,10 @@ private lemma norm_one_sub_addSpan_apply_le
   obtain ⟨e, he, hsum⟩ := hψ
   rw [← hsum, AddChar.sum_apply]
   simp_rw [AddChar.zsmul_apply]
-  refine (norm_one_sub_prod_le_sum fun γ hγ ↦ ?_).trans
+  refine (norm_one_sub_prod_le_sum ?_).trans
     (Finset.sum_le_sum fun γ hγ ↦
       norm_one_sub_zpow_le (AddChar.norm_apply γ x) (he γ))
+  intro γ hγ
   rw [norm_zpow, AddChar.norm_apply, one_zpow]
 
 /-- Controlling Chang's generators in chord distance controls the whole large spectrum and
@@ -367,10 +370,11 @@ theorem changGenerators_chord_subset_fourfold
     {x | ∀ ψ ∈ Δ, ‖1 - ψ x‖ ≤
       ((4 : ℝ) * (Δ.card + 1))⁻¹} ⊆
       ((X + X) - (X + X) : Finset (ZMod q)) := by
-  refine fun x hx ↦ changLargeSpectrum_chord_subset_fourfold X hκ hX hXX ?_
+  intro x hx
+  apply changLargeSpectrum_chord_subset_fourfold X hκ hX hXX
   intro ψ hψ
-  refine (norm_one_sub_addSpan_apply_le (hspan hψ) x).trans ?_
-  refine (Finset.sum_le_sum fun γ hγ ↦ hx γ hγ).trans ?_
+  apply (norm_one_sub_addSpan_apply_le (hspan hψ) x).trans
+  apply (Finset.sum_le_sum fun γ hγ ↦ hx γ hγ).trans
   rw [sum_const, nsmul_eq_mul]
   have hcard : (0 : ℝ) ≤ Δ.card := Nat.cast_nonneg _
   have hdenom : (0 : ℝ) < 4 * (Δ.card + 1) := by positivity
@@ -392,7 +396,8 @@ theorem exists_frequency_chord_le {q : ℕ} [NeZero q] (ψ : AddChar (ZMod q) �
     ∃ r : ZMod q, ∀ (x : ZMod q) (a : ℤ), ((a : ZMod q) = r * x) →
       ‖1 - ψ x‖ ≤ 2 * Real.pi * |(a : ℝ)| / q := by
   obtain ⟨r, rfl⟩ := AddChar.zmodAddEquiv.surjective ψ
-  refine ⟨r, fun x a ha ↦ ?_⟩
+  use r
+  intro x a ha
   have hψ : (AddChar.zmodAddEquiv r) x = ZMod.stdAddChar ((a : ZMod q)) := by
     rw [ha]
     rfl

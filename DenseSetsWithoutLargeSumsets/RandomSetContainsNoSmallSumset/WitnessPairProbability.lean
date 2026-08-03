@@ -58,8 +58,8 @@ lemma bltWitnessPair_probability_le (n : ℕ) {δ : unitInterval}
   classical
   by_cases hnonempty : ∃ S : Finset ℕ, bltWitnessPairSumsetIsSubset p S
   · rcases hnonempty with ⟨S₀, hS₀⟩
-    refine le_trans (b := (binomialFinsetSubset (Set.Icc 1 n) δ).real
-      {S : Finset ℕ | (p.1 + p.2).image Int.toNat ⊆ S}) ?_ ?_
+    apply le_trans (b := (binomialFinsetSubset (Set.Icc 1 n) δ).real
+      {S : Finset ℕ | (p.1 + p.2).image Int.toNat ⊆ S})
     · rw [MeasureTheory.measureReal_def, MeasureTheory.measureReal_def]
       apply ENNReal.toReal_mono
       · exact MeasureTheory.measure_ne_top (binomialFinsetSubset (Set.Icc 1 n) δ) _
@@ -116,7 +116,7 @@ private lemma sum_union_le_sum_add_sum {α : Type*} [DecidableEq α] (A B : Fins
     (f : α → ℝ) (hf : ∀ x, 0 ≤ f x) :
     ∑ x ∈ A ∪ B, f x ≤ ∑ x ∈ A, f x + ∑ x ∈ B, f x := by
   classical
-  refine le_trans (b := ∑ x ∈ A ∪ (B \ A), f x) ?_ ?_
+  apply le_trans (b := ∑ x ∈ A ∪ (B \ A), f x)
   · apply le_of_eq
     congr 1
     ext x
@@ -140,8 +140,8 @@ private lemma sum_biUnion_le_sum {α β : Type*} [DecidableEq β] (s : Finset α
   · simp
   · intro a s ha ih
     rw [Finset.biUnion_insert]
-    refine (sum_union_le_sum_add_sum (t a) (s.biUnion t) f hf).trans ?_
-    refine (add_le_add_right ih _).trans_eq ?_
+    apply (sum_union_le_sum_add_sum (t a) (s.biUnion t) f hf).trans
+    apply (add_le_add_right ih _).trans_eq
     rw [Finset.sum_insert ha]
 
 lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
@@ -174,7 +174,7 @@ lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
     apply Finset.sum_nonneg'
     intro p
     exact pow_nonneg (unitInterval.nonneg δ) (p.1 + p.2).card
-  refine Finset.sum_le_sum ?_
+  apply Finset.sum_le_sum
   intro d _hd
   refine (Finset.sum_le_sum (s := properGAPsZModOfDim d s hqpos)
     (f := fun P => ∑ p ∈ bltDimSmallWitnessPairs
@@ -189,8 +189,8 @@ lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
             ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
         Real.exp (-((1 - 3 * ε γ) * (d : ℝ) * (k : ℝ)) * Real.log (1 / δ))) ?_).trans_eq ?_
   · intro P hP
-    refine (bltDimSmallWitnessPairs_probability_sum_le
-      (zmodGAPPreimageContainer n ψ P) P.dim k C γ hC hε hδ_pos hδ_lt).trans ?_
+    apply (bltDimSmallWitnessPairs_probability_sum_le
+      (zmodGAPPreimageContainer n ψ P) P.dim k C γ hC hε hδ_pos hδ_lt).trans
     rw [((mem_properGAPsZModOfDim hqpos).1 hP).1]
     have hbase :
         (natCastImage (zmodGAPPreimageContainer n ψ P)).card + 1 ≤ s + 1 := by

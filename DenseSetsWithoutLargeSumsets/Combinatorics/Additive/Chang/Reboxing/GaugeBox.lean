@@ -62,7 +62,7 @@ lemma gaugeReboxingDilation_le_pow (s : ℕ) :
       have hbase : 4 * s + 1 ≤ 4 * (s + 1) + 1 := by omega
       have hpow := Nat.pow_le_pow_left hbase s
       have hmul := Nat.mul_le_mul_left (4 * s) (ih.trans hpow)
-      refine (Nat.add_le_add_left hmul 1).trans ?_
+      apply (Nat.add_le_add_left hmul 1).trans
       rw [pow_succ]
       have hone : 1 ≤ (4 * (s + 1) + 1) ^ s :=
         one_le_pow₀ (by omega)
@@ -82,12 +82,12 @@ lemma boxReboxingFactor_le_pow (s : ℕ) :
         2 * (s * gaugeReboxingDilation s) + 1 ≤
           (2 * s + 1) * (4 * s + 1) ^ s := by
       nlinarith
-    refine hfirst.trans ?_
+    apply hfirst.trans
     have hcoef : 2 * s + 1 ≤ (4 * s + 1) ^ 2 := by nlinarith
     simpa only [mul_comm] using
       Nat.mul_le_mul_right ((4 * s + 1) ^ s) hcoef
   unfold boxReboxingFactor
-  refine (Nat.pow_le_pow_left hbase s).trans_eq ?_
+  apply (Nat.pow_le_pow_left hbase s).trans_eq
   rw [← pow_mul]
 
 /-- The zero-rank base of the projection induction. -/
@@ -180,15 +180,15 @@ lemma gauge_sum_zsmul_le_card_mul
     (hend : ∀ i, (m i : ℝ) * gauge K (step i) ≤ A)
     {c : Fin s → ℤ} (hc : c ∈ intBox m) :
     gauge K (∑ i, (c i : ℝ) • step i) ≤ s * A := by
-  refine (gauge_sum_le hconv (absorbent_nhds_zero hK₀) Finset.univ
-    fun i ↦ (c i : ℝ) • step i).trans ?_
+  apply (gauge_sum_le hconv (absorbent_nhds_zero hK₀) Finset.univ
+    fun i ↦ (c i : ℝ) • step i).trans
   have hterm : ∀ i : Fin s, gauge K ((c i : ℝ) • step i) ≤ A := by
     intro i
     rw [gauge_smul_abs hsymm]
     refine (mul_le_mul_of_nonneg_right ?_ (gauge_nonneg (step i))).trans (hend i)
     have hi := mem_intBox.mp hc i
     exact_mod_cast hi
-  refine (Finset.sum_le_sum fun i _ ↦ hterm i).trans_eq ?_
+  apply (Finset.sum_le_sum fun i _ ↦ hterm i).trans_eq
   simp
 
 lemma GaugeControlledLatticeBox.gauge_sum_le
@@ -226,7 +226,8 @@ lemma intVectorToReal_stepsHom (step : Fin s → (Fin s → ℤ)) (c : Fin s →
       ∑ i, (c i : ℝ) • intVectorToReal (step i) := by
   change intVectorToReal (∑ i, c i • step i) = _
   rw [intVectorToReal_sum]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  apply Finset.sum_congr rfl
+  intro i _
   rw [intVectorToReal_zsmul, Int.cast_smul_eq_zsmul]
 
 /-- A gauge-controlled box in the standard integer lattice gives an adapted integral box. Its
@@ -279,8 +280,8 @@ theorem GaugeControlledLatticeBox.exists_adaptedLatticeBox
       intVectorToReal v ∈ ((s * a : ℕ) : ℝ) • K := by
     intro v hv
     obtain ⟨c, hc, rfl⟩ := Finset.mem_image.mp hv
-    refine (mem_smul_iff_gauge_le hconv hclosed hK₀ hbdd
-      (Nat.cast_nonneg _) _).mpr ?_
+    apply (mem_smul_iff_gauge_le hconv hclosed hK₀ hbdd
+      (Nat.cast_nonneg _) _).mpr
     rw [intVectorToReal_stepsHom]
     change gauge K (∑ i, (c i : ℝ) • intVectorToReal (stepZ i)) ≤ _
     simp_rw [hstepReal]

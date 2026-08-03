@@ -97,7 +97,7 @@ private lemma cast_choose_le_classCountScale_mul_exp {t m d : ℕ} (ht : 0 < t)
         (Stirling.le_factorial_stirling k)
     have hchoose_scale : (m.choose k : ℝ) ≤
         ((Real.exp 1 * (m : ℝ)) / (k : ℝ)) ^ k := by
-      refine (Nat.choose_le_pow_div k m).trans ?_
+      apply (Nat.choose_le_pow_div k m).trans
       rw [div_pow]
       convert
         (div_le_div_iff_of_pos_left (by positivity : 0 < (m : ℝ) ^ k)
@@ -118,7 +118,7 @@ private lemma cast_choose_le_classCountScale_mul_exp {t m d : ℕ} (ht : 0 < t)
         ring
       · norm_num
     change (m.choose k : ℝ) ≤ _
-    refine hchoose_scale.trans ?_
+    apply hchoose_scale.trans
     convert mul_le_mul (pow_le_pow_right₀ hbase_one hk_le_t) hratio
       (by positivity) (by positivity) using 1
     rw [← mul_pow]
@@ -168,9 +168,9 @@ private lemma coreClassCost_le {t m : ℕ}
       (by exact_mod_cast (one_lt_of_smallSumsetClassCountThreshold_le ht).le) (by norm_num))
   have hcore_real : (coreCardBound t m : ℝ) ≤ 4 * A + 1 := by
     unfold coreCardBound
-    refine (Nat.ceil_lt_add_one (mul_nonneg
+    apply (Nat.ceil_lt_add_one (mul_nonneg
       (mul_nonneg (by norm_num) (coreSamplingRate_pos ht).le)
-      (Nat.cast_nonneg m))).le.trans ?_
+      (Nat.cast_nonneg m))).le.trans
     have hsampling : coreSamplingRate t * (t : ℝ) ^ ((31 : ℝ) / 30) = A := by
       dsimp only [A]
       unfold coreSamplingRate
@@ -224,8 +224,8 @@ private lemma extensionClassCost_le {t m : ℕ}
     exact Real.one_le_rpow (by exact_mod_cast ht_pos) (by norm_num)
   have hexception_real : (exceptionCardBound t m : ℝ) ≤ 4 * B + 1 := by
     unfold exceptionCardBound
-    refine (Nat.ceil_lt_add_one (by positivity :
-      0 ≤ 4 * (t : ℝ) ^ (-(4 : ℝ) / 5) * (m : ℝ))).le.trans ?_
+    apply (Nat.ceil_lt_add_one (by positivity :
+      0 ≤ 4 * (t : ℝ) ^ (-(4 : ℝ) / 5) * (m : ℝ))).le.trans
     have hpower : (t : ℝ) ^ (-(4 : ℝ) / 5) *
         (t : ℝ) ^ ((31 : ℝ) / 30) = B := by
       dsimp only [B]
@@ -279,8 +279,8 @@ private lemma exceptionCountCost_le {t m : ℕ}
     exact Real.one_le_rpow (by exact_mod_cast ht_pos) (by norm_num)
   have hexception_real : (exceptionCardBound t m : ℝ) ≤ 4 * B + 1 := by
     unfold exceptionCardBound
-    refine (Nat.ceil_lt_add_one (by positivity :
-      0 ≤ 4 * (t : ℝ) ^ (-(4 : ℝ) / 5) * (m : ℝ))).le.trans ?_
+    apply (Nat.ceil_lt_add_one (by positivity :
+      0 ≤ 4 * (t : ℝ) ^ (-(4 : ℝ) / 5) * (m : ℝ))).le.trans
     have hpower : (t : ℝ) ^ (-(4 : ℝ) / 5) *
         (t : ℝ) ^ ((31 : ℝ) / 30) = B := by
       dsimp only [B]
@@ -316,9 +316,9 @@ private lemma coreCardBound_le_t {t m : ℕ}
     all_goals norm_num
   have hcore_real : (coreCardBound t m : ℝ) ≤ 4 * A + 1 := by
     unfold coreCardBound
-    refine (Nat.ceil_lt_add_one (mul_nonneg
+    apply (Nat.ceil_lt_add_one (mul_nonneg
       (mul_nonneg (by norm_num) (coreSamplingRate_pos ht).le)
-      (Nat.cast_nonneg m))).le.trans ?_
+      (Nat.cast_nonneg m))).le.trans
     have hsampling : coreSamplingRate t * (t : ℝ) ^ ((31 : ℝ) / 30) = A := by
       dsimp only [A]
       unfold coreSamplingRate
@@ -502,7 +502,8 @@ lemma freimanClassCountBound_le {t m : ℕ}
         ∑ d ∈ Finset.range (exceptionCardBound t m + 1),
           ∑ _ ∈ Finset.Icc 1 (coreCardBound t m),
             scale * Real.exp ((99 / 100 : ℝ) * E) := by
-      refine Finset.sum_le_sum fun d hd => ?_
+      apply Finset.sum_le_sum
+      intro d hd
       exact Finset.sum_le_sum fun l hl => hterm d hd l hl
     _ = ((exceptionCardBound t m + 1) * coreCardBound t m : ℕ) *
         (scale * Real.exp ((99 / 100 : ℝ) * E)) := by
@@ -677,7 +678,8 @@ theorem smallSumsetFreimanDimSets_ncard_le_of_class_cover (n r s t : ℕ)
       _ ≤ ∑ B ∈ representatives, (realizationFinset B).card :=
         Finset.card_biUnion_le
       _ ≤ ∑ _ ∈ representatives, n ^ (r + 1) := by
-        refine Finset.sum_le_sum fun B hB => ?_
+        apply Finset.sum_le_sum
+        intro B hB
         change (hrealizations_finite B).toFinset.card ≤ n ^ (r + 1)
         rw [← Set.ncard_eq_toFinset_card (freimanClassRealizations n r t B)
           (hrealizations_finite B)]

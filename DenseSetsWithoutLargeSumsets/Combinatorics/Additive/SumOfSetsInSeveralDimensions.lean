@@ -60,9 +60,9 @@ private lemma sumsetCardLowerBound_step {d m n : ℕ} (hm : 2 ≤ m) :
       rw [sum_Icc_two_eq_sum_Icc_one]
       rw [← Nat.add_assoc, add_min_sub_one]
       simp only [Nat.add_assoc]
-      refine congrArg (fun k => n - 1 + k) ?_
+      apply congrArg (fun k => n - 1 + k)
       nth_rewrite 1 [add_comm (min (d + 1) n)]
-      refine congrArg (fun k => k + min (d + 1) n) ?_
+      apply congrArg (fun k => k + min (d + 1) n)
       apply Finset.sum_congr rfl
       intro t _
       congr 1
@@ -83,8 +83,9 @@ private lemma sumsetCardLowerBound_le_large_deletion {d m n : ℕ} (hm : 2 ≤ m
       · omega
       · refine le_trans (Nat.add_le_add (min_le_right d (n - (m - 1)))
           (Finset.sum_le_sum (g := fun t ↦ min (d - 1) (n - 1 - t) + 1)
-            fun t ht ↦ ?_)) ?_
-        · rw [Finset.mem_Icc] at ht
+            ?_)) ?_
+        · intro t ht
+          rw [Finset.mem_Icc] at ht
           omega
         · rw [Finset.sum_add_distrib, Finset.sum_const, Nat.card_Icc]
           simp only [smul_eq_mul, mul_one]
@@ -114,8 +115,8 @@ private lemma sumsetCardLowerBound_le_small_deletion {d m n : ℕ} (hm : 2 ≤ m
 private lemma sumsetCardLowerBound_le_strict_right_deletion {d m n : ℕ} (hm : 1 ≤ m) (hmn : m < n) :
     sumsetCardLowerBound d m n ≤ m + sumsetCardLowerBound (d - 1) m (n - 1) := by
   rw [sumsetCardLowerBound_eq, sumsetCardLowerBound_eq]
-  refine le_trans (b := n + (Finset.Icc 1 (m - 1)).sum
-    (fun t ↦ min (d - 1) (n - 1 - t) + 1)) ?_ ?_
+  apply le_trans (b := n + (Finset.Icc 1 (m - 1)).sum
+    (fun t ↦ min (d - 1) (n - 1 - t) + 1))
   · apply Nat.add_le_add_left
     apply Finset.sum_le_sum
     intro t ht
@@ -776,7 +777,8 @@ private lemma left_base_not_mem_codimension_one_deletion
       Set (Fin D → ℝ))).direction) :
     finsetAffineDim (X.erase 0 + Y.erase 0) = d - 1 ∧
       Y.card + (X.erase 0 + Y.erase 0).card ≤ (X + Y).card := by
-  refine ⟨hdel.trans he, ?_⟩
+  constructor
+  · exact hdel.trans he
   rw [← Finset.card_union_of_disjoint]
   · apply Finset.card_le_card
     intro z hz
@@ -899,7 +901,7 @@ private lemma codimension_two_deletion
     · rw [← finrank_deleted_direction_eq X Y hdel]
       rw [← Submodule.finrank_sup_span_singleton]
       · apply Submodule.finrank_mono
-        refine sup_le ?_ ?_
+        apply sup_le
         · apply AffineSubspace.direction_le
           apply affineSpan_mono
           intro z hz
@@ -985,7 +987,8 @@ private lemma full_dim_deletion_card
     · exact Finset.disjoint_sdiff
   · rw [Finset.mem_union]
     push Not
-    refine ⟨zero_notMem_add_erase_zero X Y hposX hposY, ?_⟩
+    constructor
+    · exact zero_notMem_add_erase_zero X Y hposX hposY
     intro hzero
     rw [deletedComplement, Finset.mem_sdiff] at hzero
     simpa using hzero.1
@@ -1161,8 +1164,8 @@ private theorem sumsetCardLowerBound_le_card_add :
       · have hrec :
             sumsetCardLowerBound (d - 1) (Y.erase 0).card X.card ≤
               (X + Y.erase 0).card := by
-          refine ih ((Y.erase 0).card + X.card)
-            (card_erase_add_card_lt h0Y hYXsum) X (Y.erase 0) ?_ ?_ ?_ ?_
+          apply ih ((Y.erase 0).card + X.card)
+            (card_erase_add_card_lt h0Y hYXsum) X (Y.erase 0)
           · apply (Finset.one_lt_card_iff_nontrivial.mp ?_).erase_nonempty
             omega
           · apply card_erase_le_card h0Y

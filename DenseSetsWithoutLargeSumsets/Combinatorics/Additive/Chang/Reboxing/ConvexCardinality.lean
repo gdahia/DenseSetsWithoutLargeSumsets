@@ -82,8 +82,9 @@ theorem card_le_pow_mul_card_of_mem_convex_dilate
   let R : Finset (Fin s → ZMod N) := Finset.univ
   refine Finset.card_le_mul_card_image_of_maps_to
     (f := residueVector N) (s := T) (t := R) (fun _ _ ↦ Finset.mem_univ _)
-      E.card (fun b _ ↦ ?_) |>.trans ?_
-  · by_cases hfiber :
+      E.card ?_ |>.trans ?_
+  · intro b _
+    by_cases hfiber :
         ({a ∈ T | residueVector N a = b} : Finset (Fin s → ℤ)).Nonempty
     swap
     · simp only [Finset.not_nonempty_iff_eq_empty.mp hfiber, Finset.card_empty,
@@ -92,7 +93,7 @@ theorem card_le_pow_mul_card_of_mem_convex_dilate
     have hy := Finset.mem_filter.mp hfiber.choose_spec
     have hyT : y ∈ T := hy.1
     have hyres : residueVector N y = b := hy.2
-    refine Finset.card_le_card_of_injOn (quotientDifference N · y) ?_ ?_
+    apply Finset.card_le_card_of_injOn (quotientDifference N · y)
     · intro x hx
       rw [Finset.mem_coe, Finset.mem_filter] at hx
       rw [Finset.mem_coe, hE]

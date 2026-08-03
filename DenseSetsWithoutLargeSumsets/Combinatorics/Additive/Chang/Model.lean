@@ -115,8 +115,8 @@ lemma zero_mem_latticeDomain : 0 ∈ latticeDomain S := by
 
 lemma latticeEmbed_zero :
     latticeEmbed S ⟨0, zero_mem_latticeDomain S⟩ = 0 := by
-  refine Subtype.ext_iff.mpr ?_
-  refine Subtype.ext_iff.mpr ?_
+  apply Subtype.ext_iff.mpr
+  apply Subtype.ext_iff.mpr
   exact intVectorToReal_zero
 
 /-- The model map restricted to `S` is a Freiman 2-isomorphism onto its image. -/

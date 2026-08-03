@@ -38,8 +38,8 @@ private lemma card_add_self_le_sq_mul {G : Type*} [DecidableEq G] [AddCommGroup 
     refine (div_le_iff₀ ?_).mpr hAB
     exact_mod_cast hkpos
   have hratio_nonneg : 0 ≤ ((A + B).card : ℝ) / k := by positivity
-  refine le_trans
-    (b := (((A + B).card : ℝ) / k) ^ 2 * k) ?_ ?_
+  apply le_trans
+    (b := (((A + B).card : ℝ) / k) ^ 2 * k)
   · rw [← two_nsmul A]
     have hplu :
         ((2 • A).card : ℚ≥0) ≤ (((A + B).card : ℚ≥0) / k) ^ 2 * k := by
@@ -67,7 +67,7 @@ lemma card_union_add_union_le_κ_mul {G : Type*} [DecidableEq G] [AddCommGroup G
     simp [hAcard, hBcard]
   · rw [Finset.union_add, Finset.add_union, Finset.add_union, add_comm B A]
     simp only [Finset.union_assoc, Finset.union_left_idem]
-    refine le_trans (b := ((A + A).card : ℝ) + (A + B).card + (B + B).card) ?_ ?_
+    apply le_trans (b := ((A + A).card : ℝ) + (A + B).card + (B + B).card)
     · norm_cast
       simpa only [Finset.union_assoc] using
         (Finset.card_union_le ((A + A) ∪ (A + B)) (B + B)).trans
@@ -143,8 +143,8 @@ private lemma choose_succ_two_le_sq (r : ℕ) :
 private lemma choose_succ_two_le_add_pred_mul {r a b : ℕ}
     (hr : 1 ≤ r) (hrb : r ≤ b) (hba : b ≤ a) :
     Nat.choose (r + 1) 2 ≤ a + (r - 1) * b := by
-  refine (choose_succ_two_le_sq r).trans ?_
-  refine (Nat.mul_le_mul_left r hrb).trans ?_
+  apply (choose_succ_two_le_sq r).trans
+  apply (Nat.mul_le_mul_left r hrb).trans
   rw [← Nat.sub_add_cancel hr]
   rw [Nat.add_mul, one_mul]
   rw [add_comm ((r - 1) * b) b]
@@ -160,7 +160,7 @@ lemma asym_large_subsets_sum_lower
     (hA_large : (1 - ε) * (k : ℝ) ≤ (A.card : ℝ))
     (hB_large : (1 - ε) * (k : ℝ) ≤ (B.card : ℝ)) :
     (1 - 2 * ε) * (r : ℝ) * (k : ℝ) ≤ ((A + B).card : ℝ) := by
-  refine (by
+  apply (by
     rw [Nat.cast_sub hr]
     norm_num
     nlinarith [hA_large, hB_large,
@@ -173,7 +173,7 @@ lemma asym_large_subsets_sum_lower
         (Nat.choose (r + 1) 2 : ℝ) ≤ ε * (r : ℝ) * (k : ℝ))] :
     (1 - 2 * ε) * (r : ℝ) * (k : ℝ) ≤
       (A.card : ℝ) + ((r - 1 : ℕ) : ℝ) * (B.card : ℝ) -
-        (Nat.choose (r + 1) 2 : ℝ)).trans ?_
+        (Nat.choose (r + 1) 2 : ℝ)).trans
   rw [← Nat.cast_mul, ← Nat.cast_add]
   rw [← Nat.cast_sub (choose_succ_two_le_add_pred_mul hr
     (by

@@ -90,7 +90,7 @@ private lemma freimanRelation_iff_mem_space {s t : ℕ} (a : Fin t → ℕ)
 
 private lemma finrank_freimanRelationSpace_le {s t : ℕ} (a : Fin t → ℕ) :
     Module.finrank ℚ (freimanRelationSpace (s := s) a) ≤ t := by
-  refine (freimanRelationSpace (s := s) a).finrank_le.trans_eq ?_
+  apply (freimanRelationSpace (s := s) a).finrank_le.trans_eq
   simp
 
 private lemma freimanRelationVector_reflexive_zero {s t : ℕ} (p : Fin s → Fin t) :
@@ -122,7 +122,7 @@ private lemma exists_freimanRelationCode {s t : ℕ} (ht : 0 < t) (a : Fin t →
     freimanRelationVector_reflexive_zero _
   let code : Fin t → FreimanRelationIndex s t := fun i ↦
     if hi : i.val < d then index ⟨i.val, hi⟩ else zeroIndex
-  refine ⟨code, ?_⟩
+  use code
   change Submodule.span ℚ (freimanRelationVector '' Set.range code) =
     Submodule.span ℚ relations
   rw [← hbasis_span]
@@ -153,7 +153,7 @@ private def freimanRelationCodes {s t : ℕ} (a : Fin t → ℕ) :
 private lemma freimanRelationCodes_nonempty {s t : ℕ} (ht : 0 < t)
     (a : Fin t → ℕ) : (freimanRelationCodes (s := s) a).Nonempty := by
   obtain ⟨code, hcode⟩ := exists_freimanRelationCode (s := s) ht a
-  refine ⟨code, ?_⟩
+  use code
   simp [freimanRelationCodes, hcode]
 
 noncomputable def freimanRelationCode {s t : ℕ} (ht : 0 < t)
@@ -185,7 +185,7 @@ private lemma freimanRelationCode_eq_of_space_eq {s t : ℕ} (ht : 0 < t)
     (H := freimanRelationCodes_nonempty (s := s) ht a)
     ((freimanRelationCodes (s := s) b).min'
       (freimanRelationCodes_nonempty (s := s) ht b))).mpr
-  refine ⟨?_, ?_⟩
+  constructor
   · rw [hcodes]
     exact Finset.min'_mem _ _
   · intro code hcode
@@ -210,7 +210,7 @@ lemma freimanRelationCode_eq_of_relations_iff {s t : ℕ} (ht : 0 < t)
     (hrelations : ∀ p : FreimanRelationIndex s t,
       freimanRelationHolds a p ↔ freimanRelationHolds b p) :
     freimanRelationCode (s := s) ht a = freimanRelationCode ht b := by
-  refine freimanRelationCode_eq_of_space_eq ht ?_
+  apply freimanRelationCode_eq_of_space_eq ht
   exact freimanRelationSpace_eq_of_relations_iff hrelations
 
 lemma freimanRelations_iff_of_code_eq {s t : ℕ} (ht : 0 < t)
@@ -545,8 +545,8 @@ private lemma sum_assignmentWeight_marginal {κ ι : Type*} [Fintype κ] [Fintyp
     ∑ ω : ι → Bool, assignmentWeight q ω * F (ω ∘ f) =
         ∑ z : (κ → Bool) × (C → Bool),
           (assignmentWeight q z.1 * F z.1) * assignmentWeight q z.2 := by
-      refine (eΩ.sum_comp
-        (fun ω ↦ assignmentWeight q ω * F (ω ∘ f))).symm.trans ?_
+      apply (eΩ.sum_comp
+        (fun ω ↦ assignmentWeight q ω * F (ω ∘ f))).symm.trans
       apply Fintype.sum_congr
       intro z
       let η : κ ⊕ C → Bool :=

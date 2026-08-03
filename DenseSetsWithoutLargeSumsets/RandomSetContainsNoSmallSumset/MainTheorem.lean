@@ -49,13 +49,13 @@ theorem small_sumset_pair_probability_le_fingerprint_sum {γ C c : ℝ} {n : ℕ
             P.dim (pairCardThreshold (3 + γ) n δ) C γ,
           (δ : ℝ) ^ (p.1 + p.2).card := by
   classical
-  refine le_trans (b := (smallSumsetMeasure n δ).real
+  apply le_trans (b := (smallSumsetMeasure n δ).real
       (⋃ P ∈ lowerModelGAPs (γ := γ) (C := C) (n := n) δ hγ_pos C_pos hn,
         ⋃ p ∈ bltDimSmallWitnessPairs
             (zmodGAPPreimageContainer n
               (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) P)
             P.dim (pairCardThreshold (3 + γ) n δ) C γ,
-          {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S})) ?_ ?_
+          {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S}))
   · change (smallSumsetMeasure n δ).real
       {S : Finset ℕ |
         pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
@@ -67,23 +67,23 @@ theorem small_sumset_pair_probability_le_fingerprint_sum {γ C c : ℝ} {n : ℕ
           pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs
             (γ := γ) (C := C) (c := c) (n := n) (δ := δ)
             hγ_pos hγ_le C_pos hc_pos hc_lt hn hn_gap hδ_lower hδ_upper hδ_upper_c))
-  refine (MeasureTheory.measureReal_biUnion_finset_le
+  apply (MeasureTheory.measureReal_biUnion_finset_le
     (lowerModelGAPs (γ := γ) (C := C) (n := n) δ hγ_pos C_pos hn)
     (fun P =>
       ⋃ p ∈ bltDimSmallWitnessPairs
           (zmodGAPPreimageContainer n
             (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) P)
           P.dim (pairCardThreshold (3 + γ) n δ) C γ,
-        {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S})).trans ?_
-  refine Finset.sum_le_sum ?_
+        {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S})).trans
+  apply Finset.sum_le_sum
   intro P _hP
-  refine (MeasureTheory.measureReal_biUnion_finset_le
+  apply (MeasureTheory.measureReal_biUnion_finset_le
     (bltDimSmallWitnessPairs
       (zmodGAPPreimageContainer n
         (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) P)
       P.dim (pairCardThreshold (3 + γ) n δ) C γ)
-    (fun p => {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S})).trans ?_
-  refine Finset.sum_le_sum ?_
+    (fun p => {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S})).trans
+  apply Finset.sum_le_sum
   intro p _hp
   simpa [smallSumsetMeasure] using bltWitnessPair_probability_le n (δ := δ) p
 
@@ -107,7 +107,7 @@ private lemma lower_dim_fingerprint_sum_bound {γ C c : ℝ} {n : ℕ} {δ : uni
   have hδ_lt : (δ : ℝ) < 1 := unitInterval_lt_one hδ_upper
   have hkpos : 0 < pairCardThreshold (3 + γ) n δ :=
     pairCardThreshold_pos_of_lower_density hγ_pos hn hδ_lower hδ_upper
-  refine le_trans (b :=
+  apply le_trans (b :=
     ∑ d ∈ Finset.Icc 1 (pairCardThreshold (3 + γ) n δ),
       ((properGAPsZModOfDim d
         ⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊
@@ -123,15 +123,15 @@ private lemma lower_dim_fingerprint_sum_bound {γ C c : ℝ} {n : ℕ} {δ : uni
                 ⌈lowerBltConstant C γ hC_two hε *
                   Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ)⌉₊ : ℕ) : ℝ)) *
           Real.exp (-((1 - 3 * ε γ) * (d : ℝ) *
-            (pairCardThreshold (3 + γ) n δ : ℝ)) * Real.log (1 / δ))) ?_ ?_
+            (pairCardThreshold (3 + γ) n δ : ℝ)) * Real.log (1 / δ)))
   · simpa [lowerModelGAPs] using
       dim_fingerprint_sum_le_gap_dim_sum
         (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
         (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).pos
         (zmodModelEmbedding_iso (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).bijOn.injOn
         hC_two hε hδ_pos hδ_lt
-  refine le_trans (b := ∑ d ∈ Finset.Icc 1 (pairCardThreshold (3 + γ) n δ),
-    (n : ℝ) ^ (-(ε γ / 2))) ?_ ?_
+  apply le_trans (b := ∑ d ∈ Finset.Icc 1 (pairCardThreshold (3 + γ) n δ),
+    (n : ℝ) ^ (-(ε γ / 2)))
   · refine Finset.sum_le_sum ?_
     intro d hd
     exact lower_gap_dim_summand_le hγ_pos hγ_le C_pos hC_one hc_pos hc_lt hn hn_gap
@@ -146,7 +146,7 @@ private lemma lower_dim_fingerprint_sum_bound {γ C c : ℝ} {n : ℕ} {δ : uni
           (pairCardThreshold (3 + γ) n δ)).le
       nlinarith [hcard, ((by exact_mod_cast hkpos) :
         (0 : ℝ) < pairCardThreshold (3 + γ) n δ)]
-    refine (mul_le_mul_of_nonneg_right hcoef (by positivity)).trans ?_
+    apply (mul_le_mul_of_nonneg_right hcoef (by positivity)).trans
     rw [Real.rpow_neg (le_of_lt (old_model_threshold_nat_pos hn))]
     ring_nf
     exact le_rfl

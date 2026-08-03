@@ -56,9 +56,9 @@ lemma pairEvent_measure_le_three_ranges
     (hmid : (binomialFinsetSubset (Set.Icc 1 n) δ).real (mediumSumsetEvent n k C) ≤ M)
     (hlarge : (binomialFinsetSubset (Set.Icc 1 n) δ).real (largeSumsetEvent n k) ≤ G) :
     (binomialFinsetSubset (Set.Icc 1 n) δ).real {S | exactPairEvent n k S} ≤ L + M + G := by
-  refine (measureReal_mono (pairEvent_subset_three_ranges)).trans ?_
-  refine (measureReal_union_le (smallSumsetEvent n k C ∪ mediumSumsetEvent n k C)
-    (largeSumsetEvent n k)).trans ?_
+  apply (measureReal_mono (pairEvent_subset_three_ranges)).trans
+  apply (measureReal_union_le (smallSumsetEvent n k C ∪ mediumSumsetEvent n k C)
+    (largeSumsetEvent n k)).trans
   apply add_le_add ?_ hlarge
   exact (measureReal_union_le (smallSumsetEvent n k C) (mediumSumsetEvent n k C)).trans
     (add_le_add hlower hmid)
@@ -107,7 +107,7 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
     rcases Finset.exists_subset_card_eq hBk with ⟨B', hB'sub, hB'card⟩
     exact ⟨A', B', hA'sub.trans hA, hB'sub.trans hB, hA'card, hB'card,
       (Finset.add_subset_add hA'sub hB'sub).trans hsum⟩
-  refine (measureReal_mono hlarge_subset).trans ?_
+  apply (measureReal_mono hlarge_subset).trans
   refine (pairEvent_measure_le_three_ranges (C := C)
     (L := 2 * (k : ℝ) / Real.rpow (n : ℝ) (ε γ / 2))
     (M := 2 * (k : ℝ) ^ 2 / Real.rpow (n : ℝ) (((1 + γ) * C) / 2))
@@ -174,7 +174,7 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
       dsimp [pairEventDecayExponent]
       field_simp
       nlinarith [le_trans (by norm_num : (1 : ℝ) ≤ 2) hk_two]
-  refine le_of_eq ?_
+  apply le_of_eq
   ring
 
 lemma eventually_pairEvent_bound_lt {γ α c ε : ℝ}
@@ -228,8 +228,8 @@ lemma eventually_pairEvent_bound_lt {γ α c ε : ℝ}
       sq_nonneg ((pairCardThreshold (3 + γ) n δ : ℝ) - q * Real.log (n : ℝ))]
   have hden_pos : 0 < Real.rpow (n : ℝ) (pairEventDecayExponent γ) :=
     Real.rpow_pos_of_pos hn_pos _
-  refine (div_le_div_of_nonneg_right
-    (mul_le_mul_of_nonneg_left hsq (by norm_num)) hden_pos.le).trans_lt ?_
+  apply (div_le_div_of_nonneg_right
+    (mul_le_mul_of_nonneg_left hsq (by norm_num)) hden_pos.le).trans_lt
   have hlogpow : Real.rpow (Real.log (n : ℝ)) 2 = (Real.log (n : ℝ)) ^ 2 :=
     Real.rpow_two _
   rw [hlogpow] at hsmall
@@ -335,13 +335,13 @@ private theorem eventually_exists_dense_subset_without_large_sumsets_uniform
   intro δ hδ_lower hδ_upper
   have hn_pos : 0 < (n : ℝ) := by positivity
   change existsDenseSetWithoutLargeSumsets n (pairCardThreshold (3 + γ) n δ) δ
-  refine exists_dense_set_of_pair_probability_lt_quarter
-    (n := n) (k := pairCardThreshold (3 + γ) n δ) ?_ ?_
+  apply exists_dense_set_of_pair_probability_lt_quarter
+    (n := n) (k := pairCardThreshold (3 + γ) n δ)
   · refine le_trans ?_ (mul_lt_mul_of_pos_right hδ_lower hn_pos).le
     refine le_trans (b := Real.rpow (n : ℝ)
       (-denseSubsetDensityExponent γ c + 1)) ?_
       (Real.rpow_add_one hn_pos.ne' (-denseSubsetDensityExponent γ c)).le
-    refine le_trans (b := Real.rpow (n : ℝ) (1 / 2)) ?_ ?_
+    apply le_trans (b := Real.rpow (n : ℝ) (1 / 2))
     · have hsqrt : (3 : ℝ) ≤ Real.sqrt (n : ℝ) := by
         rw [← Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 3)]
         exact Real.sqrt_le_sqrt (by exact_mod_cast hn_nine)

@@ -56,7 +56,8 @@ theorem exists_gaugeControlledLatticeBox_aux :
         push Not at hcon
         have hbot : Submodule.span ℝ (K ∩ (L : Set E)) = ⊥ := by
           apply le_antisymm
-          · refine Submodule.span_le.mpr fun x hx ↦ ?_
+          · refine Submodule.span_le.mpr ?_
+            intro x hx
             change x = 0
             exact hcon x hx.1 hx.2
           · exact bot_le
@@ -90,10 +91,11 @@ theorem exists_gaugeControlledLatticeBox_aux :
       have hKcompact : IsCompact K := Metric.isCompact_of_isClosed_isBounded hclosed hbdd
       have hKbar₀ : π '' K ∈ 𝓝 (0 : W) := by
         have hpre : (fun x : W ↦ (x : E)) ⁻¹' K ∈ 𝓝 (0 : W) := by
-          refine continuous_subtype_val.continuousAt.preimage_mem_nhds ?_
+          apply continuous_subtype_val.continuousAt.preimage_mem_nhds
           simpa using hK₀
-        refine Filter.mem_of_superset hpre fun x hx ↦
-          ⟨(x : E), hx, Submodule.projectionOnto_apply_left hcompl x⟩
+        apply Filter.mem_of_superset hpre
+        intro x hx
+        exact ⟨(x : E), hx, Submodule.projectionOnto_apply_left hcompl x⟩
       have hpv : p v = 0 :=
         Submodule.projection_apply_of_mem_right hcompl
           (Submodule.mem_span_singleton_self v)
@@ -101,13 +103,13 @@ theorem exists_gaugeControlledLatticeBox_aux :
         intro y
         have hmem : y - p y ∈ Submodule.span ℝ {v} := by
           rw [← Submodule.ker_projection hcompl]
-          refine LinearMap.mem_ker.mpr ?_
+          apply LinearMap.mem_ker.mpr
           rw [map_sub, Submodule.projection_apply_of_mem_left hcompl
             (Submodule.projection_apply_mem hcompl y), sub_self]
         obtain ⟨s, hs⟩ := Submodule.mem_span_singleton.mp hmem
         exact ⟨s, hs.symm⟩
       haveI : DiscreteTopology (L.map (π : E →+ W)) := by
-        refine discreteTopology_of_exists_pos_forall_norm_lt ?_
+        apply discreteTopology_of_exists_pos_forall_norm_lt
         obtain ⟨r, hrpos, hr⟩ :=
           exists_pos_forall_norm_apply_lt (L := L) p hvL hpv hsplit
         refine ⟨r, hrpos, ?_⟩
@@ -149,7 +151,7 @@ theorem exists_gaugeControlledLatticeBox_aux :
         exact endpoint_gauge_lift_le_two_mul (hygauge i) hlower
           (Bbar.endpoint_gauge i)
       have hyindep : LinearIndependent ℝ y := by
-        refine LinearIndependent.of_comp π ?_
+        apply LinearIndependent.of_comp π
         have hcomp : (π : E → W) ∘ y = Bbar.step := funext hyπ
         rw [hcomp]
         exact Bbar.step_independent
@@ -181,12 +183,13 @@ theorem exists_gaugeControlledLatticeBox_aux :
             rw [hcπ, sub_self]
           obtain ⟨t, ht⟩ := hker _ hresker
           have hresL : x - ∑ i, (c i : ℝ) • y i ∈ L := by
-            refine L.sub_mem hx.2 ?_
+            apply L.sub_mem hx.2
             simp_rw [Int.cast_smul_eq_zsmul]
             exact AddSubgroup.sum_mem L fun i _ ↦ L.zsmul_mem (hyL i) (c i)
           obtain ⟨k, hk⟩ :=
             exists_intCast_smul_eq_of_gauge_min hsymm hvL hvpos hmin hresL ht
-          refine ⟨c, hc, k, fun _ ↦ ?_⟩
+          refine ⟨c, hc, k, ?_⟩
+          intro _
           rw [← hk]
           abel
         · exact ⟨0, zero_mem_intBox _, 0, fun h ↦ absurd h hx⟩
@@ -217,8 +220,8 @@ theorem exists_gaugeControlledLatticeBox_aux :
               (k x : ℝ) • v = x - ∑ i, (c x i : ℝ) • y i := by
             exact eq_sub_iff_add_eq.mpr (hk x hxmem).symm
           rw [heq, sub_eq_add_neg]
-          refine (gauge_add_le hconv (absorbent_nhds_zero hK₀) x
-            (-∑ i, (c x i : ℝ) • y i)).trans ?_
+          apply (gauge_add_le hconv (absorbent_nhds_zero hK₀) x
+            (-∑ i, (c x i : ℝ) • y i)).trans
           rw [gauge_neg hsymm]
           exact add_le_add hxgauge hsumgauge
         rw [gauge_smul_abs hsymm] at hresgauge
@@ -234,7 +237,8 @@ theorem exists_gaugeControlledLatticeBox_aux :
         step := step
         halfWidth := halfWidth
         step_mem := by
-          refine Fin.cases hvL fun i ↦ ?_
+          refine Fin.cases hvL ?_
+          intro i
           exact hyL i
         step_independent := linearIndependent_finCons.mpr ⟨hyindep, hvnotspan⟩
         cover := by
@@ -242,7 +246,7 @@ theorem exists_gaugeControlledLatticeBox_aux :
           let coeff : Fin (m + 1) → ℤ := Fin.cons (k x) (c x)
           refine ⟨coeff, ?_, ?_⟩
           · rw [mem_intBox]
-            refine Fin.cases ?_ fun i ↦ ?_
+            apply Fin.cases
             · change |k x| ≤ (m₀ : ℤ)
               rw [Int.abs_eq_natAbs]
               have hxS : x ∈ S := by
@@ -251,22 +255,24 @@ theorem exists_gaugeControlledLatticeBox_aux :
                 exact ⟨hxK, hxL⟩
               exact_mod_cast Finset.le_sup (f := fun z ↦ (k z).natAbs)
                 hxS
-            · exact mem_intBox.mp (hc x) i
+            · intro i
+              exact mem_intBox.mp (hc x) i
           · rw [Fin.sum_univ_succ]
             change (k x : ℝ) • v + ∑ i, (c x i : ℝ) • y i = x
             exact (hk x ⟨hxK, hxL⟩).symm
         endpoint_gauge := by
-          refine Fin.cases ?_ fun i ↦ ?_
+          apply Fin.cases
           · change (m₀ : ℝ) * gauge K v ≤
               (gaugeReboxingDilation (m + 1) : ℝ)
             rw [gaugeReboxingDilation]
             push_cast
-            refine hm₀.trans ?_
+            apply hm₀.trans
             have hmnonneg : (0 : ℝ) ≤ m := Nat.cast_nonneg m
             have hAnonneg : (0 : ℝ) ≤ gaugeReboxingDilation m :=
               Nat.cast_nonneg _
             nlinarith [mul_nonneg hmnonneg hAnonneg]
-          · change (Bbar.halfWidth i : ℝ) * gauge K (y i) ≤
+          · intro i
+            change (Bbar.halfWidth i : ℝ) * gauge K (y i) ≤
               (gaugeReboxingDilation (m + 1) : ℝ)
             rw [gaugeReboxingDilation]
             push_cast
@@ -275,7 +281,7 @@ theorem exists_gaugeControlledLatticeBox_aux :
             have hApos := gaugeReboxingDilation_pos hmpos
             have hAposR : (0 : ℝ) < gaugeReboxingDilation m := by
               exact_mod_cast hApos
-            refine (hyendpoint i).trans ?_
+            apply (hyendpoint i).trans
             have hmoneR : (1 : ℝ) ≤ m := by exact_mod_cast hmpos
             have hAm :
                 (gaugeReboxingDilation m : ℝ) ≤

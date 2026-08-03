@@ -195,9 +195,10 @@ private lemma popular_facts {K ε : ℝ} (hK : 1 ≤ K) (hε : 0 < ε) (hε1 : �
     have hEbad : (c₁ : ℝ) * c₂ / (9 * ((#X : ℝ) * #Y) + bltAlpha K ε * n * ((c₁ : ℝ) * c₂))
         * (#(Cleanup.badPairs X Y P) : ℝ) ≤ Sampling.expectSumset X Y c₁ c₂ := by
       rw [hEsum, hbadeq, mul_sum]
-      refine le_trans (sum_le_sum fun s hs => ?_)
+      refine le_trans (sum_le_sum ?_)
         (sum_le_sum_of_subset_of_nonneg sdiff_subset
           fun s _ _ => Sampling.hitProb_nonneg X Y c₁ c₂ s)
+      intro s hs
       rw [mul_comm]
       exact hunpop s hs
     have hCκ : 1296 * K * m ≤ ε * (bltDelta K ε * ((c₁ : ℝ) * c₂)) := by
@@ -234,7 +235,7 @@ private lemma popular_facts {K ε : ℝ} (hK : 1 ≤ K) (hε : 0 < ε) (hε1 : �
     have hbound : ∀ s ∈ P, (Sampling.reprCount X Y s : ℝ) ≤ n := by
       intro s _
       rw [hn]
-      refine le_min ?_ ?_
+      apply le_min
       · exact_mod_cast Sampling.reprCount_le_left X Y s
       · exact_mod_cast Sampling.reprCount_le_right X Y s
     refine le_trans (sum_le_sum hbound) (le_of_eq ?_)
@@ -541,8 +542,8 @@ private lemma bltSampleSize_le_mul_sqrt {σ ε : ℝ} (hσ : 0 < σ) (hε : 0 < 
   push_cast
   rw [Real.sqrt_mul
     ((zero_le_one' ℝ).trans (le_max_left 1 (originalBltConstant σ ε hσ hε)))]
-  refine le_trans (b := Real.sqrt (max 1 (originalBltConstant σ ε hσ hε)) *
-    Real.sqrt (M : ℝ) + 2) ?_ ?_
+  apply le_trans (b := Real.sqrt (max 1 (originalBltConstant σ ε hσ hε)) *
+    Real.sqrt (M : ℝ) + 2)
   · nlinarith [Nat.ceil_lt_add_one (mul_nonneg
       (Real.sqrt_nonneg (max 1 (originalBltConstant σ ε hσ hε)))
       (Real.sqrt_nonneg (M : ℝ)))]
@@ -603,8 +604,8 @@ private lemma exists_subset_card_le_bltConstant_mul_sqrt {σ ε : ℝ} (hσ : 0 
           (σ * (#B : ℝ)) ≤ (#(A + B') : ℝ) := by
   set T := min (min ((1 - ε) * (#(A + B) : ℝ)) (σ * (#A : ℝ))) (σ * (#B : ℝ))
   have hceil : (⌈T⌉₊ : ℝ) ≤ bltConstant σ ε hσ hε * Real.sqrt (max #A #B : ℝ) := by
-    refine (cast_ceil_le_add_one ((min_le_left _ _).trans (min_le_right _ _))
-      (by positivity)).trans ?_
+    apply (cast_ceil_le_add_one ((min_le_left _ _).trans (min_le_right _ _))
+      (by positivity)).trans
     rw [← Nat.cast_max]
     exact mul_add_one_le_bltConstant_mul_sqrt hσ hε
       ((Nat.one_le_iff_ne_zero.mpr hA.card_ne_zero).trans (le_max_left _ _)) hsmall

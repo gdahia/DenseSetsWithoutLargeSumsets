@@ -115,19 +115,21 @@ lemma coordinateMap_injective_on (_h : P.Proper) :
 
 lemma coordinateMap_bijOn (h : P.Proper) :
     Set.BijOn P.coordinateMap P.carrier P.box := by
-  refine ⟨fun x hx ↦ P.coordinateMap_mem_box hx, P.coordinateMap_injective_on h, ?_⟩
-  intro y hy
-  change y ∈ P.box at hy
-  rw [box, Finset.mem_image] at hy
-  obtain ⟨w, _, hwy⟩ := hy
-  subst y
-  let x := gapMap P.origin P.step P.length w
-  have hx : x ∈ P.carrier := by
-    rw [P.carrier_eq, Finset.mem_image]
-    exact ⟨w, Finset.mem_univ _, by simp [x]⟩
-  refine ⟨x, hx, ?_⟩
-  unfold coordinateMap
-  rw [P.coefficientsFin_eq_of_proper h hx (w := w) (by simp [x])]
+  refine ⟨?_, P.coordinateMap_injective_on h, ?_⟩
+  · intro x hx
+    exact P.coordinateMap_mem_box hx
+  · intro y hy
+    change y ∈ P.box at hy
+    rw [box, Finset.mem_image] at hy
+    obtain ⟨w, _, hwy⟩ := hy
+    subst y
+    let x := gapMap P.origin P.step P.length w
+    have hx : x ∈ P.carrier := by
+      rw [P.carrier_eq, Finset.mem_image]
+      exact ⟨w, Finset.mem_univ _, by simp [x]⟩
+    refine ⟨x, hx, ?_⟩
+    unfold coordinateMap
+    rw [P.coefficientsFin_eq_of_proper h hx (w := w) (by simp [x])]
 
 /-- Add two coefficient vectors inside the doubled box. -/
 def sumCoefficients (w₁ w₂ : (i : Fin P.dim) → Fin (P.length i)) :
@@ -351,14 +353,16 @@ lemma mem_symBox {P : GAP G} {v : Fin P.dim → ℤ} :
 lemma card_symBox (P : GAP G) :
     (symBox P).card ≤ 2 ^ P.dim * ∏ i, P.length i := by
   rw [symBox, Pi.card_Icc]
-  refine (Finset.prod_le_prod' (g := fun i ↦ 2 * P.length i) fun i _ ↦ ?_).trans ?_
-  · rw [Int.card_Icc]
+  refine (Finset.prod_le_prod' (g := fun i ↦ 2 * P.length i) ?_).trans ?_
+  · intro i _
+    rw [Int.card_Icc]
     omega
   · rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
 
 lemma sub_coordinateMap_mem_symBox (P : GAP G) (x y : G) :
     P.coordinateMap x - P.coordinateMap y ∈ symBox P := by
-  refine mem_symBox.mpr fun i ↦ ?_
+  apply mem_symBox.mpr
+  intro i
   have hxi := (P.coefficientsFin x i).2
   have hyi := (P.coefficientsFin y i).2
   change |(P.coefficientsFin x i : ℤ) - P.coefficientsFin y i| < _

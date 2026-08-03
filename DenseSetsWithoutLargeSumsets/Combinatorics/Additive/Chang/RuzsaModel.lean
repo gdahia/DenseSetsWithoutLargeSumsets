@@ -72,7 +72,7 @@ lemma mem_dvdResidues [NeZero q] {y : ZMod q} : y ∈ dvdResidues q m ↔ y ≠ 
 /-- There are at most `(q - 1) / m` nonzero residues with representative divisible by `m`. -/
 lemma card_dvdResidues_le [NeZero q] : (dvdResidues q m).card ≤ (q - 1) / m := by
   suffices h : (dvdResidues q m).card ≤ (Finset.Icc 1 ((q - 1) / m)).card by simpa using h
-  refine Finset.card_le_card_of_injOn (fun y ↦ y.val / m) ?_ ?_
+  apply Finset.card_le_card_of_injOn (fun y ↦ y.val / m)
   · intro y hy
     rw [Finset.mem_coe, mem_dvdResidues] at hy
     have hval : y.val ≠ 0 := fun h ↦ hy.1 ((ZMod.val_eq_zero y).1 h)
@@ -84,7 +84,7 @@ lemma card_dvdResidues_le [NeZero q] : (dvdResidues q m).card ≤ (q - 1) / m :=
   · intro y hy z hz hyz
     rw [Finset.mem_coe, mem_dvdResidues] at hy hz
     have hyz' : y.val / m = z.val / m := hyz
-    refine ZMod.val_injective q ?_
+    apply ZMod.val_injective q
     rw [← Nat.div_mul_cancel hy.2, ← Nat.div_mul_cancel hz.2, hyz']
 
 /-- **Existence of a good dilation.** A set `D` of at most `m` residues, containing `0`, admits a
@@ -103,8 +103,8 @@ lemma exists_isGoodDilation (hq : q.Prime) {D : Finset (ZMod q)} (h0 : (0 : ZMod
       < (Finset.univ.erase (0 : ZMod q)).card := by
     have hbiUnion : ((D.erase 0).biUnion fun d ↦ (dvdResidues q m).image (· * d⁻¹)).card
         ≤ (D.card - 1) * (dvdResidues q m).card := by
-      refine Finset.card_biUnion_le.trans ?_
-      refine le_trans (Finset.sum_le_card_nsmul _ _ _ fun d _ ↦ Finset.card_image_le) ?_
+      apply Finset.card_biUnion_le.trans
+      apply le_trans (Finset.sum_le_card_nsmul _ _ _ fun d _ ↦ Finset.card_image_le)
       rw [Finset.card_erase_of_mem h0, smul_eq_mul]
     have huniv : (Finset.univ.erase (0 : ZMod q)).card = q - 1 := by
       rw [Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, ZMod.card]
@@ -221,8 +221,9 @@ lemma modelInt_sum_bounds [NeZero q] {A : Finset (ZMod q)} {l : ZMod q} (hL : 0 
     (hbucket : ∀ x ∈ A, (l * x).val / L = j) {ρ : Multiset (ZMod q)} (hρ : ∀ x ∈ ρ, x ∈ A) :
     0 ≤ (ρ.map (modelInt L j l)).sum ∧
       (ρ.map (modelInt L j l)).sum ≤ (Multiset.card ρ : ℤ) * ((L : ℤ) - 1) := by
-  refine ⟨Multiset.sum_nonneg ?_, ?_⟩
-  · intro z hz
+  constructor
+  · apply Multiset.sum_nonneg
+    intro z hz
     obtain ⟨x, hx, rfl⟩ := Multiset.mem_map.1 hz
     exact modelInt_nonneg hL (hbucket x (hρ x hx))
   · refine le_trans (Multiset.sum_le_card_nsmul _ ((L : ℤ) - 1) ?_) ?_
@@ -266,8 +267,9 @@ lemma dvd_modelInt_sum_sub_iff [NeZero q] {A : Finset (ZMod q)} {l : ZMod q} (hl
     have hmem' : ρ'.sum ∈ s • A := by rw [← hcρ']; exact multiset_sum_mem_nsmul hρ'
     exact not_dvd_of_isGoodDilation hgood (Finset.sub_mem_sub hmem hmem') (sub_ne_zero.2 hne) hpos
       (by omega) (hcong ρ ρ' hcρ hcρ')
-  refine ⟨fun hdvd ↦ ?_, fun heq ↦ ?_⟩
-  · by_contra hne
+  constructor
+  · intro hdvd
+    by_contra hne
     rcases lt_trichotomy ((σ.map (modelInt L j l)).sum - (τ.map (modelInt L j l)).sum) 0 with
       hneg | hzero | hpos
     · refine key τ σ hτ hσ hcτ hcσ (Ne.symm hne) (by omega) ?_
@@ -276,7 +278,8 @@ lemma dvd_modelInt_sum_sub_iff [NeZero q] {A : Finset (ZMod q)} {l : ZMod q} (hl
     · refine hne (sub_eq_zero.1 (hl.mul_right_eq_zero.1 ?_))
       rw [← hcong σ τ hcσ hcτ, hzero, Int.cast_zero]
     · exact key σ τ hσ hτ hcσ hcτ hne hpos hdvd
-  · obtain ⟨hlb, hub⟩ := modelInt_sum_bounds hL hbucket hσ
+  · intro heq
+    obtain ⟨hlb, hub⟩ := modelInt_sum_bounds hL hbucket hσ
     obtain ⟨hlb', hub'⟩ := modelInt_sum_bounds hL hbucket hτ
     rw [hcσ] at hub
     rw [hcτ] at hub'
@@ -323,7 +326,7 @@ theorem isAddFreimanIso_modelMap [NeZero q] {A : Finset (ZMod q)} {l : ZMod q} (
       exact add_left_cancel heq
     · rw [Multiset.map_cons, Multiset.sum_cons, Multiset.map_replicate, Multiset.map_replicate,
         Multiset.sum_replicate, Multiset.sum_replicate, hxy, ← succ_nsmul', Nat.sub_add_cancel hs]
-  refine ⟨?_, ?_⟩
+  constructor
   · rw [Finset.coe_image]
     exact hinj.bijOn_image
   · intro σ τ hσ hτ hcσ hcτ
@@ -391,7 +394,7 @@ theorem exists_ruzsa_model_of_doubling {q s : ℕ} {κ : ℝ} (hq : q.Prime) (hs
       (Finset.pluennecke_ruzsa_inequality_nsmul_sub_nsmul_add hX X s s)
     push_cast [NNRat.cast_pow] at hcast
     exact hcast
-  refine le_trans hbound ?_
+  apply le_trans hbound
   rw [two_mul]
   gcongr
   exact (div_le_iff₀ hXpos).2 hXX

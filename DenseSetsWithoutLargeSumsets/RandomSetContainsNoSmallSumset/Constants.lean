@@ -171,7 +171,7 @@ lemma ε_le_one_twelfth {γ : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) :
 
 lemma ε_lt_one_half {γ : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) :
     ε γ < 1 / 2 := by
-  refine (ε_le_one_twelfth hγ_pos hγ_le).trans_lt ?_
+  apply (ε_le_one_twelfth hγ_pos hγ_le).trans_lt
   norm_num
 
 lemma half_le_one_sub_ε {γ : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) :

@@ -47,7 +47,8 @@ private lemma sum_nsmul_eq_update_add_single {d : ℕ} {M : Type*} [AddCommMonoi
       (∑ j, Function.update w i (w i - 1) j • σ j) +
         ∑ j, (Pi.single i 1 : Fin d → ℕ) j • σ j := by
   rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  apply Finset.sum_congr rfl
+  intro j _
   by_cases hj : j = i
   · subst hj
     rw [Function.update_self, Pi.single_eq_same, ← add_nsmul]
@@ -172,7 +173,8 @@ theorem exists_map_of_isAddFreimanIso (Q : GAP H) (hQ : Q.Proper) {f : H → G}
     ∃ R : GAP G, R.Proper ∧ R.dim = Q.dim ∧ R.carrier = Q.carrier.image f := by
   have himage : Finset.univ.image (gapMap (f Q.origin) (Q.transportStep f) Q.length) =
       Q.carrier.image f := by
-    refine Finset.ext fun y ↦ ?_
+    apply Finset.ext
+    intro y
     simp only [Finset.mem_image, Q.carrier_eq]
     constructor
     · rintro ⟨w, -, rfl⟩
@@ -187,7 +189,7 @@ theorem exists_map_of_isAddFreimanIso (Q : GAP H) (hQ : Q.Proper) {f : H → G}
     himage.symm⟩, ?_, rfl, rfl⟩
   change Function.Injective (gapMap (f Q.origin) (Q.transportStep f) Q.length)
   rw [← Set.injOn_univ, ← Finset.coe_univ]
-  refine Finset.injOn_of_card_image_eq ?_
+  apply Finset.injOn_of_card_image_eq
   rw [himage, Finset.card_image_of_injOn hf.bijOn.injOn, Q.card_eq_prod_length hQ,
     Finset.card_univ, Fintype.card_pi]
   simp
@@ -251,7 +253,7 @@ private lemma pairRep_spec {B : Finset H} {z : H} (hz : z ∈ B + B) :
 two elements is injective, because a relation between two sums is reflected by the isomorphism. -/
 theorem card_add_le_of_isAddFreimanIso {A : Finset G} {B : Finset H} {ψ : H → G}
     (hψ : IsAddFreimanIso 2 (B : Set H) (A : Set G) ψ) : (B + B).card ≤ (A + A).card := by
-  refine Finset.card_le_card_of_injOn (fun z ↦ ψ (pairRep B z).1 + ψ (pairRep B z).2) ?_ ?_
+  apply Finset.card_le_card_of_injOn (fun z ↦ ψ (pairRep B z).1 + ψ (pairRep B z).2)
   · intro z hz
     obtain ⟨⟨h1, h2⟩, -⟩ := pairRep_spec (B := B) hz
     exact Finset.add_mem_add (Finset.mem_coe.1 (hψ.bijOn.mapsTo (Finset.mem_coe.2 h1)))

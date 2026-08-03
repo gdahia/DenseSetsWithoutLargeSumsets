@@ -129,7 +129,8 @@ lemma mem_badPairs {X Y P : Finset G} {p : G × G} :
 lemma card_sumTriples_eq (X Y P : Finset G) (u v : G) :
     #(ArithmeticRemoval.sumTriples ((-u) +ᵥ X) ((-v) +ᵥ Y) ((-(u + v)) +ᵥ ((X + Y) \ P)))
       = #(badPairs X Y P) := by
-  refine (card_bij (fun p _ => (p.1 - u, p.2 - v, p.1 + p.2 - (u + v))) ?_ ?_ ?_).symm
+  symm
+  apply card_bij (fun p _ => (p.1 - u, p.2 - v, p.1 + p.2 - (u + v)))
   · intro p hp
     rw [mem_badPairs] at hp
     refine ArithmeticRemoval.mem_sumTriples.2
@@ -235,11 +236,11 @@ theorem exists_cleanup {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
     rw [hcardZ, div_mul_eq_mul_div, div_le_iff₀ (by linarith)]
     nlinarith
   have hsubX : u +ᵥ A' ⊆ X := by
-    refine (vadd_finset_subset_vadd_finset hA'sub).trans ?_
+    apply (vadd_finset_subset_vadd_finset hA'sub).trans
     rw [hA₁def, vadd_vadd]
     simp
   have hsubY : v +ᵥ B' ⊆ Y := by
-    refine (vadd_finset_subset_vadd_finset hB'sub).trans ?_
+    apply (vadd_finset_subset_vadd_finset hB'sub).trans
     rw [hB₁def, vadd_vadd]
     simp
   refine ⟨u +ᵥ A', hsubX, v +ᵥ B', hsubY, ?_, ?_, ?_⟩
@@ -257,10 +258,10 @@ theorem exists_cleanup {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
       intro z hz
       by_cases hzP : z ∈ P
       · exact mem_union_left _ hzP
-      refine mem_union_right _ ?_
+      apply mem_union_right _
       obtain ⟨a, ha, b, hb, rfl⟩ := mem_add.1 hz
       rw [mem_vadd_finset_iff_sub_mem, mem_sdiff]
-      refine ⟨?_, ?_⟩
+      constructor
       · rw [hC₁def, mem_vadd_finset_iff_sub_mem]
         have hrw : a + b - (u + v) - -(u + v) = a + b := by abel
         rw [hrw]
@@ -287,36 +288,45 @@ theorem exists_cleanup {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
 /-- Counting the bad pairs one first coordinate at a time. -/
 lemma sum_card_bad_left (X Y P : Finset G) :
     ∑ u ∈ X, #(Y.filter fun w => u + w ∉ P) = #(badPairs X Y P) := by
-  refine Eq.trans (sum_congr rfl fun u hu => ?_)
+  refine Eq.trans (sum_congr rfl ?_)
     (card_eq_sum_card_fiberwise (f := fun p : G × G => p.1) (s := badPairs X Y P) (t := X)
       fun p hp => (mem_badPairs.1 hp).1).symm
-  refine card_bij (fun w _ => (u, w)) (fun w hw => ?_) (fun w _ w' _ h => (Prod.mk_inj.1 h).2)
-    fun p hp => ?_
-  · rw [mem_filter] at hw ⊢
-    exact ⟨mem_badPairs.2 ⟨hu, hw.1, hw.2⟩, rfl⟩
-  · rw [mem_filter, mem_badPairs] at hp
-    exact ⟨p.2, mem_filter.2 ⟨hp.1.2.1, by rw [← hp.2]; exact hp.1.2.2⟩, by rw [← hp.2]⟩
+  · intro u hu
+    apply card_bij (fun w _ => (u, w))
+    · intro w hw
+      rw [mem_filter] at hw ⊢
+      exact ⟨mem_badPairs.2 ⟨hu, hw.1, hw.2⟩, rfl⟩
+    · intro w _ w' _ h
+      exact (Prod.mk_inj.1 h).2
+    · intro p hp
+      rw [mem_filter, mem_badPairs] at hp
+      exact ⟨p.2, mem_filter.2 ⟨hp.1.2.1, by rw [← hp.2]; exact hp.1.2.2⟩, by rw [← hp.2]⟩
 
 /-- Counting the bad pairs one second coordinate at a time. -/
 lemma sum_card_bad_right (X Y P : Finset G) :
     ∑ v ∈ Y, #(X.filter fun w => w + v ∉ P) = #(badPairs X Y P) := by
-  refine Eq.trans (sum_congr rfl fun v hv => ?_)
+  refine Eq.trans (sum_congr rfl ?_)
     (card_eq_sum_card_fiberwise (f := fun p : G × G => p.2) (s := badPairs X Y P) (t := Y)
       fun p hp => (mem_badPairs.1 hp).2.1).symm
-  refine card_bij (fun w _ => (w, v)) (fun w hw => ?_) (fun w _ w' _ h => (Prod.mk_inj.1 h).1)
-    fun p hp => ?_
-  · rw [mem_filter] at hw ⊢
-    exact ⟨mem_badPairs.2 ⟨hw.1, hv, hw.2⟩, rfl⟩
-  · rw [mem_filter, mem_badPairs] at hp
-    exact ⟨p.1, mem_filter.2 ⟨hp.1.1, by rw [← hp.2]; exact hp.1.2.2⟩, by rw [← hp.2]⟩
+  · intro v hv
+    apply card_bij (fun w _ => (w, v))
+    · intro w hw
+      rw [mem_filter] at hw ⊢
+      exact ⟨mem_badPairs.2 ⟨hw.1, hv, hw.2⟩, rfl⟩
+    · intro w _ w' _ h
+      exact (Prod.mk_inj.1 h).1
+    · intro p hp
+      rw [mem_filter, mem_badPairs] at hp
+      exact ⟨p.1, mem_filter.2 ⟨hp.1.1, by rw [← hp.2]; exact hp.1.2.2⟩, by rw [← hp.2]⟩
 
 omit [AddCommGroup G] in
 /-- The fibres of a map over a set of values are disjoint subsets of the domain. -/
 lemma sum_card_fiber_le {α : Type*} (Q : Finset α) (φ : α → G) (T : Finset G) :
     ∑ z ∈ T, #(Q.filter fun q => φ q = z) ≤ #Q := by
-  refine Eq.trans_le (sum_congr rfl fun z hz => ?_)
+  refine Eq.trans_le (sum_congr rfl ?_)
     ((card_eq_sum_card_fiberwise (f := φ) (s := Q.filter fun q => φ q ∈ T) (t := T)
       fun q hq => (mem_filter.1 hq).2).symm.trans_le (card_le_card (filter_subset _ _)))
+  intro z hz
   congr 1
   ext q
   simp only [mem_filter, and_assoc]
@@ -353,12 +363,13 @@ theorem exists_covering {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
     have hlow : (#(X \ X₁) : ℝ) * (δ / ρ * #Y)
         ≤ ∑ u ∈ X \ X₁, ((#(Y.filter fun w => u + w ∉ P) : ℝ)) := by
       rw [← nsmul_eq_mul]
-      refine card_nsmul_le_sum _ _ _ fun u hu => ?_
+      apply card_nsmul_le_sum _ _ _
+      intro u hu
       rw [hfil, mem_filter] at hu
       exact le_of_not_ge hu.2
     have hup : ∑ u ∈ X \ X₁, ((#(Y.filter fun w => u + w ∉ P) : ℝ))
         ≤ δ * ((#X : ℝ) * #Y) := by
-      refine le_trans (sum_le_sum_of_subset_of_nonneg sdiff_subset fun _ _ _ => by positivity) ?_
+      apply le_trans (sum_le_sum_of_subset_of_nonneg sdiff_subset fun _ _ _ => by positivity)
       have := sum_card_bad_left X Y P
       have hcast : ∑ u ∈ X, ((#(Y.filter fun w => u + w ∉ P) : ℝ)) = (#(badPairs X Y P) : ℝ) := by
         exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) this
@@ -378,12 +389,13 @@ theorem exists_covering {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
     have hlow : (#(Y \ Y₁) : ℝ) * (δ / ρ * #X)
         ≤ ∑ v ∈ Y \ Y₁, ((#(X.filter fun w => w + v ∉ P) : ℝ)) := by
       rw [← nsmul_eq_mul]
-      refine card_nsmul_le_sum _ _ _ fun v hv => ?_
+      apply card_nsmul_le_sum _ _ _
+      intro v hv
       rw [hfil, mem_filter] at hv
       exact le_of_not_ge hv.2
     have hup : ∑ v ∈ Y \ Y₁, ((#(X.filter fun w => w + v ∉ P) : ℝ))
         ≤ δ * ((#X : ℝ) * #Y) := by
-      refine le_trans (sum_le_sum_of_subset_of_nonneg sdiff_subset fun _ _ _ => by positivity) ?_
+      apply le_trans (sum_le_sum_of_subset_of_nonneg sdiff_subset fun _ _ _ => by positivity)
       have := sum_card_bad_right X Y P
       have hcast : ∑ v ∈ Y, ((#(X.filter fun w => w + v ∉ P) : ℝ)) = (#(badPairs X Y P) : ℝ) := by
         exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) this
@@ -437,14 +449,16 @@ theorem exists_covering {X Y P : Finset G} (hX : X.Nonempty) (hY : Y.Nonempty)
       nlinarith [hu.2, hv.2, hbad, hη8, hxpos, hypos, hδ]
     -- The good pairs inject into the triples of `P` representing `u + v`.
     have hinj : #Good ≤ #((P ×ˢ P ×ˢ P).filter fun t => t.1 + t.2.1 - t.2.2 = u + v) := by
-      refine card_le_card_of_injOn (fun q => (u + q.2, q.1 + v, q.1 + q.2)) (fun q hq => ?_)
-        fun q _ q' _ h => ?_
-      · rw [mem_coe, hGood, mem_filter] at hq
+      apply card_le_card_of_injOn (fun q => (u + q.2, q.1 + v, q.1 + q.2))
+      · intro q hq
+        rw [mem_coe, hGood, mem_filter] at hq
         rw [mem_coe, mem_filter, mem_product, mem_product]
-        refine ⟨⟨hq.2.1, hq.2.2.1, hq.2.2.2⟩, ?_⟩
+        constructor
+        · exact ⟨hq.2.1, hq.2.2.1, hq.2.2.2⟩
         have hrw : u + q.2 + (q.1 + v) = u + v + (q.1 + q.2) := by abel
         rw [hrw, add_sub_cancel_right]
-      · simp only [Prod.mk_inj] at h
+      · intro q _ q' _ h
+        simp only [Prod.mk_inj] at h
         exact Prod.ext (add_right_cancel h.2.1) (add_left_cancel h.1)
     have : (#Good : ℝ) ≤ #((P ×ˢ P ×ˢ P).filter fun t => t.1 + t.2.1 - t.2.2 = u + v) := by
       exact_mod_cast hinj

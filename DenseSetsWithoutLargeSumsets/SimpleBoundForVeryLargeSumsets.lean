@@ -78,8 +78,9 @@ lemma pair_small_sumset_family_subset_ruzsa_encoding (n k m : ℕ) :
   · refine ⟨∅, by simp, by simp, ?_, ?_⟩
     · exact Finset.mem_powersetCard.mpr ⟨hp.2.1, hp.2.2.2.1⟩
     · apply Finset.mem_powersetCard.mpr
-      refine ⟨?_, hp.2.2.1⟩
-      simp [Finset.card_eq_zero.mp (by simpa [hk] using hp.2.2.1)]
+      constructor
+      · simp [Finset.card_eq_zero.mp (by simpa [hk] using hp.2.2.1)]
+      · exact hp.2.2.1
   · obtain ⟨F, hFA, hFcard, hcover⟩ :=
       ruzsa_covering_int (A := p.1) (B := p.2)
         (Finset.card_pos.mp (by simpa [hp.2.2.2.1] using Nat.pos_of_ne_zero hk)) hp.2.2.2.2
@@ -97,7 +98,7 @@ private def coverFinset (n k r : ℕ) : Finset (Finset ℤ × Finset ℤ) :=
 private lemma coverFinset_card_le (n k r : ℕ) (hrk : r ≤ k) :
     (coverFinset n k r).card ≤ Nat.choose n k * Nat.choose n r * Nat.choose (k ^ 3) k := by
   classical
-  refine Finset.card_biUnion_le.trans ?_
+  apply Finset.card_biUnion_le.trans
   refine (Finset.sum_le_sum
     (f := fun B => ((Finset.powersetCard r (integerInterval n)).biUnion fun F =>
       ((F + B - B).powersetCard k).image fun A => (A, B)).card)
@@ -110,9 +111,9 @@ private lemma coverFinset_card_le (n k r : ℕ) (hrk : r ≤ k) :
         (((F + B - B).powersetCard k).image fun A => (A, B)).card)
       (g := fun _ => ∑ F ∈ (integerInterval n).powersetCard r, Nat.choose (k ^ 3) k) ?_).trans ?_
     · intro B hB
-      refine Finset.sum_le_sum ?_
+      apply Finset.sum_le_sum
       intro F hF
-      refine (Finset.card_image_le.trans_eq (Finset.card_powersetCard k (F + B - B))).trans ?_
+      apply (Finset.card_image_le.trans_eq (Finset.card_powersetCard k (F + B - B))).trans
       apply Nat.choose_le_choose k
       apply ruzsa_container_card_le_cube (by
         rw [(Finset.mem_powersetCard.mp hF).2]
@@ -366,7 +367,7 @@ private lemma veryLargeSumset_log_log_bound {γ c : ℝ} (hγ_pos : 0 < γ)
   have hlogqx_le : Real.log (q * x) ≤ y := by
     rw [hlogqx_eq]
     linarith [log_le_half_self hy_pos]
-  refine (mul_le_mul_of_nonneg_left hlogqx_le (by norm_num)).trans_eq ?_
+  apply (mul_le_mul_of_nonneg_left hlogqx_le (by norm_num)).trans_eq
   rw [← hy, ← hx]
   ring
 
@@ -429,9 +430,9 @@ lemma veryLargeSumsetPairSlice_card_le (n k m : ℕ) :
       p.1.card = k ∧ p.2.card = k ∧ (p.1 + p.2).card ≤ m}) = T
   generalize hUdef : ((interval n).powersetCard k ×ˢ (interval n).powersetCard k) = U
   have hTfinite : T.Finite := by
-    refine Set.Finite.subset (s := (U : Set (Finset ℕ × Finset ℕ)))
+    apply Set.Finite.subset (s := (U : Set (Finset ℕ × Finset ℕ)))
       (by rw [← hUdef]; exact (Finset.powersetCard k (interval n) ×ˢ
-        Finset.powersetCard k (interval n)).finite_toSet) ?_
+        Finset.powersetCard k (interval n)).finite_toSet)
     intro p hp
     rw [← hTdef] at hp
     rw [← hUdef] at ⊢
@@ -495,10 +496,10 @@ lemma veryLargeSumsetEvent_measure_le_sum
       (veryLargeSumsetPairSlice n k m).card * prob m) ?_ ?_
     · refine Finset.sum_le_sum ?_
       intro m hm
-      refine le_trans
+      apply le_trans
         (MeasureTheory.measureReal_biUnion_finset_le
           (μ := binomialFinsetSubset (Set.Icc 1 n) δ) (veryLargeSumsetPairSlice n k m)
-          fun p => {S : Finset ℕ | p.1 + p.2 ⊆ S}) ?_
+          fun p => {S : Finset ℕ | p.1 + p.2 ⊆ S})
       refine (Finset.sum_le_sum
         (g := fun _ => prob m) ?_).trans ?_
       · intro p hp
@@ -729,9 +730,9 @@ private lemma veryLargeSumsetAnalyticBound_of_density_bounds
   change (∑ m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
       (n ^ (k + m / k) * Nat.choose (k ^ 3) k : ℝ) * (δ : ℝ) ^ m) ≤
     (k : ℝ) ^ 2 / (n : ℝ) ^ (γ * (k : ℝ) / 3)
-  refine le_trans
+  apply le_trans
     (b := ∑ m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
-      (n : ℝ) ^ (-γ * (k : ℝ) / 3)) ?_ ?_
+      (n : ℝ) ^ (-γ * (k : ℝ) / 3))
   · refine Finset.sum_le_sum
       (s := Finset.Icc ((k + 1) * k / 2) (k * k))
       (f := fun m =>
@@ -746,12 +747,12 @@ private lemma veryLargeSumsetAnalyticBound_of_density_bounds
     · have hcard : ((Finset.Icc ((k + 1) * k / 2) (k * k)).card : ℝ) ≤
           (k : ℝ) ^ 2 := by
         have hcardNat := veryLargeSumset_mRange_card_le k hkpos
-        refine le_trans (b := ((k * k : ℕ) : ℝ)) ?_ ?_
+        apply le_trans (b := ((k * k : ℕ) : ℝ))
         · exact_mod_cast hcardNat
         · rw [Nat.cast_mul]
           ring_nf
           apply le_refl
-      refine (mul_le_mul_of_nonneg_right hcard hbound_nonneg).trans_eq ?_
+      apply (mul_le_mul_of_nonneg_right hcard hbound_nonneg).trans_eq
       have hneg : -γ * (k : ℝ) / 3 = -(γ * (k : ℝ) / 3) := by ring
       rw [hneg, Real.rpow_neg hn_pos_real.le]
       ring

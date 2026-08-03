@@ -189,7 +189,7 @@ lemma one_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
     1 ≤ 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  refine (by norm_num : (1 : ℝ) ≤ 3 * 2).trans ?_
+  apply (by norm_num : (1 : ℝ) ≤ 3 * 2).trans
   nlinarith [(by
     rw [← one_mul (2 : ℝ)]
     exact mul_le_mul (one_le_lowerConstant hC_two hε)
@@ -204,7 +204,7 @@ private lemma four_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInter
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
     4 ≤ 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  refine (by norm_num : (4 : ℝ) ≤ 3 * 2).trans ?_
+  apply (by norm_num : (4 : ℝ) ≤ 3 * 2).trans
   nlinarith [(by
     rw [← one_mul (2 : ℝ)]
     exact mul_le_mul (one_le_lowerConstant hC_two hε)
@@ -253,8 +253,8 @@ lemma blt_ceiling_succ_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitI
     ((⌈lowerBltConstant C γ hC_two hε *
           Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ)⌉₊ + 1 : ℕ) : ℝ) ≤
       3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  refine (lower_blt_ceiling_succ_le_two_mul hγ_pos hγ_le hC_one hn hδ_lower hδ_upper
-    hC_two hε).trans ?_
+  apply (lower_blt_ceiling_succ_le_two_mul hγ_pos hγ_le hC_one hn hδ_lower hδ_upper
+    hC_two hε).trans
   nlinarith [
     (mul_le_mul (lowerBltConstant_le_lowerConstant hC_two hε)
       (by
@@ -279,10 +279,10 @@ lemma zmodModelQ_le_n_mul_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitI
     (zmodModelQ (γ := γ) (C := C) (n := n) hγ_pos C_pos hn : ℝ) ≤
       (n : ℝ) * (3 * lowerConstant C γ hC_two hε *
         (pairCardThreshold (3 + γ) n δ : ℝ)) := by
-  refine (by
+  apply (by
       exact_mod_cast zmodModelQ_upper (γ := γ) (C := C) (n := n) hγ_pos C_pos hn :
         (zmodModelQ (γ := γ) (C := C) (n := n) hγ_pos C_pos hn : ℝ) ≤
-          4 * (n : ℝ)).trans ?_
+          4 * (n : ℝ)).trans
   rw [mul_comm (4 : ℝ) (n : ℝ)]
   exact mul_le_mul_of_nonneg_left
     (four_le_lower_counting_base hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε)
@@ -362,7 +362,7 @@ lemma lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n 
           ((by norm_num : (1 : ℝ) < 15).le.trans
             (le_of_lt (fifteen_lt_log_of_lowerAnalyticThreshold hn)))
           (by norm_num) ((zero_le_one' ℝ).trans (one_le_lowerConstant hC_two hε))
-      refine hbase.trans ?_
+      apply hbase.trans
       simpa [mul_assoc] using mul_le_mul_of_nonneg_right
         ((by norm_num : (1 : ℝ) ≤ 42).trans
           (le_max_left (42 : ℝ) (3 * densityCoefficient (3 + γ) c)))

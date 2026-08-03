@@ -70,26 +70,34 @@ of `x`. -/
 lemma setOf_mem_smul_eq_Ici (hconv : Convex ℝ K) (hclosed : IsClosed K) (hK₀ : K ∈ 𝓝 0)
     (hbdd : Bornology.IsVonNBounded ℝ K) (x : E) :
     {t : ℝ | 0 ≤ t ∧ x ∈ t • K} = Set.Ici (gauge K x) := by
-  refine Set.ext fun t ↦
-    ⟨fun ht ↦ gauge_le_of_mem ht.1 ht.2, fun ht ↦ ⟨(gauge_nonneg x).trans ht, ?_⟩⟩
-  rcases eq_or_ne x 0 with rfl | hx
-  · rw [← smul_zero t]
-    exact Set.smul_mem_smul_set (mem_of_mem_nhds hK₀)
-  · have htpos : 0 < t := lt_of_lt_of_le ((gauge_pos (absorbent_nhds_zero hK₀) hbdd).mpr hx) ht
-    rw [Set.mem_smul_set_iff_inv_smul_mem₀ htpos.ne', ← hclosed.closure_eq,
-      ← gauge_le_one_iff_mem_closure hconv hK₀, gauge_smul_of_nonneg (inv_nonneg.mpr htpos.le),
-      smul_eq_mul, inv_mul_le_one₀ htpos]
-    exact ht
+  apply Set.ext
+  intro t
+  constructor
+  · intro ht
+    exact gauge_le_of_mem ht.1 ht.2
+  · intro ht
+    refine ⟨(gauge_nonneg x).trans ht, ?_⟩
+    rcases eq_or_ne x 0 with rfl | hx
+    · rw [← smul_zero t]
+      exact Set.smul_mem_smul_set (mem_of_mem_nhds hK₀)
+    · have htpos : 0 < t :=
+        lt_of_lt_of_le ((gauge_pos (absorbent_nhds_zero hK₀) hbdd).mpr hx) ht
+      rw [Set.mem_smul_set_iff_inv_smul_mem₀ htpos.ne', ← hclosed.closure_eq,
+        ← gauge_le_one_iff_mem_closure hconv hK₀, gauge_smul_of_nonneg (inv_nonneg.mpr htpos.le),
+        smul_eq_mul, inv_mul_le_one₀ htpos]
+      exact ht
 
 /-- Membership in a dilate of a convex body is decided by the gauge. -/
 lemma mem_smul_iff_gauge_le (hconv : Convex ℝ K) (hclosed : IsClosed K) (hK₀ : K ∈ 𝓝 0)
     (hbdd : Bornology.IsVonNBounded ℝ K) {t : ℝ} (ht : 0 ≤ t) (x : E) :
     x ∈ t • K ↔ gauge K x ≤ t := by
-  refine ⟨gauge_le_of_mem ht, fun h ↦ ?_⟩
-  have hmem : t ∈ {t : ℝ | 0 ≤ t ∧ x ∈ t • K} := by
-    rw [setOf_mem_smul_eq_Ici hconv hclosed hK₀ hbdd]
-    exact h
-  exact hmem.2
+  constructor
+  · exact gauge_le_of_mem ht
+  · intro h
+    have hmem : t ∈ {t : ℝ | 0 ≤ t ∧ x ∈ t • K} := by
+      rw [setOf_mem_smul_eq_Ici hconv hclosed hK₀ hbdd]
+      exact h
+    exact hmem.2
 
 /-- Membership in a dilate is monotone in the dilation factor. -/
 lemma mem_smul_of_le (hconv : Convex ℝ K) (hclosed : IsClosed K) (hK₀ : K ∈ 𝓝 0)
@@ -155,7 +163,8 @@ lemma exists_pos_forall_norm_lt (L : AddSubgroup E) [DiscreteTopology L] :
     rw [hUL]
     exact Set.mem_singleton 0
   obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp hUopen 0 h0U.1
-  refine ⟨r, hr, fun x hx hnorm ↦ ?_⟩
+  refine ⟨r, hr, ?_⟩
+  intro x hx hnorm
   have hxU : x ∈ U ∩ (L : Set E) :=
     ⟨hball (by simpa only [Metric.mem_ball, dist_zero_right] using hnorm), hx⟩
   rw [hUL] at hxU
@@ -166,7 +175,8 @@ the lattice meets only at the origin is below it. -/
 lemma le_successiveMinimum_one [DiscreteTopology L] {R r t : ℝ} (hR : K ⊆ closedBall 0 R)
     (hr : ∀ x ∈ L, ‖x‖ < r → x = 0) (ht : 0 ≤ t) (htR : t * R < r)
     (hne : ∃ s, 0 ≤ s ∧ HasIndependentShort L K 1 s) : t ≤ successiveMinimum L K 1 := by
-  refine le_successiveMinimum hne fun s hs hshort ↦ ?_
+  apply le_successiveMinimum hne
+  intro s hs hshort
   by_contra hlt
   push Not at hlt
   obtain ⟨v, hindep, hv⟩ := hshort
@@ -211,8 +221,13 @@ theorem exists_witness_successiveMinimum [ProperSpace E] [DiscreteTopology L]
     rcases le_or_gt (lam + 1) t with hle | hlt
     · exact Or.inr hle
     obtain ⟨v, hindep, hv⟩ := ht.2
-    refine Or.inl (Set.mem_iUnion₂.mpr ⟨v, ⟨fun j ↦ ⟨?_, (hv j).1⟩, hindep⟩, ?_⟩)
-    · exact mem_smul_of_le hconv hclosed hK₀ hvonN ht.1 hlt.le (hv j).2
+    refine Or.inl (Set.mem_iUnion₂.mpr ⟨v, ?_, ?_⟩)
+    · constructor
+      · intro j
+        constructor
+        · exact mem_smul_of_le hconv hclosed hK₀ hvonN ht.1 hlt.le (hv j).2
+        · exact (hv j).1
+      · exact hindep
     · exact Set.mem_iInter.mpr fun j ↦
         (mem_smul_iff_gauge_le hconv hclosed hK₀ hvonN ht.1 (v j)).mp (hv j).2
   have hmem : lam ∈ (⋃ v ∈ Fams, ⋂ j, Set.Ici (gauge K (v j))) ∪ Set.Ici (lam + 1) :=
@@ -317,9 +332,9 @@ lifts to a lattice vector that is short by at most `λ₁ / 2`. -/
 lemma exists_int_gauge_sub_zsmul_le (hconv : Convex ℝ K) (hK₀ : K ∈ 𝓝 0)
     (hsymm : ∀ x ∈ K, -x ∈ K) {t : ℝ} {y z v : E} {s : ℝ} (hz : gauge K z ≤ t)
     (hy : y = z + s • v) : ∃ m : ℤ, gauge K (y - (m : ℝ) • v) ≤ t + gauge K v / 2 := by
-  refine ⟨round s, ?_⟩
+  use round s
   rw [hy, add_sub_assoc, ← sub_smul]
-  refine le_trans (gauge_add_le hconv (absorbent_nhds_zero hK₀) _ _) ?_
+  apply le_trans (gauge_add_le hconv (absorbent_nhds_zero hK₀) _ _)
   refine add_le_add hz (le_trans (gauge_zsmul_le hsymm _ _) ?_)
   rw [div_eq_inv_mul]
   refine mul_le_mul_of_nonneg_right ?_ (gauge_nonneg v)
@@ -333,14 +348,14 @@ lattice. -/
 lemma exists_intCast_smul_eq_of_gauge_min (hsymm : ∀ x ∈ K, -x ∈ K) {v w : E} (hv : v ∈ L)
     (hvpos : 0 < gauge K v) (hmin : ∀ y ∈ L, y ≠ 0 → gauge K v ≤ gauge K y) (hw : w ∈ L)
     {s : ℝ} (hws : w = s • v) : ∃ m : ℤ, w = (m : ℝ) • v := by
-  refine ⟨round s, ?_⟩
+  use round s
   by_contra hne
   refine absurd (hmin _ (L.sub_mem hw ?_) (sub_ne_zero_of_ne hne)) (not_le.mpr ?_)
   · rw [Int.cast_smul_eq_zsmul]
     exact L.zsmul_mem hv _
   · rw [hws, ← sub_smul]
-    refine lt_of_le_of_lt (gauge_zsmul_le hsymm _ _) ?_
-    refine lt_of_le_of_lt (mul_le_mul_of_nonneg_right (abs_sub_round s) (gauge_nonneg v)) ?_
+    apply lt_of_le_of_lt (gauge_zsmul_le hsymm _ _)
+    apply lt_of_le_of_lt (mul_le_mul_of_nonneg_right (abs_sub_round s) (gauge_nonneg v))
     rw [one_div]
     linarith
 
@@ -403,7 +418,7 @@ theorem hasIndependentShort_succ_of_map {F : Type*} [NormedAddCommGroup F] [Norm
   choose y hyL hyπ hygauge using fun j ↦
     exists_mem_gauge_le_of_mem_map hconv hK₀ hsymm π hv hπv hker ht (hw j).1 (hw j).2
   have hyindep : LinearIndependent ℝ y := by
-    refine LinearIndependent.of_comp π ?_
+    apply LinearIndependent.of_comp π
     rwa [show (π : E → F) ∘ y = w from funext hyπ]
   have hmax : 0 ≤ max (gauge K v) (t + gauge K v / 2) := le_max_of_le_left (gauge_nonneg v)
   refine ⟨Fin.cons v y, linearIndependent_finCons.mpr ⟨hyindep, ?_⟩, ?_⟩
@@ -412,14 +427,19 @@ theorem hasIndependentShort_succ_of_map {F : Type*} [NormedAddCommGroup F] [Norm
     have hcw : ∑ j, c j • w j = 0 := by
       rw [← hπv, ← hc, map_sum]
       exact Finset.sum_congr rfl fun j _ ↦ by rw [map_smul, hyπ]
-    refine hvne ?_
+    apply hvne
     rw [← hc, Finset.sum_eq_zero fun j _ ↦ ?_]
     rw [Fintype.linearIndependent_iff.mp hwindep c hcw j, zero_smul]
-  · refine Fin.cases ?_ (fun j ↦ ?_)
-    · refine ⟨by simpa using hv, (mem_smul_iff_gauge_le hconv hclosed hK₀ hbdd hmax v).mpr ?_⟩
-      exact le_max_left (gauge K v) (t + gauge K v / 2)
-    · refine ⟨by simpa using hyL j, (mem_smul_iff_gauge_le hconv hclosed hK₀ hbdd hmax _).mpr ?_⟩
-      simpa using le_trans (hygauge j) (le_max_right (gauge K v) (t + gauge K v / 2))
+  · refine Fin.cases ?_ ?_
+    · constructor
+      · simpa using hv
+      · apply (mem_smul_iff_gauge_le hconv hclosed hK₀ hbdd hmax v).mpr
+        exact le_max_left (gauge K v) (t + gauge K v / 2)
+    · intro j
+      constructor
+      · simpa using hyL j
+      · apply (mem_smul_iff_gauge_le hconv hclosed hK₀ hbdd hmax _).mpr
+        simpa using le_trans (hygauge j) (le_max_right (gauge K v) (t + gauge K v / 2))
 
 /-- The lifting theorem for the projection onto a complement of the line through `v`.
 
@@ -433,10 +453,10 @@ theorem hasIndependentShort_succ_of_isCompl {W : Submodule ℝ E} {v : E}
     (h : HasIndependentShort (L.map ((Submodule.projectionOnto W _ hcompl : E →ₗ[ℝ] W) : E →+ W))
       (Submodule.projectionOnto W _ hcompl '' K) i t) :
     HasIndependentShort L K (i + 1) (max (gauge K v) (t + gauge K v / 2)) := by
-  refine hasIndependentShort_succ_of_map hconv hclosed hK₀ hbdd hsymm _ hv hvne ?_
-    (fun x hx ↦ ?_) ht h
+  refine hasIndependentShort_succ_of_map hconv hclosed hK₀ hbdd hsymm _ hv hvne ?_ ?_ ht h
   · exact Submodule.projectionOnto_apply_of_mem_right _ (Submodule.mem_span_singleton_self v)
-  · have hxker : x ∈ Submodule.span ℝ {v} := by
+  · intro x hx
+    have hxker : x ∈ Submodule.span ℝ {v} := by
       rw [← Submodule.ker_projectionOnto hcompl]
       exact LinearMap.mem_ker.mpr hx
     obtain ⟨s, hs⟩ := Submodule.mem_span_singleton.mp hxker
@@ -460,7 +480,8 @@ lemma neg_mem_image (hsymm : ∀ x ∈ K, -x ∈ K) (π : E →ₗ[ℝ] F) :
 /-- Projecting does not increase the gauge. -/
 lemma gauge_image_le (hK₀ : Absorbent ℝ K) (π : E →ₗ[ℝ] F) (x : E) :
     gauge (π '' K) (π x) ≤ gauge K x := by
-  refine csInf_le_csInf ⟨0, fun _ hr ↦ hr.1.le⟩ hK₀.gauge_set_nonempty fun r hr ↦ ?_
+  apply csInf_le_csInf ⟨0, fun _ hr ↦ hr.1.le⟩ hK₀.gauge_set_nonempty
+  intro r hr
   obtain ⟨y, hy, hyx⟩ := hr.2
   simp only at hyx
   refine ⟨hr.1, π y, ⟨y, hy, rfl⟩, ?_⟩
@@ -487,23 +508,24 @@ theorem exists_pos_forall_norm_apply_lt [ProperSpace E] [DiscreteTopology L] (p 
     Metric.finite_isBounded_inter_isClosed DiscreteTopology.isDiscrete isBounded_closedBall
       AddSubgroup.isClosed_of_discrete
   set N := (hAfin.toFinset.image fun y ↦ ‖p y‖).filter (0 < ·) with hN
-  refine ⟨if hne : N.Nonempty then min (N.min' hne) 1 else 1, ?_, fun y hy hylt ↦ ?_⟩
+  refine ⟨if hne : N.Nonempty then min (N.min' hne) 1 else 1, ?_, ?_⟩
   · split
     · exact lt_min (Finset.mem_filter.mp (N.min'_mem _)).2 one_pos
     · exact one_pos
-  · by_contra hpy
+  · intro y hy hylt
+    by_contra hpy
     obtain ⟨s, hs⟩ := hsplit y
     have hyv : y - (round s : ℝ) • v ∈ closedBall (0 : E) (‖v‖ + 1) ∩ (L : Set E) := by
-      refine ⟨?_, ?_⟩
+      constructor
       · have hrw : y - (round s : ℝ) • v = p y + (s - (round s : ℝ)) • v := by
           rw [sub_smul, ← hs]
           abel
         rw [mem_closedBall, dist_zero_right, hrw]
-        refine le_trans (norm_add_le _ _) ?_
+        apply le_trans (norm_add_le _ _)
         rw [norm_smul, Real.norm_eq_abs]
         have hround := abs_sub_round s
         have hrle : ‖p y‖ ≤ 1 := by
-          refine le_trans hylt.le ?_
+          apply le_trans hylt.le
           split
           · exact min_le_right _ _
           · exact le_rfl
@@ -528,11 +550,16 @@ lemma discreteTopology_of_exists_pos_forall_norm_lt {G : AddSubgroup E}
     (h : ∃ r : ℝ, 0 < r ∧ ∀ x ∈ G, ‖x‖ < r → x = 0) : DiscreteTopology G := by
   obtain ⟨r, hr, hG⟩ := h
   rw [discreteTopology_iff_isOpen_singleton_zero]
-  refine isOpen_induced_iff.mpr ⟨Metric.ball (0 : E) r, Metric.isOpen_ball, Set.ext fun x ↦ ?_⟩
+  refine isOpen_induced_iff.mpr ⟨Metric.ball (0 : E) r, Metric.isOpen_ball, ?_⟩
+  apply Set.ext
+  intro x
   simp only [Set.mem_preimage, Metric.mem_ball, dist_zero_right, Set.mem_singleton_iff]
-  refine ⟨fun hx ↦ Subtype.ext (hG x x.2 hx), fun hx ↦ ?_⟩
-  rw [hx]
-  simpa using hr
+  constructor
+  · intro hx
+    exact Subtype.ext (hG x x.2 hx)
+  · intro hx
+    rw [hx]
+    simpa using hr
 
 /-! ## The lattice point count
 
@@ -653,10 +680,11 @@ theorem ncard_inter_le_prod_aux :
     have hKcompact : IsCompact K := Metric.isCompact_of_isClosed_isBounded hclosed hbdd
     have hKbar₀ : π '' K ∈ 𝓝 (0 : W) := by
       have hpre : (fun x : W ↦ (x : E)) ⁻¹' K ∈ 𝓝 (0 : W) := by
-        refine continuous_subtype_val.continuousAt.preimage_mem_nhds ?_
+        apply continuous_subtype_val.continuousAt.preimage_mem_nhds
         simpa using hK₀
-      refine Filter.mem_of_superset hpre fun x hx ↦ ⟨(x : E), hx, ?_⟩
-      exact Submodule.projectionOnto_apply_left hcompl x
+      apply Filter.mem_of_superset hpre
+      intro x hx
+      exact ⟨(x : E), hx, Submodule.projectionOnto_apply_left hcompl x⟩
     -- The projected lattice is again discrete.
     have hpv : p v = 0 :=
       Submodule.projection_apply_of_mem_right hcompl (Submodule.mem_span_singleton_self v)
@@ -664,13 +692,13 @@ theorem ncard_inter_le_prod_aux :
       intro y
       have hmem : y - p y ∈ Submodule.span ℝ {v} := by
         rw [← Submodule.ker_projection hcompl]
-        refine LinearMap.mem_ker.mpr ?_
+        apply LinearMap.mem_ker.mpr
         rw [map_sub, Submodule.projection_apply_of_mem_left hcompl
           (Submodule.projection_apply_mem hcompl y), sub_self]
       obtain ⟨s, hs⟩ := Submodule.mem_span_singleton.mp hmem
       exact ⟨s, hs.symm⟩
     haveI : DiscreteTopology (L.map (π : E →+ W)) := by
-      refine discreteTopology_of_exists_pos_forall_norm_lt ?_
+      apply discreteTopology_of_exists_pos_forall_norm_lt
       obtain ⟨r, hrpos, hr⟩ := exists_pos_forall_norm_apply_lt (L := L) p hvL hpv hsplit
       refine ⟨r, hrpos, ?_⟩
       rintro x hx hnorm
@@ -686,43 +714,47 @@ theorem ncard_inter_le_prod_aux :
     have hcount : (K ∩ (L : Set E)).ncard ≤
         (2 * ⌊2 / gauge K v⌋₊ + 1) * ((π '' K) ∩ ((L.map (π : E →+ W)) : Set W)).ncard := by
       rw [Set.ncard_eq_toFinset_card _ hSfin, Set.ncard_eq_toFinset_card _ hTfin]
-      refine Finset.card_le_mul_card_image_of_maps_to (f := fun x ↦ π x) (fun a ha ↦ ?_) _
-        fun b _ ↦ ?_
-      · rw [Set.Finite.mem_toFinset] at ha ⊢
+      refine Finset.card_le_mul_card_image_of_maps_to (f := fun x ↦ π x) ?_ _ ?_
+      · intro a ha
+        rw [Set.Finite.mem_toFinset] at ha ⊢
         exact ⟨⟨a, ha.1, rfl⟩, AddSubgroup.mem_map.mpr ⟨a, ha.2, rfl⟩⟩
-      rcases Finset.eq_empty_or_nonempty {a ∈ hSfin.toFinset | π a = b} with hempty | ⟨x₀, hx₀⟩
-      · simp [hempty]
-      rw [Finset.mem_filter, Set.Finite.mem_toFinset] at hx₀
-      have hbase : x₀ + ((0 : ℤ) : ℝ) • v ∈ K := by simpa using hx₀.1.1
-      have hkey : ∀ x : E, ∃ mz : ℤ,
-          x ∈ ({a ∈ hSfin.toFinset | π a = b} : Finset E) → x = x₀ + (mz : ℝ) • v := by
-        intro x
-        by_cases hx : x ∈ ({a ∈ hSfin.toFinset | π a = b} : Finset E)
-        swap
-        · exact ⟨0, fun hcon ↦ absurd hcon hx⟩
-        rw [Finset.mem_filter, Set.Finite.mem_toFinset] at hx
-        have hsubker : π (x - x₀) = 0 := by rw [map_sub, hx.2, hx₀.2, sub_self]
-        obtain ⟨s, hs⟩ := hker _ hsubker
-        obtain ⟨mz, hmz⟩ := exists_intCast_smul_eq_of_gauge_min hsymm hvL hvpos hmin
-          (L.sub_mem hx.1.2 hx₀.1.2) hs
-        refine ⟨mz, fun _ ↦ ?_⟩
-        rw [← hmz]
-        abel
-      choose g hg using hkey
-      refine le_trans (Finset.card_le_card_of_injOn (t := Finset.Icc (-(⌊2 / gauge K v⌋₊ : ℤ))
-        (⌊2 / gauge K v⌋₊ : ℤ)) g (fun x hx ↦ ?_) fun a ha b' hb' hab ↦ ?_) (le_of_eq ?_)
-      · have hxmem := Finset.mem_coe.mp hx
-        have hmemK : x₀ + ((g x : ℤ) : ℝ) • v ∈ K := by
-          rw [← hg x hxmem]
-          rw [Finset.mem_filter, Set.Finite.mem_toFinset] at hxmem
-          exact hxmem.1.1
-        have hIcc := setOf_add_smul_mem_subset_Icc hconv hsymm hvpos hbase hmemK
-        rw [Set.mem_Icc] at hIcc
-        rw [Finset.mem_coe, Finset.mem_Icc]
-        omega
-      · rw [hg a (Finset.mem_coe.mp ha), hg b' (Finset.mem_coe.mp hb'), hab]
-      · rw [Int.card_Icc]
-        omega
+      · intro b _
+        rcases Finset.eq_empty_or_nonempty {a ∈ hSfin.toFinset | π a = b} with hempty | ⟨x₀, hx₀⟩
+        · simp [hempty]
+        rw [Finset.mem_filter, Set.Finite.mem_toFinset] at hx₀
+        have hbase : x₀ + ((0 : ℤ) : ℝ) • v ∈ K := by simpa using hx₀.1.1
+        have hkey : ∀ x : E, ∃ mz : ℤ,
+            x ∈ ({a ∈ hSfin.toFinset | π a = b} : Finset E) → x = x₀ + (mz : ℝ) • v := by
+          intro x
+          by_cases hx : x ∈ ({a ∈ hSfin.toFinset | π a = b} : Finset E)
+          swap
+          · exact ⟨0, fun hcon ↦ absurd hcon hx⟩
+          rw [Finset.mem_filter, Set.Finite.mem_toFinset] at hx
+          have hsubker : π (x - x₀) = 0 := by rw [map_sub, hx.2, hx₀.2, sub_self]
+          obtain ⟨s, hs⟩ := hker _ hsubker
+          obtain ⟨mz, hmz⟩ := exists_intCast_smul_eq_of_gauge_min hsymm hvL hvpos hmin
+            (L.sub_mem hx.1.2 hx₀.1.2) hs
+          refine ⟨mz, ?_⟩
+          intro _
+          rw [← hmz]
+          abel
+        choose g hg using hkey
+        refine le_trans (Finset.card_le_card_of_injOn (t := Finset.Icc (-(⌊2 / gauge K v⌋₊ : ℤ))
+          (⌊2 / gauge K v⌋₊ : ℤ)) g ?_ ?_) (le_of_eq ?_)
+        · intro x hx
+          have hxmem := Finset.mem_coe.mp hx
+          have hmemK : x₀ + ((g x : ℤ) : ℝ) • v ∈ K := by
+            rw [← hg x hxmem]
+            rw [Finset.mem_filter, Set.Finite.mem_toFinset] at hxmem
+            exact hxmem.1.1
+          have hIcc := setOf_add_smul_mem_subset_Icc hconv hsymm hvpos hbase hmemK
+          rw [Set.mem_Icc] at hIcc
+          rw [Finset.mem_coe, Finset.mem_Icc]
+          omega
+        · intro a ha b' hb' hab
+          rw [hg a (Finset.mem_coe.mp ha), hg b' (Finset.mem_coe.mp hb'), hab]
+        · rw [Int.card_Icc]
+          omega
     -- The minima of the projected lattice are comparable with those of the lattice.
     have hstep : ∀ j : ℕ,
         (2 : ℝ) ^ (m + 1) / successiveMinimum (L.map (π : E →+ W)) (π '' K) (j + 1) + 1 ≤
@@ -753,7 +785,8 @@ theorem ncard_inter_le_prod_aux :
           hshort₀
       have hhalf : successiveMinimum L K (j + 1 + 1) / 2 ≤
           successiveMinimum (L.map (π : E →+ W)) (π '' K) (j + 1) := by
-        refine le_successiveMinimum ⟨t₀, ht₀, hshort₀⟩ fun s hs hss ↦ ?_
+        apply le_successiveMinimum ⟨t₀, ht₀, hshort₀⟩
+        intro s hs hss
         have := hlift s hs hss
         linarith
       have hpow : (2 : ℝ) ^ (m + 1 + 1) = 2 ^ (m + 1) * 2 := by ring
@@ -783,7 +816,8 @@ theorem ncard_inter_le_prod_aux :
         div_le_div_of_nonneg_right hpow hvpos.le
       have hfour : (4 : ℝ) / gauge K v = 2 * (2 / gauge K v) := by ring
       linarith
-    · refine hIH.trans (Finset.prod_le_prod (fun i _ ↦ ?_) fun i _ ↦ hstep i)
+    · refine hIH.trans (Finset.prod_le_prod ?_ fun i _ ↦ hstep i)
+      intro i _
       exact le_trans zero_le_one (one_le_div_successiveMinimum_add_one _ _ (by positivity) _)
 
 /-- **The lattice point count.** A symmetric convex body contains at most
@@ -817,9 +851,11 @@ theorem successiveMinimum_one_le_of_measure_lt [MeasurableSpace E] [BorelSpace E
     exact ⟨-z, hsymm z hz, by simp only [smul_neg]⟩
   obtain ⟨x, hx, hxK⟩ :=
     exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure fund hsymm' (hconv.smul t) hvol
-  refine successiveMinimum_le ht ⟨fun _ ↦ (x : E), linearIndependent_unique_iff.mpr ?_,
-    fun _ ↦ ⟨x.2, hxK⟩⟩
-  simpa only [ne_eq, ZeroMemClass.coe_eq_zero] using hx
+  refine successiveMinimum_le ht ⟨fun _ ↦ (x : E), ?_, ?_⟩
+  · apply linearIndependent_unique_iff.mpr
+    simpa only [ne_eq, ZeroMemClass.coe_eq_zero] using hx
+  · intro _
+    exact ⟨x.2, hxK⟩
 
 /-- **Minkowski's first theorem** in the quantitative form that Minkowski's second theorem
 generalizes: `λ₁ ^ d * vol K ≤ 2 ^ d * covol L`.

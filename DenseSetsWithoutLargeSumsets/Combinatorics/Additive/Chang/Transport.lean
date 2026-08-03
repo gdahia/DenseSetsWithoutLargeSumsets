@@ -104,7 +104,7 @@ lemma latticeIntMap_latticeVector
 
 lemma latticeVector_latticeIntMap {y : Fin d → ℤ} (hy : y ∈ latticeDomain S) :
     latticeVector S (latticeIntMap S y) = y := by
-  refine latticeIntMap_injective_on S (latticeVector_mem_latticeDomain S _) hy ?_
+  apply latticeIntMap_injective_on S (latticeVector_mem_latticeDomain S _) hy
   rw [latticeIntMap_latticeVector]
 
 variable {G : Type*} [DecidableEq G] [AddCommGroup G]
@@ -146,7 +146,7 @@ lemma realSymBox_eq_realBox (P : GAP G) :
 
 lemma convex_realSymBox (P : GAP G) : Convex ℝ (realSymBox P) := by
   intro x hx y hy a b ha hb hab i
-  refine (abs_add_le _ _).trans ?_
+  apply (abs_add_le _ _).trans
   rw [Pi.smul_apply, Pi.smul_apply, smul_eq_mul, smul_eq_mul, abs_mul, abs_mul,
     abs_of_nonneg ha, abs_of_nonneg hb]
   nlinarith [hx i, hy i, abs_nonneg (x i), abs_nonneg (y i)]
@@ -211,7 +211,7 @@ lemma sliceSource_mem_nhds (P : GAP G) (S : Finset (Fin P.dim → ℤ))
     (hSbox : ∀ v ∈ S, v ∈ symBox P) :
     {p : integerGeneratedSubspace S | (p : Fin P.dim → ℝ) ∈ realSymBox P} ∈
       𝓝 (0 : integerGeneratedSubspace S) := by
-  refine Filter.mem_of_superset (Metric.ball_mem_nhds 0 zero_lt_one) ?_
+  apply Filter.mem_of_superset (Metric.ball_mem_nhds 0 zero_lt_one)
   intro p hp i
   rw [mem_ball_zero_iff] at hp
   by_cases hi : P.length i = 1
@@ -231,20 +231,21 @@ lemma isCompact_sliceSource (P : GAP G) (S : Finset (Fin P.dim → ℤ)) :
     IsCompact {p : integerGeneratedSubspace S |
       (p : Fin P.dim → ℝ) ∈ realSymBox P} := by
   rw [realSymBox_eq_realBox]
-  refine Metric.isCompact_of_isClosed_isBounded
-    ((BoxLattice.isClosed_realBox P.halfWidth).preimage continuous_subtype_val) ?_
+  apply Metric.isCompact_of_isClosed_isBounded
+    ((BoxLattice.isClosed_realBox P.halfWidth).preimage continuous_subtype_val)
   obtain ⟨R, hR⟩ :=
       (BoxLattice.isBounded_realBox P.halfWidth).subset_closedBall
         (0 : Fin P.dim → ℝ)
   rw [Metric.isBounded_iff_subset_closedBall (0 : integerGeneratedSubspace S)]
-  refine ⟨R, fun p hp ↦ ?_⟩
+  refine ⟨R, ?_⟩
+  intro p hp
   have hpR := hR hp
   rw [Metric.mem_closedBall, dist_zero_right] at hpR ⊢
   simpa only [Submodule.norm_coe] using hpR
 
 lemma isCompact_sliceBody (P : GAP G) (S : Finset (Fin P.dim → ℤ)) :
     IsCompact (sliceBody P S) := by
-  refine (isCompact_sliceSource P S).image ?_
+  apply (isCompact_sliceSource P S).image
   exact LinearMap.continuous_of_finiteDimensional
     (integerGeneratedCoordinateEquiv S).toLinearMap
 
@@ -278,7 +279,8 @@ lemma intVectorToReal_mem_realSymBox {P : GAP G} {v : Fin P.dim → ℤ} (hv : v
 
 lemma mem_symBox_of_intVectorToReal_mem {P : GAP G} {v : Fin P.dim → ℤ}
     (hv : intVectorToReal v ∈ realSymBox P) : v ∈ symBox P := by
-  refine mem_symBox.mpr fun i ↦ ?_
+  apply mem_symBox.mpr
+  intro i
   have hi : ((|v i| : ℤ) : ℝ) ≤ ((P.length i : ℝ) - 1) := by
     simpa [intVectorToReal, abs_of_nonneg] using hv i
   have hi' : (|v i| : ℤ) ≤ (P.length i : ℤ) - 1 := by exact_mod_cast hi
@@ -302,7 +304,7 @@ lemma mem_sliceCoords_iff {P : GAP G} {S : Finset (Fin P.dim → ℤ)}
         ← intVectorToReal_latticeIntMap S (latticeVector_mem_latticeDomain S v),
         latticeIntMap_latticeVector]
     have hmem : latticeVector S v ∈ symBox P := by
-      refine mem_symBox_of_intVectorToReal_mem ?_
+      apply mem_symBox_of_intVectorToReal_mem
       rw [intVectorToReal_latticeVector S v,
         (integerGeneratedCoordinateEquiv S).injective (hcoord.trans hep.symm)]
       exact hp
@@ -329,9 +331,10 @@ lemma span_sliceBody_inter_standardLattice_eq_top
   obtain ⟨c, hc, rfl⟩ := hx
   rw [effectiveLatticeCoords, Finset.mem_image] at hc
   obtain ⟨v, hvS, rfl⟩ := hc
-  refine ⟨?_, AddSubgroup.mem_map.mpr ⟨effectiveLatticeMap S v, Set.mem_univ _, rfl⟩⟩
-  rw [← mem_sliceCoords_iff]
-  exact mem_sliceCoords_of_mem_symBox (hSbox v hvS)
+  constructor
+  · rw [← mem_sliceCoords_iff]
+    exact mem_sliceCoords_of_mem_symBox (hSbox v hvS)
+  · exact AddSubgroup.mem_map.mpr ⟨effectiveLatticeMap S v, Set.mem_univ _, rfl⟩
 
 /-- The integer points of the effective-coordinate slice of a coefficient box admit a proper
 centered reboxing with the same explicit rank factor as projected boxes. -/
@@ -468,10 +471,10 @@ theorem chang_coordinate_reduction {q : ℕ} (X : Finset (ZMod q))
   have hQ₀card : (Q₀.carrier.card : ℝ) ≤
       Real.exp (2 * ((P.dim : ℝ) + 2) ^ 4) *
         P.carrier.card := by
-    refine hQ₀cardCube.trans ?_
-    refine (mul_le_mul_of_nonneg_left
+    apply hQ₀cardCube.trans
+    apply (mul_le_mul_of_nonneg_left
       (mul_le_mul_of_nonneg_right (two_pow_le_exp P.dim) (Nat.cast_nonneg _))
-      (by positivity)).trans ?_
+      (by positivity)).trans
     rw [← mul_assoc, ← Real.exp_add]
     refine mul_le_mul_of_nonneg_right (Real.exp_le_exp.mpr ?_) (Nat.cast_nonneg _)
     have hpow : ((P.dim : ℝ) + 2) ^ 3 ≤ ((P.dim : ℝ) + 2) ^ 4 := by
@@ -490,7 +493,7 @@ theorem chang_coordinate_reduction {q : ℕ} (X : Finset (ZMod q))
           Q₀.carrier.card ≤
       Real.exp (coordinateReductionConstant * ((P.dim : ℝ) + 2) ^ 4) *
         P.carrier.card := by
-    refine (mul_le_mul hexp hQ₀card (Nat.cast_nonneg _) (Real.exp_nonneg _)).trans ?_
+    apply (mul_le_mul hexp hQ₀card (Nat.cast_nonneg _) (Real.exp_nonneg _)).trans
     rw [← mul_assoc, ← Real.exp_add]
     rw [coordinateReductionConstant]
     ring_nf

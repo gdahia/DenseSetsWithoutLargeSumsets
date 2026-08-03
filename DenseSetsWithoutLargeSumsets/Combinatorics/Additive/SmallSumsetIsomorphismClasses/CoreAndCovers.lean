@@ -102,9 +102,9 @@ lemma one_hundred_eighty_le_rpow_one_thirtieth {t : ℕ}
   have htReal : ((2 ^ (9000 : ℕ) : ℕ) : ℝ) ≤ t := by
     exact_mod_cast (smallSumsetClassCountThreshold_def ▸ ht)
   have h180pow : (180 : ℝ) ≤ (2 : ℝ) ^ (300 : ℕ) := by
-    refine ((by norm_num : (180 : ℝ) ≤ 2 ^ (8 : ℕ))).trans ?_
+    apply ((by norm_num : (180 : ℝ) ≤ 2 ^ (8 : ℕ))).trans
     exact pow_le_pow_right₀ (by norm_num) (by norm_num)
-  refine h180pow.trans ?_
+  apply h180pow.trans
   rw [← Real.rpow_natCast]
   norm_num only [Nat.cast_ofNat]
   have hexponent : (300 : ℝ) = 9000 * ((1 : ℝ) / 30) := by norm_num
@@ -129,7 +129,7 @@ lemma popularSumThreshold_lower {t : ℕ}
       congr 1
       norm_num
     rw [hright] at hpow
-    refine ((by norm_num : (2 : ℝ) ≤ 180)).trans ?_
+    apply ((by norm_num : (2 : ℝ) ≤ 180)).trans
     have h180rpow : (180 : ℝ) ≤ (180 : ℝ) ^ (6 : ℝ) := by
       simpa only [Real.rpow_one] using
         Real.rpow_le_rpow_of_exponent_le (by norm_num : (1 : ℝ) ≤ 180)
@@ -156,7 +156,7 @@ lemma popularSumThreshold_half_lower {t : ℕ}
       congr 1
       norm_num
     rw [hright] at hpow
-    refine ((by norm_num : (4 : ℝ) ≤ 180)).trans ?_
+    apply ((by norm_num : (4 : ℝ) ≤ 180)).trans
     have h180rpow : (180 : ℝ) ≤ (180 : ℝ) ^ (6 : ℝ) := by
       simpa only [Real.rpow_one] using
         Real.rpow_le_rpow_of_exponent_le (by norm_num : (1 : ℝ) ≤ 180)
@@ -221,7 +221,7 @@ lemma samplingFailureProbability_le {t : ℕ}
     linarith
   have hstep : (1 - q ^ (2 : ℕ)) ^ N ≤
       Real.exp (-(N : ℝ) * q ^ (2 : ℕ)) := by
-    refine (pow_le_pow_left₀ hbase (Real.one_sub_le_exp_neg (q ^ (2 : ℕ))) N).trans_eq ?_
+    apply (pow_le_pow_left₀ hbase (Real.one_sub_le_exp_neg (q ^ (2 : ℕ))) N).trans_eq
     rw [← Real.exp_nat_mul]
     congr 1
     ring
@@ -446,9 +446,9 @@ lemma freimanEquivalent_of_canonicalCode_eq {s t : ℕ} (ht : 0 < t) (X Y : Size
     dsimp [f]
     rw [if_pos (Set.mem_range_self i), Function.leftInverse_invFun ha_inj]
   unfold FreimanEquivalent
-  refine ⟨f, ?_⟩
+  use f
   rw [ha_range, hb_range]
-  refine ⟨?_, ?_⟩
+  constructor
   · refine ⟨?_, ?_, ?_⟩
     · intro x hx; rcases hx with ⟨i, rfl⟩; exact ⟨i, (hf_on_range i).symm⟩
     · intro x hx y hy hxy
@@ -700,8 +700,8 @@ lemma exists_extensionFreimanClassCover (base : Finset ℕ) (d : ℕ)
     have hbound : (S.image fun X =>
         canonicalFreimanRelationCode (s := 2) hl_d_pos X).card ≤
         (1 + l ^ 4) ^ ((d + 1) ^ 4) := by
-      refine card_canonicalFreimanRelationCode_image_of_fixed_extensionBase hl S
-        (fun X => X) label ?_ ?_ ?_
+      apply card_canonicalFreimanRelationCode_image_of_fixed_extensionBase hl S
+        (fun X => X) label
       · intro X hX
         exact (hlabel_spec X hX).1
       · intro X hX
@@ -872,8 +872,8 @@ private lemma freimanEquivalent_trans {order : ℕ} {A B C : Finset ℕ}
 
 private lemma freimanEquivalent_translate (order a : ℕ) (A : Finset ℕ) :
     FreimanEquivalent order A (A.image (a + ·)) := by
-  refine ⟨(a + ·), ?_⟩
-  refine ⟨?_, ?_⟩
+  use (a + ·)
+  constructor
   · refine ⟨?_, ?_, ?_⟩
     · intro x hx
       exact Finset.mem_coe.mpr (Finset.mem_image.mpr ⟨x, Finset.mem_coe.mp hx, rfl⟩)
@@ -996,7 +996,7 @@ private lemma exists_nonemptyCoreDecomposition (A : Finset ℕ) {t m : ℕ}
       unfold coreSamplingRate
       nlinarith [mul_lt_mul_of_pos_left hpower (by positivity : 0 < 4 * (m : ℝ))]
     have hcore_lt_t : 4 * coreSamplingRate t * m < t := by
-      refine lt_of_le_of_lt (Nat.le_ceil (4 * coreSamplingRate t * m)) ?_
+      apply lt_of_le_of_lt (Nat.le_ceil (4 * coreSamplingRate t * m))
       exact_mod_cast Nat.lt_of_not_ge hlarge
     have hdiff_lt : (A \ A₁).card < t := by
       exact_mod_cast hexception.trans_lt (hexception_lt_core.trans hcore_lt_t)
@@ -1175,17 +1175,22 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
               ∑ C ∈ coreReps l,
                 ∑ R ∈ remainderReps C (t - d), (extensionReps R d).card := by
         dsimp only [representatives]
-        refine Finset.card_biUnion_le.trans ?_
-        refine Finset.sum_le_sum fun d hd => ?_
-        refine Finset.card_biUnion_le.trans ?_
-        refine Finset.sum_le_sum fun l hl => ?_
-        refine Finset.card_biUnion_le.trans ?_
-        refine Finset.sum_le_sum fun C hC => ?_
+        apply Finset.card_biUnion_le.trans
+        apply Finset.sum_le_sum
+        intro d hd
+        apply Finset.card_biUnion_le.trans
+        apply Finset.sum_le_sum
+        intro l hl
+        apply Finset.card_biUnion_le.trans
+        apply Finset.sum_le_sum
+        intro C hC
         exact Finset.card_biUnion_le
       _ ≤ freimanClassCountBound t m := by
         unfold freimanClassCountBound
-        refine Finset.sum_le_sum fun d hd => ?_
-        refine Finset.sum_le_sum fun l hl => ?_
+        apply Finset.sum_le_sum
+        intro d hd
+        apply Finset.sum_le_sum
+        intro l hl
         have hl_pos : 0 < l := by
           have := (Finset.mem_Icc.mp hl).1
           omega
@@ -1194,12 +1199,14 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
               ∑ R ∈ remainderReps C (t - d), (extensionReps R d).card ≤
               ∑ C ∈ coreReps l,
                 m.choose (t - d) * (1 + (t - d) ^ 4) ^ ((d + 1) ^ 4) := by
-            refine Finset.sum_le_sum fun C hC => ?_
+            apply Finset.sum_le_sum
+            intro C hC
             calc
               ∑ R ∈ remainderReps C (t - d), (extensionReps R d).card ≤
                   ∑ _ ∈ remainderReps C (t - d),
                     (1 + (t - d) ^ 4) ^ ((d + 1) ^ 4) := by
-                refine Finset.sum_le_sum fun R hR => ?_
+                apply Finset.sum_le_sum
+                intro R hR
                 have hR_card : R.card = t - d := by
                   exact hremainder_spec C (t - d)
                     (Finset.card_pos.mp (by

@@ -236,7 +236,8 @@ lemma exists_maximal_disjoint_translates (A Q : Finset G) (hQ : Q.Nonempty) :
     ⟨∅, Finset.empty_mem_powerset A, by simp⟩)
   simp only [C, Finset.mem_filter, Finset.mem_powerset] at hFmax
   obtain ⟨hFA, hF⟩ := hFmax.1
-  refine ⟨F, hFA, hF, fun a ha ↦ ?_⟩
+  refine ⟨F, hFA, hF, ?_⟩
+  intro a ha
   by_cases haF : a ∈ F
   · exact Finset.subset_add_left F hQ.zero_mem_sub haF
   by_cases! H : ∀ b ∈ F, Disjoint (a +ᵥ Q) (b +ᵥ Q)

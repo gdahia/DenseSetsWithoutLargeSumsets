@@ -76,13 +76,15 @@ lemma mem_natBox {m : Fin d → ℕ} {v : Fin d → ℤ} :
 
 lemma card_intBox (m : Fin d → ℕ) : (intBox m).card = ∏ i, (2 * m i + 1) := by
   rw [intBox, Pi.card_Icc]
-  refine Finset.prod_congr rfl fun i _ ↦ ?_
+  apply Finset.prod_congr rfl
+  intro i _
   rw [Int.card_Icc]
   omega
 
 lemma card_natBox (m : Fin d → ℕ) : (natBox m).card = ∏ i, (m i + 1) := by
   rw [natBox, Pi.card_Icc]
-  refine Finset.prod_congr rfl fun i _ ↦ ?_
+  apply Finset.prod_congr rfl
+  intro i _
   rw [Int.card_Icc]
   simp
 
@@ -90,7 +92,8 @@ lemma card_natBox (m : Fin d → ℕ) : (natBox m).card = ∏ i, (m i + 1) := by
 lemma sub_mem_intBox {m : Fin d → ℕ} {v w : Fin d → ℤ} (hv : v ∈ natBox m) (hw : w ∈ natBox m) :
     v - w ∈ intBox m := by
   rw [mem_natBox] at hv hw
-  refine mem_intBox.mpr fun i ↦ ?_
+  apply mem_intBox.mpr
+  intro i
   have := hv i
   have := hw i
   simp only [Pi.sub_apply, abs_le]
@@ -101,7 +104,8 @@ lemma add_mem_intBox {m m' : Fin d → ℕ} {v w : Fin d → ℤ} (hv : v ∈ in
     (hw : w ∈ natBox m') : v + w ∈ intBox fun i ↦ m i + m' i := by
   rw [mem_intBox] at hv
   rw [mem_natBox] at hw
-  refine mem_intBox.mpr fun i ↦ ?_
+  apply mem_intBox.mpr
+  intro i
   have := abs_le.mp (hv i)
   have := hw i
   simp only [Pi.add_apply, abs_le, Nat.cast_add]
@@ -188,7 +192,7 @@ theorem card_mul_prod_le_of_separated {s : Finset (Fin d → ℤ)} {m M : Fin d 
     s.card * ∏ i, (m i + 1) ≤ ∏ i, (2 * (M i + m i) + 1) := by
   classical
   rw [← card_natBox, ← Finset.card_product, ← card_intBox]
-  refine Finset.card_le_card_of_injOn (fun p ↦ p.1 + p.2) ?_ ?_
+  apply Finset.card_le_card_of_injOn (fun p ↦ p.1 + p.2)
   · intro p hp
     rw [Finset.mem_coe, Finset.mem_product] at hp
     exact add_mem_intBox (mem_intBox.mpr (hbox p.1 hp.1)) hp.2
@@ -212,7 +216,8 @@ theorem card_mul_prod_le_of_eq_zero_of_mem_intBox {Λ : AddSubgroup (Fin d → �
     (hm : ∀ v ∈ Λ, (∀ i, |v i| ≤ (m i : ℤ)) → v = 0) (s : Finset (Fin d → ℤ))
     (hs : ∀ v ∈ s, v ∈ Λ) (hbox : ∀ v ∈ s, ∀ i, |v i| ≤ (M i : ℤ)) :
     s.card * ∏ i, (m i + 1) ≤ ∏ i, (2 * (M i + m i) + 1) := by
-  refine card_mul_prod_le_of_separated hbox fun u hu w hw huw ↦ ?_
+  apply card_mul_prod_le_of_separated hbox
+  intro u hu w hw huw
   by_contra hcon
   push Not at hcon
   exact huw (sub_eq_zero.mp (hm _ (Λ.sub_mem (hs u hu) (hs w hw)) hcon))
@@ -283,7 +288,7 @@ lemma successiveMinimum_le {Λ : AddSubgroup (Fin d → ℤ)} {L : Fin d → ℕ
 lemma successiveMinimum_mono {Λ : AddSubgroup (Fin d → ℤ)} {L : Fin d → ℕ} {k k' : ℕ}
     (hk : k ≤ k') (hne : ∃ t, 0 ≤ t ∧ HasIndependentShort Λ L k' t) :
     successiveMinimum Λ L k ≤ successiveMinimum Λ L k' := by
-  refine le_csInf hne fun t ht ↦ successiveMinimum_le ht.1 (ht.2.of_le hk)
+  exact le_csInf hne fun t ht ↦ successiveMinimum_le ht.1 (ht.2.of_le hk)
 
 /-- A dilation factor smaller than every minimum bounds it from below. -/
 lemma le_successiveMinimum {Λ : AddSubgroup (Fin d → ℤ)} {L : Fin d → ℕ} {k : ℕ} {t : ℝ}
@@ -310,7 +315,8 @@ positivity of the first minimum for a general lattice. -/
 lemma le_successiveMinimum_one {Λ : AddSubgroup (Fin d → ℤ)} {L : Fin d → ℕ} {B : ℕ} {t : ℝ}
     (hB : ∀ i, L i ≤ B) (ht : t * B < 1)
     (hne : ∃ s, 0 ≤ s ∧ HasIndependentShort Λ L 1 s) : t ≤ successiveMinimum Λ L 1 := by
-  refine le_successiveMinimum hne fun s hs hshort ↦ ?_
+  apply le_successiveMinimum hne
+  intro s hs hshort
   by_contra hlt
   push Not at hlt
   obtain ⟨i, hi⟩ := exists_one_le_mul_of_hasIndependentShort hshort
@@ -353,8 +359,11 @@ lemma isShort_of_scaledSup_le {L : Fin d → ℕ} {k : ℕ} (hL : ∀ i, 0 < L i
 /-- A family short for the dilation factor `s` has scaled supremum at most `s * ∏ L`. -/
 lemma scaledSup_le_mul {L : Fin d → ℕ} {k : ℕ} {v : Fin k → (Fin d → ℤ)} {s : ℝ} (hs : 0 ≤ s)
     (hv : ∀ j, IsShort L s (v j)) : (scaledSup L v : ℝ) ≤ s * ((∏ i, L i : ℕ) : ℝ) := by
-  refine le_trans (Nat.cast_le.mpr (Finset.sup_le fun p _ ↦ Nat.le_floor ?_))
-    (Nat.floor_le (mul_nonneg hs (Nat.cast_nonneg _)))
+  refine le_trans ?_ (Nat.floor_le (mul_nonneg hs (Nat.cast_nonneg _)))
+  apply Nat.cast_le.mpr
+  apply Finset.sup_le
+  intro p _
+  apply Nat.le_floor
   have hcancel : ((∏ i, L i : ℕ) : ℝ) = ((L p.2 : ℕ) : ℝ) * (((∏ i, L i) / L p.2 : ℕ) : ℝ) := by
     rw [← Nat.cast_mul, Nat.mul_div_cancel' (Finset.dvd_prod_of_mem L (Finset.mem_univ p.2))]
   rw [Nat.cast_mul, Nat.cast_natAbs, Int.cast_abs, hcancel, ← mul_assoc]
@@ -372,13 +381,14 @@ theorem exists_witness_successiveMinimum {Λ : AddSubgroup (Fin d → ℤ)} {L :
     exact ⟨scaledSup L v, v, hindep, fun j ↦ (hv j).1, le_rfl⟩
   obtain ⟨v₀, hindep₀, hmem₀, hsup₀⟩ := Nat.find_spec hQ
   have hmin : successiveMinimum Λ L k = (Nat.find hQ : ℝ) / ((∏ i, L i : ℕ) : ℝ) := by
-    refine le_antisymm (successiveMinimum_le (by positivity)
-      ⟨v₀, hindep₀, fun j ↦ ⟨hmem₀ j, isShort_of_scaledSup_le hL hsup₀ j⟩⟩) ?_
-    refine le_successiveMinimum hne fun s hs hshort ↦ ?_
+    apply le_antisymm (successiveMinimum_le (by positivity)
+      ⟨v₀, hindep₀, fun j ↦ ⟨hmem₀ j, isShort_of_scaledSup_le hL hsup₀ j⟩⟩)
+    apply le_successiveMinimum hne
+    intro s hs hshort
     obtain ⟨v, hindep, hv⟩ := hshort
     rw [div_le_iff₀ (prod_pos_of_length_pos hL)]
-    refine le_trans (Nat.cast_le.mpr (Nat.find_min' hQ
-      ⟨v, hindep, fun j ↦ (hv j).1, le_rfl⟩)) ?_
+    apply le_trans (Nat.cast_le.mpr (Nat.find_min' hQ
+      ⟨v, hindep, fun j ↦ (hv j).1, le_rfl⟩))
     exact scaledSup_le_mul hs fun j ↦ (hv j).2
   rw [hmin]
   exact ⟨v₀, hindep₀, fun j ↦ ⟨hmem₀ j, isShort_of_scaledSup_le hL hsup₀ j⟩⟩
@@ -389,8 +399,10 @@ theorem successiveMinimum_one_le_of_index_lt {Λ : AddSubgroup (Fin d → ℤ)} 
     {L m : Fin d → ℕ} {t : ℝ} (ht : 0 ≤ t) (hm : ∀ i, (m i : ℝ) ≤ t * L i)
     (hindex : Λ.index < ∏ i, (m i + 1)) : successiveMinimum Λ L 1 ≤ t := by
   obtain ⟨v, hv, hne, hbox⟩ := exists_ne_zero_mem_of_index_lt Λ hindex
-  refine successiveMinimum_le ht ⟨fun _ ↦ v, ?_, fun _ ↦ ⟨hv, isShort_of_abs_le hbox hm⟩⟩
-  exact linearIndependent_unique_iff.mpr hne
+  refine successiveMinimum_le ht ⟨fun _ ↦ v, ?_, ?_⟩
+  · exact linearIndependent_unique_iff.mpr hne
+  · intro _
+    exact ⟨hv, isShort_of_abs_le hbox hm⟩
 
 /-! ### Adapted families
 
@@ -417,7 +429,8 @@ lemma exists_linearIndependent_snoc {i : ℕ} {v : Fin i → (Fin d → ℤ)}
     have hlast : g (Fin.last i) ≠ 0 := by
       intro hzero
       rw [hzero, zero_smul, add_zero] at hg
-      refine hm (Fin.lastCases hzero (fun m ↦ ?_) m)
+      refine hm (Fin.lastCases hzero ?_ m)
+      intro m
       exact Fintype.linearIndependent_iff.mp hv (fun m ↦ g m.castSucc) hg m
     refine ⟨g (Fin.last i), hlast, ?_⟩
     rw [eq_neg_of_add_eq_zero_right hg]
@@ -425,14 +438,15 @@ lemma exists_linearIndependent_snoc {i : ℕ} {v : Fin i → (Fin d → ℤ)}
       Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, rfl⟩))
   choose c hc hmem using key
   have hscaled : LinearIndependent ℤ fun j ↦ c j • w j := by
-    refine Fintype.linearIndependent_iff.mpr fun a ha j ↦ ?_
+    apply Fintype.linearIndependent_iff.mpr
+    intro a ha j
     refine (mul_eq_zero.mp
       (Fintype.linearIndependent_iff.mp hw (fun j ↦ a j * c j) ?_ j)).resolve_right (hc j)
     rw [← ha]
     exact Finset.sum_congr rfl fun j _ ↦ mul_smul (a j) (c j) (w j)
   have hindep : LinearIndependent ℤ
       fun j ↦ (⟨c j • w j, hmem j⟩ : Submodule.span ℤ (Set.range v)) := by
-    refine LinearIndependent.of_comp (Submodule.span ℤ (Set.range v)).subtype ?_
+    apply LinearIndependent.of_comp (Submodule.span ℤ (Set.range v)).subtype
     simpa [Function.comp_def] using hscaled
   have hrank := LinearIndependent.cardinal_le_rank hindep
   rw [Cardinal.mk_fin] at hrank
@@ -459,10 +473,12 @@ theorem exists_adapted_shortFamily {Λ : AddSubgroup (Fin d → ℤ)} {L : Fin d
       obtain ⟨w, hwindep, hw⟩ :=
         exists_witness_successiveMinimum (k := m + 1) hL ⟨t₀, ht₀, hfull.of_le hm⟩
       obtain ⟨j, hsnoc⟩ := exists_linearIndependent_snoc hvindep hwindep
-      refine ⟨Fin.snoc v (w j), hsnoc, Fin.lastCases ?_ fun i ↦ ?_⟩
+      refine ⟨Fin.snoc v (w j), hsnoc, ?_⟩
+      apply Fin.lastCases
       · rw [Fin.snoc_last, Fin.val_last]
         exact hw j
-      · rw [Fin.snoc_castSucc, Fin.val_castSucc]
+      · intro i
+        rw [Fin.snoc_castSucc, Fin.val_castSucc]
         exact hv i
 
 end SuccessiveMinima

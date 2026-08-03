@@ -88,22 +88,28 @@ lemma freqBox_pos {D : ℕ} (hq : 0 < q) (hD : 0 < D) : ∀ i, 0 < freqBox (k :=
 defined and positive. -/
 lemma hasIndependentShort_freqLattice (r : Fin k → ZMod q) {D : ℕ} (hq : 0 < q) (hD : 0 < D) :
     HasIndependentShort (freqLattice r) (freqBox q D) (k + 1) (q : ℝ) := by
-  refine ⟨fun i ↦ Pi.single i (q : ℤ), ?_, fun i ↦ ⟨mem_freqLattice.mpr fun j ↦ ?_, fun j ↦ ?_⟩⟩
-  · refine Fintype.linearIndependent_iff.mpr fun c hc i ↦ ?_
+  refine ⟨fun i ↦ Pi.single i (q : ℤ), ?_, ?_⟩
+  · refine Fintype.linearIndependent_iff.mpr ?_
+    intro c hc i
     have hi := congr_fun hc i
     simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_zero,
       Finset.sum_ite_eq, Finset.mem_univ, if_true, Pi.zero_apply] at hi
     exact (mul_eq_zero.mp hi).resolve_right (Int.natCast_ne_zero.mpr hq.ne')
-  · simp only [Pi.single_apply]
-    split <;> split <;> simp
-  · have hbox : (1 : ℝ) ≤ (freqBox (k := k) q D j : ℝ) := by
-      exact_mod_cast freqBox_pos hq hD j
-    simp only [Pi.single_apply]
-    split
-    · rw [Int.cast_natCast, abs_of_nonneg (Nat.cast_nonneg (α := ℝ) q)]
-      nlinarith [Nat.cast_nonneg (α := ℝ) q]
-    · rw [Int.cast_zero, abs_zero]
-      positivity
+  · intro i
+    constructor
+    · refine mem_freqLattice.mpr ?_
+      intro j
+      simp only [Pi.single_apply]
+      split <;> split <;> simp
+    · intro j
+      have hbox : (1 : ℝ) ≤ (freqBox (k := k) q D j : ℝ) := by
+        exact_mod_cast freqBox_pos hq hD j
+      simp only [Pi.single_apply]
+      split
+      · rw [Int.cast_natCast, abs_of_nonneg (Nat.cast_nonneg (α := ℝ) q)]
+        nlinarith [Nat.cast_nonneg (α := ℝ) q]
+      · rw [Int.cast_zero, abs_zero]
+        positivity
 
 end FrequencyLattice
 
@@ -116,9 +122,10 @@ lemma abs_sum_zsmul_le {d : ℕ} {L : Fin d → ℕ} {lam : Fin d → ℝ} {v : 
   have hcoord : ((∑ i, n i • v i) j : ℤ) = ∑ i, n i * v i j := by
     simp [Finset.sum_apply]
   rw [hcoord, Int.cast_sum]
-  refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
-  refine (Finset.sum_le_sum (g := fun i ↦ |(n i : ℝ)| * lam i * L j) fun i _ ↦ ?_).trans ?_
-  · rw [Int.cast_mul, abs_mul]
+  apply (Finset.abs_sum_le_sum_abs _ _).trans
+  refine (Finset.sum_le_sum (g := fun i ↦ |(n i : ℝ)| * lam i * L j) ?_).trans ?_
+  · intro i _
+    rw [Int.cast_mul, abs_mul]
     exact (mul_le_mul_of_nonneg_left (hv i j) (abs_nonneg _)).trans_eq (by ring)
   · rw [← Finset.sum_mul]
     exact mul_le_mul_of_nonneg_right hn (Nat.cast_nonneg _)
@@ -148,7 +155,8 @@ lemma gapMap_neg_stepsHom_eq {G : Type*} [AddCommGroup G] {d : ℕ} (x : Fin d �
     (hn : ∀ i, n i = ((w i : ℕ) : ℤ) - L i) :
     gapMap (stepsHom x fun i ↦ -(L i : ℤ)) x len w = stepsHom x n := by
   rw [gapMap, stepsHom_apply, stepsHom_apply, ← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  apply Finset.sum_congr rfl
+  intro i _
   rw [hn i, sub_zsmul, natCast_zsmul, neg_zsmul]
   abel
 
@@ -177,8 +185,9 @@ lemma exists_coeff_of_mem_symmetricGAP {y : G} (hy : y ∈ (symmetricGAP x L).ca
     ∃ n : Fin d → ℤ, (∀ i, |n i| ≤ (L i : ℤ)) ∧ y = stepsHom x n := by
   rw [(symmetricGAP x L).carrier_eq] at hy
   obtain ⟨w, -, rfl⟩ := Finset.mem_image.mp hy
-  refine ⟨fun i : Fin d ↦ ((w i : ℕ) : ℤ) - L i, fun i ↦ ?_,
+  refine ⟨fun i : Fin d ↦ ((w i : ℕ) : ℤ) - L i, ?_,
     gapMap_neg_stepsHom_eq x L _ w fun _ ↦ rfl⟩
+  intro i
   have hwi := (w i).isLt
   simp only [symmetricGAP_length] at hwi
   dsimp only
@@ -247,30 +256,33 @@ theorem exists_proper_gap_of_freqLattice {q k : ℕ} [NeZero q] (r : Fin k → Z
       (∑ i, n i • v i) ∈ freqLattice r ∧
         ∀ j, 2 * |(∑ i, n i • v i) j| ≤ (freqBox q D j : ℤ) := by
     intro n hn
-    refine ⟨AddSubgroup.sum_mem _ fun i _ ↦ AddSubgroup.zsmul_mem _ (hv i).1 _, fun j ↦ ?_⟩
-    have hsum : ∑ i, |(n i : ℝ)| * lam i ≤ 1 / 2 := by
-      refine (Finset.sum_le_sum
-        (g := fun _ : Fin (k + 1) ↦ 1 / (2 * ((k : ℝ) + 1))) fun i _ ↦ ?_).trans ?_
-      · have hlami := hlampos i
-        have hni : |(n i : ℝ)| ≤ 2 * L i := by
-          have := (Int.cast_le (R := ℝ)).mpr (hn i)
-          push_cast at this
-          exact this
-        have hfloor : (L i : ℝ) ≤ 1 / (4 * ((k : ℝ) + 1) * lam i) :=
-          Nat.floor_le (by positivity)
-        rw [le_div_iff₀ (by positivity)] at hfloor
-        rw [le_div_iff₀ (by positivity)]
-        nlinarith [mul_le_mul_of_nonneg_right hni
-          (by positivity : (0 : ℝ) ≤ lam i * (2 * ((k : ℝ) + 1)))]
-      · rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one_div,
-          div_le_div_iff₀ (by positivity) (by norm_num)]
-        push_cast
-        ring_nf
-        linarith
-    have hbox := abs_sum_zsmul_le (fun i ↦ (hv i).2) hsum j
-    rw [← Int.cast_le (R := ℝ)]
-    push_cast
-    linarith
+    constructor
+    · exact AddSubgroup.sum_mem _ fun i _ ↦ AddSubgroup.zsmul_mem _ (hv i).1 _
+    · intro j
+      have hsum : ∑ i, |(n i : ℝ)| * lam i ≤ 1 / 2 := by
+        refine (Finset.sum_le_sum
+          (g := fun _ : Fin (k + 1) ↦ 1 / (2 * ((k : ℝ) + 1))) ?_).trans ?_
+        · intro i _
+          have hlami := hlampos i
+          have hni : |(n i : ℝ)| ≤ 2 * L i := by
+            have := (Int.cast_le (R := ℝ)).mpr (hn i)
+            push_cast at this
+            exact this
+          have hfloor : (L i : ℝ) ≤ 1 / (4 * ((k : ℝ) + 1) * lam i) :=
+            Nat.floor_le (by positivity)
+          rw [le_div_iff₀ (by positivity)] at hfloor
+          rw [le_div_iff₀ (by positivity)]
+          nlinarith [mul_le_mul_of_nonneg_right hni
+            (by positivity : (0 : ℝ) ≤ lam i * (2 * ((k : ℝ) + 1)))]
+        · rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one_div,
+            div_le_div_iff₀ (by positivity) (by norm_num)]
+          push_cast
+          ring_nf
+          linarith
+      have hbox := abs_sum_zsmul_le (fun i ↦ (hv i).2) hsum j
+      rw [← Int.cast_le (R := ℝ)]
+      push_cast
+      linarith
   -- The progression generated by the first coordinates of the adapted family.
   set x : Fin (k + 1) → ZMod q := fun i ↦ ((v i 0 : ℤ) : ZMod q) with hxdef
   have hstepsHom : ∀ n : Fin (k + 1) → ℤ,
@@ -292,7 +304,8 @@ theorem exists_proper_gap_of_freqLattice {q k : ℕ} [NeZero q] (r : Fin k → Z
       rw [← ZMod.intCast_zmod_eq_zero_iff_dvd, ← hstepsHom, hzero]
     refine Fintype.linearIndependent_iff.mp hvindep n ?_ i
     funext j
-    refine Fin.cases hfirst (fun j ↦ ?_) j
+    refine Fin.cases hfirst ?_ j
+    intro j
     refine eq_zero_of_dvd_of_two_mul_abs_le hqz ?_ (hbox j.succ) ?_
     · rw [← ZMod.intCast_zmod_eq_zero_iff_dvd, mem_freqLattice.mp hmem j, hfirst]
       simp
@@ -327,12 +340,14 @@ theorem exists_proper_gap_of_freqLattice {q k : ℕ} [NeZero q] (r : Fin k → Z
       have hconst : ((2 : ℝ) ^ (k + 5) * ((k : ℝ) + 1)) ^ (k + 1) * ∏ i, (len i : ℝ) =
           ∏ i : Fin (k + 1), ((2 : ℝ) ^ (k + 5) * ((k : ℝ) + 1) * len i) := by
         rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-      refine (BoxLattice.ncard_latticeBoxPoints_le _ hBpos).trans ?_
+      apply (BoxLattice.ncard_latticeBoxPoints_le _ hBpos).trans
       rw [hconst]
-      refine Finset.prod_le_prod (fun i _ ↦ ?_) fun i _ ↦ ?_
-      · have := hlampos i
+      apply Finset.prod_le_prod
+      · intro i _
+        have := hlampos i
         positivity
-      · have hlami := hlampos i
+      · intro i _
+        have hlami := hlampos i
         have hlen1 : (1 : ℝ) ≤ (len i : ℝ) := by
           rw [hlendef]
           push_cast
@@ -398,11 +413,12 @@ theorem exists_proper_gap_chordSet {q : ℕ} [NeZero q] (Δ : Finset (AddChar (Z
     nlinarith [mul_le_mul_of_nonneg_right hε hq.le]
   obtain ⟨Q, hproper, hdim, hcert, hsize⟩ :=
     exists_proper_gap_of_freqLattice r hDpos hDq
-  refine ⟨Q, hproper, hdim, fun y hy ψ hψ ↦ ?_, ?_⟩
-  · obtain ⟨a, ha, habs⟩ := hcert y hy (Δ.equivFin ⟨ψ, hψ⟩)
+  refine ⟨Q, hproper, hdim, ?_, ?_⟩
+  · intro y hy ψ hψ
+    obtain ⟨a, ha, habs⟩ := hcert y hy (Δ.equivFin ⟨ψ, hψ⟩)
     have hchord := hr (Δ.equivFin ⟨ψ, hψ⟩) y a ha
     simp only [Equiv.symm_apply_apply] at hchord
-    refine hchord.trans ?_
+    apply hchord.trans
     rw [div_le_iff₀ hq]
     have hcast : |(a : ℝ)| ≤ (⌊ε * q / (2 * Real.pi)⌋₊ : ℝ) := by
       have := (Int.cast_le (R := ℝ)).mpr habs

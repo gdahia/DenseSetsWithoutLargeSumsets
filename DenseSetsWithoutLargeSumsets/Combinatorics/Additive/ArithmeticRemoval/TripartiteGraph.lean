@@ -88,7 +88,7 @@ lemma sub_mem_of_adj_in₀_in₂ {u w : ↥W} (h : (tripartiteGraph W A B C).Adj
 edges force the three defining conditions of `triangleIndices` separately. -/
 lemma card_cliqueFinset_le :
     #((tripartiteGraph W A B C).cliqueFinset 3) ≤ #(triangleIndices W A B C) := by
-  refine card_le_card_of_surjOn toTriangle ?_
+  apply card_le_card_of_surjOn toTriangle
   intro s hs
   rw [mem_coe, mem_cliqueFinset_iff, SimpleGraph.is3Clique_iff] at hs
   obtain ⟨x, y, z, hxy, hxz, hyz, rfl⟩ := hs
@@ -102,8 +102,8 @@ so there are at most `#W` triangle indices per solution. -/
 lemma card_triangleIndices_le :
     #(triangleIndices W A B C) ≤ #W * #(sumTriples A B C) := by
   rw [← card_product]
-  refine card_le_card_of_injOn
-    (fun x => ((x.1 : G), ((x.2.1 : G) - x.1, (x.2.2 : G) - x.2.1, (x.2.2 : G) - x.1))) ?_ ?_
+  apply card_le_card_of_injOn
+    (fun x => ((x.1 : G), ((x.2.1 : G) - x.1, (x.2.2 : G) - x.2.1, (x.2.2 : G) - x.1)))
   · intro x hx
     rw [mem_coe, mem_triangleIndices] at hx
     simp only [mem_coe, mem_product, mem_sumTriples]

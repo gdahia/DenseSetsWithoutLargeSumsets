@@ -37,7 +37,7 @@ private lemma one_lt_eleven_twelfths_mul_pairCardThreshold {γ C : ℝ} {n : ℕ
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
     (1 : ℝ) < (11 / 12 : ℝ) * pairCardThreshold (3 + γ) n δ := by
-  refine (by norm_num : (1 : ℝ) < (11 / 12 : ℝ) * 2).trans_le ?_
+  apply (by norm_num : (1 : ℝ) < (11 / 12 : ℝ) * 2).trans_le
   apply mul_le_mul_of_nonneg_left
   · exact_mod_cast two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper
   · norm_num
@@ -126,10 +126,10 @@ private lemma blt_large_sum_card_le {A B : Finset ℕ} {A'' B'' : Finset ℤ}
     (hA''A : A'' ⊆ natCastImage A) (hB''B : B'' ⊆ natCastImage B)
     (hAB : (A + B).card ≤ C * k) :
     ((A'' + B'').card : ℝ) ≤ C * (k : ℝ) := by
-  refine (by
+  apply (by
     exact_mod_cast Finset.card_le_card
       (natCastImage_add_subset hA''A hB''B (by intro x hx; exact hx)) :
-    ((A'' + B'').card : ℝ) ≤ ((natCastImage (A + B)).card : ℝ)).trans ?_
+    ((A'' + B'').card : ℝ) ≤ ((natCastImage (A + B)).card : ℝ)).trans
   rw [natCastImage_card]
   exact hAB
 
@@ -138,9 +138,9 @@ private lemma first_term_le_two_mul_large_card {γ C : ℝ} {k : ℕ} {A'' B'' :
     (hAB : ((A'' + B'').card : ℝ) ≤ C * (k : ℝ))
     (hA''large : (1 - ε γ) * (k : ℝ) ≤ (A''.card : ℝ)) :
     (1 - ε γ) * ((A'' + B'').card : ℝ) ≤ (2 * C) * (A''.card : ℝ) := by
-  refine (mul_le_mul_of_nonneg_left hAB
-    ((by norm_num : (0 : ℝ) ≤ 1 / 2).trans (half_le_one_sub_ε hγ_pos hγ_le))).trans ?_
-  refine le_trans (b := C * ((1 - ε γ) * (k : ℝ))) ?_ ?_
+  apply (mul_le_mul_of_nonneg_left hAB
+    ((by norm_num : (0 : ℝ) ≤ 1 / 2).trans (half_le_one_sub_ε hγ_pos hγ_le))).trans
+  apply le_trans (b := C * ((1 - ε γ) * (k : ℝ)))
   · ring_nf
     exact le_rfl
   · refine (mul_le_mul_of_nonneg_left hA''large C_pos.le).trans ?_
@@ -151,9 +151,9 @@ private lemma first_term_le_two_mul_right_large_card {γ C : ℝ} {k : ℕ} {A''
     (hAB : ((A'' + B'').card : ℝ) ≤ C * (k : ℝ))
     (hB''large : (1 - ε γ) * (k : ℝ) ≤ (B''.card : ℝ)) :
     (1 - ε γ) * ((A'' + B'').card : ℝ) ≤ (2 * C) * (B''.card : ℝ) := by
-  refine (mul_le_mul_of_nonneg_left hAB
-    ((by norm_num : (0 : ℝ) ≤ 1 / 2).trans (half_le_one_sub_ε hγ_pos hγ_le))).trans ?_
-  refine le_trans (b := C * ((1 - ε γ) * (k : ℝ))) ?_ ?_
+  apply (mul_le_mul_of_nonneg_left hAB
+    ((by norm_num : (0 : ℝ) ≤ 1 / 2).trans (half_le_one_sub_ε hγ_pos hγ_le))).trans
+  apply le_trans (b := C * ((1 - ε γ) * (k : ℝ)))
   · ring_nf
     exact le_rfl
   · refine (mul_le_mul_of_nonneg_left hB''large C_pos.le).trans ?_

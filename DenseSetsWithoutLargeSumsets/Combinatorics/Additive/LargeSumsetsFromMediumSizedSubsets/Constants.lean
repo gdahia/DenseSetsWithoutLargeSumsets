@@ -74,7 +74,7 @@ private lemma removalDoubling_nonneg (hK : 1 ≤ K) : (0 : ℝ) ≤ 16 * bltCap 
 
 lemma bltDelta_pos (hK : 1 ≤ K) (hε : 0 < ε) : 0 < bltDelta K ε := by
   unfold bltDelta
-  refine lt_min (lt_min (by norm_num) (div_pos (bltRho_pos hK hε) (by norm_num))) ?_
+  apply lt_min (lt_min (by norm_num) (div_pos (bltRho_pos hK hε) (by norm_num)))
   exact ArithmeticRemoval.removalConst_pos (removalDoubling_nonneg hK)
     (div_pos (bltRho_pos hK hε) (bltCap_pos hK))
 

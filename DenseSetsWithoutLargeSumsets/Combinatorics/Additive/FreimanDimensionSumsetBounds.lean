@@ -45,8 +45,8 @@ lemma card_image_eq_of_kernel_iff {α β γ : Type*} [DecidableEq β] [Decidable
     (h : ∀ x ∈ s, ∀ y ∈ s, (f x = f y ↔ g x = g y)) :
     (s.image f).card = (s.image g).card := by
   classical
-  refine Finset.card_bij
-    (fun b hb => g (Classical.choose (Finset.mem_image.mp hb))) ?_ ?_ ?_
+  apply Finset.card_bij
+    (fun b hb => g (Classical.choose (Finset.mem_image.mp hb)))
   · intro b hb
     exact Finset.mem_image.2
       ⟨Classical.choose (Finset.mem_image.mp hb),
@@ -174,8 +174,8 @@ lemma finsetAffineDim_union_le_sum_add_one {D : ℕ} (A B : Finset (Fin D → �
           apply Submodule.subset_span
           simp
     · simp [ha]
-  refine (Submodule.finrank_mono hdir).trans ?_
-  refine (Submodule.finrank_add_le_finrank_add_finrank U L).trans ?_
+  apply (Submodule.finrank_mono hdir).trans
+  apply (Submodule.finrank_add_le_finrank_add_finrank U L).trans
   apply Nat.add_le_add_left
   simpa [L] using finrank_span_le_card (s := ({b - a} : Set V))
 
@@ -192,7 +192,7 @@ lemma freimanDim_le_sumsetAffineDim_add_one
     (_hAX : A ⊆ X) (_hBX : B ⊆ X) (hX : X ⊆ A ∪ B)
     (hA : A.Nonempty) (hB : B.Nonempty) :
     r ≤ finsetAffineDim (freimanRealImage f A + freimanRealImage f B) + 1 := by
-  refine haff.symm.trans_le ?_
+  apply haff.symm.trans_le
   refine (finsetAffineDim_mono (T := freimanRealImage f A ∪ freimanRealImage f B) ?_).trans ?_
   · intro y hy
     rw [Finset.mem_image] at hy
@@ -307,7 +307,7 @@ lemma sub_mul_sub_choose_le_sum_min (b r : ℕ) :
 lemma sub_mul_sub_choose_le_sum_min_of_le {a b r d : ℕ} (hba : b ≤ a) (hrd : r ≤ d + 1) :
     (r - 1) * b - Nat.choose (r + 1) 2 ≤
       (Finset.Icc 1 (b - 1)).sum (fun t => min d (a - t)) := by
-  refine (sub_mul_sub_choose_le_sum_min b r).trans ?_
+  apply (sub_mul_sub_choose_le_sum_min b r).trans
   apply Finset.sum_le_sum
   intro t ht
   rw [Finset.mem_Icc] at ht
@@ -353,8 +353,8 @@ lemma card_add_lower_bound_of_freimanDim_union {G : Type*} [DecidableEq G] [AddC
   let A₁ := freimanRealImage f A
   let B₁ := freimanRealImage f B
   let d := finsetAffineDim (A₁ + B₁)
-  refine card_add_lower_bound_of_freimanModel (d := d) hiso Finset.subset_union_left
-    Finset.subset_union_right hBA ?_ ?_
+  apply card_add_lower_bound_of_freimanModel (d := d) hiso Finset.subset_union_left
+    Finset.subset_union_right hBA
   · dsimp [d, A₁, B₁]
     exact freimanDim_le_sumsetAffineDim_add_one hiso haff Finset.subset_union_left
       Finset.subset_union_right Finset.Subset.rfl hA hB
@@ -386,8 +386,8 @@ lemma card_add_sum_min_le_of_freimanDim_union {G : Type*} [DecidableEq G] [AddCo
     rw [freimanRealImage, Finset.card_image_of_injective _ rationalVectorToReal_injective,
       Finset.card_image_of_injOn (hiso.bijOn.injOn.mono Finset.subset_union_right)]
   rw [← card_add_freimanRealImage hiso Finset.subset_union_left Finset.subset_union_right]
-  refine le_trans (b := A.card + (Finset.Icc 1 (B₁.card - 1)).sum
-    (fun t => min d (A₁.card - t))) ?_ ?_
+  apply le_trans (b := A.card + (Finset.Icc 1 (B₁.card - 1)).sum
+    (fun t => min d (A₁.card - t)))
   · apply Nat.add_le_add_left
     rw [hBcard]
     apply Finset.sum_le_sum

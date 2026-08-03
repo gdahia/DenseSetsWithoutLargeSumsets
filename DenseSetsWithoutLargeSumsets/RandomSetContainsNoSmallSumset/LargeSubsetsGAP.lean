@@ -57,10 +57,10 @@ private lemma half_threshold_le_image_union_card {γ : ℝ} {q n k : ℕ}
     (hAint : A ⊆ interval n) (hA₀A : A₀ ⊆ A)
     (hA₀large : (1 - ε γ) * (k : ℝ) ≤ (A₀.card : ℝ)) :
     (k : ℝ) / 2 ≤ ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) := by
-  refine (by
+  apply (by
     nlinarith [half_le_one_sub_ε hγ_pos hγ_le, hA₀large,
       (by positivity : 0 ≤ (k : ℝ))] :
-    (k : ℝ) / 2 ≤ (A₀.card : ℝ)).trans ?_
+    (k : ℝ) / 2 ≤ (A₀.card : ℝ)).trans
   exact_mod_cast (by
     rw [← freiman_image_card_eq_of_subset hψ (hA₀A.trans hAint)]
     exact Finset.card_le_card Finset.subset_union_left :
@@ -73,10 +73,10 @@ private lemma image_union_card_le_two_mul_threshold {q n k : ℕ}
     (hAcard : A.card = k) (hBcard : B.card = k)
     (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
     (A₀.image ψ ∪ B₀.image ψ).card ≤ 2 * k := by
-  refine (Finset.card_union_le (A₀.image ψ) (B₀.image ψ)).trans ?_
+  apply (Finset.card_union_le (A₀.image ψ) (B₀.image ψ)).trans
   rw [freiman_image_card_eq_of_subset hψ (hA₀A.trans hAint),
     freiman_image_card_eq_of_subset hψ (hB₀B.trans hBint)]
-  refine (Nat.add_le_add (Finset.card_le_card hA₀A) (Finset.card_le_card hB₀B)).trans ?_
+  apply (Nat.add_le_add (Finset.card_le_card hA₀A) (Finset.card_le_card hB₀B)).trans
   rw [hAcard, hBcard]
   omega
 
@@ -92,11 +92,11 @@ private lemma image_union_card_le_density_coeff_log {γ C c : ℝ} {n q : ℕ}
     (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
     ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) ≤
       2 * densityCoefficient (3 + γ) c * Real.log (n : ℝ) := by
-  refine (by
+  apply (by
     exact_mod_cast image_union_card_le_two_mul_threshold hψ hAint hBint hAcard hBcard hA₀A
       hB₀B :
     ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) ≤
-      ((2 * pairCardThreshold (3 + γ) n δ : ℕ) : ℝ)).trans ?_
+      ((2 * pairCardThreshold (3 + γ) n δ : ℕ) : ℝ)).trans
   rw [Nat.cast_mul]
   norm_num only [Nat.cast_ofNat]
   convert mul_le_mul_of_nonneg_left
@@ -231,9 +231,9 @@ private lemma freimanDim_image_union_le_ε_mul_threshold {γ C : ℝ} {n q : ℕ
     (hdim_bound : freimanDim (A₀.image ψ ∪ B₀.image ψ) ≤ 2 * ⌈κ C⌉₊ - 1) :
     (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) ≤ ε γ * (k : ℝ) := by
   rw [hkdef]
-  refine (by exact_mod_cast hdim_bound :
+  apply (by exact_mod_cast hdim_bound :
     (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) ≤
-      ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ)).trans ?_
+      ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ)).trans
   exact two_mul_ceil_κ_sub_one_le_ε_mul_pairCardThreshold hγ_pos hγ_le hC_one hn_one
     hδ_lower hδ_upper
 
@@ -330,7 +330,7 @@ lemma largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
   refine ⟨P, ?_, ?_, ?_, hPdim, ?_⟩
   · apply (mem_properGAPsZModUpToDim
       (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).pos).2
-    refine ⟨?_, ?_⟩
+    constructor
     · exact (hPdim.trans
         (image_union_freimanDim_le_two_ceil_κ_sub_one hγ_pos hγ_le
           (one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
@@ -349,12 +349,14 @@ lemma largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
       · exact hPcard
   · intro a ha
     rw [zmodGAPPreimageContainer, Finset.mem_filter]
-    refine ⟨hA₀A.trans hAint ha, ?_⟩
+    constructor
+    · exact hA₀A.trans hAint ha
     apply hXP
     exact Finset.mem_union.mpr (Or.inl (Finset.mem_image.2 ⟨a, ha, rfl⟩))
   · intro b hb
     rw [zmodGAPPreimageContainer, Finset.mem_filter]
-    refine ⟨hB₀B.trans hBint hb, ?_⟩
+    constructor
+    · exact hB₀B.trans hBint hb
     apply hXP
     exact Finset.mem_union.mpr (Or.inr (Finset.mem_image.2 ⟨b, hb, rfl⟩))
   · exact image_union_freimanDim_le_two_ceil_κ_sub_one hγ_pos hγ_le
@@ -377,9 +379,9 @@ lemma large_subsets_first_term_lower_by_dim {γ C : ℝ} {n q : ℕ}
     (hdim_bound : freimanDim (A₀.image ψ ∪ B₀.image ψ) ≤ 2 * ⌈κ C⌉₊ - 1) :
     (1 - 3 * ε γ) * (D : ℝ) * (k : ℝ) ≤
       (1 - ε γ) * ((natCastImage A₀ + natCastImage B₀).card : ℝ) := by
-  refine le_trans (b :=
+  apply le_trans (b :=
       (1 - ε γ) *
-        ((1 - 2 * ε γ) * (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) * (k : ℝ))) ?_ ?_
+        ((1 - 2 * ε γ) * (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) * (k : ℝ)))
   · refine le_trans (b :=
         (1 - 3 * ε γ) * (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) * (k : ℝ)) ?_ ?_
     · gcongr
@@ -390,11 +392,11 @@ lemma large_subsets_first_term_lower_by_dim {γ C : ℝ} {n q : ℕ}
           (Nat.cast_nonneg (freimanDim (A₀.image ψ ∪ B₀.image ψ)) :
             (0 : ℝ) ≤ freimanDim (A₀.image ψ ∪ B₀.image ψ))
           (Nat.cast_nonneg k : (0 : ℝ) ≤ k))]
-  refine (mul_le_mul_of_nonneg_left
+  apply (mul_le_mul_of_nonneg_left
     (large_subsets_image_sum_lower hγ_pos hγ_le hC_one hn_one hδ_lower hδ_upper hψ
       hA₀int hB₀int hkdef hkpos hA₀large hB₀large hdim_bound)
     (by
-      exact (by norm_num : (0 : ℝ) ≤ 1 / 2).trans (half_le_one_sub_ε hγ_pos hγ_le))).trans_eq ?_
+      exact (by norm_num : (0 : ℝ) ≤ 1 / 2).trans (half_le_one_sub_ε hγ_pos hγ_le))).trans_eq
   rw [freiman_image_sum_card hψ hA₀int hB₀int, natCastImage_sum_card A₀ B₀]
 
 
