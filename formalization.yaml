@@ -1,0 +1,169 @@
+version: "v0.3"
+
+project:
+  name: "DenseSetsWithoutLargeSumsets"
+  authors:
+    - "Gabriel Dahia"
+  license: "Apache-2.0"
+
+sources:
+  - title: "Dense sets without large sumsets"
+    authors:
+      - "Gabriel Dahia"
+      - "João Pedro Marciano"
+      - "Victor Souza"
+    id: "arXiv:2607.15269v1"
+    type: "preprint"
+    license: "CC-BY-4.0"
+  - title: "A polynomial bound in Freiman's theorem"
+    authors:
+      - "Mei-Chu Chang"
+    id: "doi:10.1215/S0012-7094-02-11331-3"
+    type: "journal article"
+  - title: "Counting sets with small sumset, and the clique number of random Cayley graphs"
+    authors:
+      - "Ben Green"
+    id: "doi:10.1007/s00493-005-0018-2"
+    type: "journal article"
+    journal: "Combinatorica"
+    year: 2005
+    volume: 25
+    issue: 3
+    pages: "307--326"
+  - title: "Sum of sets in several dimensions"
+    authors:
+      - "Imre Z. Ruzsa"
+    id: "doi:10.1007/BF01302969"
+    type: "journal article"
+  - title: "Large sumsets from medium-sized subsets"
+    authors:
+      - "Béla Bollobás"
+      - "Imre Leader"
+      - "Marius Tiba"
+    id: "arXiv:2206.09366v1"
+    type: "preprint"
+    license: "CC-BY-4.0"
+
+status:
+  scope: >-
+    A Lean 4 formalization of the main theorem of "Dense sets without large
+    sumsets", including its probabilistic construction and the estimates for
+    small, moderate, and very large sumsets. The project also formalizes the
+    additive-combinatorics results from Chang, Green, Ruzsa, and
+    Bollobás--Leader--Tiba described in the README.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms:
+    - "propext"
+    - "Classical.choice"
+    - "Quot.sound"
+  main_results:
+    - declaration: "DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets"
+      file: "DenseSetsWithoutLargeSumsets/DenseSubsetsWithoutLargeSumsets.lean"
+      sorry_count: 0
+      axioms:
+        - "propext"
+        - "Classical.choice"
+        - "Quot.sound"
+      literature_dependencies: []
+
+automation:
+  methods:
+    - method: "agent"
+      models:
+        - "gpt-5.6 sol high"
+      framework: "Codex"
+      tool_setup: >-
+        Codex agents guided by the repository's AGENTS.md instructions, with
+        Lean proofs checked using the pinned Lake environment.
+  notes: >-
+
+fidelity:
+  divergences: |-
+    Main theorem: The result is stated in an explicit uniform form using the
+    project-defined density exponent and a fixed positive error parameter gamma.
+    Unlike the paper, the formalization does not change the ambient setting of the
+    small-sumset probability argument from [n] to ZMod q. It maps only the relevant
+    structural subsets into ZMod q, applies the cyclic structural theorem there,
+    and then uses the pullback to [n] of the resulting GAP carrier as the container.
+    Thus the random set, witness pairs, and probability events remain in the
+    original setting throughout.
+
+    Chang: The formalization proves the cyclic small-doubling form needed by the
+    main argument, with the progression dimension bounded by the Freiman dimension.
+    Its derivation also differs from the one used in the source paper: it follows
+    Chang's proof directly in the cyclic setting and transports the constructed
+    progression within ZMod q. In particular, it does not use any input from the
+    Cwalina--Schoen paper or the Campos--Dahia--Marciano paper. The formalization
+    instead supplies its own properization and coordinate-transport stages; this
+    is the source of the quantitative loss described next. Its progression-size
+    estimate is quantitatively weaker than Chang's exp(O(kappa^2 (log kappa)^3))
+    ratio. The formalized ratio is exp(changTheoremExponent kappa), where
+    changTheoremExponent includes a quartic properization and coordinate-transport
+    cost applied to the already coarse changContainerExponent budget.
+
+    Bollobás--Leader--Tiba: The formalization replaces the paper's iterative use of
+    a restricted-sumset cleanup theorem with a simpler proof based on one
+    penalized-potential minimizer. In the small-sumset case it applies directly a
+    small-doubling arithmetic-removal lemma; in the large-sumset case it uses an
+    elementary covering estimate. The normalized theorem retains at least
+    (1 - epsilon / 4) of each original set, improving the paper's (1 - epsilon)
+    bound. With popularity threshold alpha = delta / (36 K), its explicit sampling
+    constant is 36 / (epsilon alpha), replacing the exponential dependence on
+    1 / alpha in the paper's proof by linear dependence. The published statement
+    follows after a harmless rescaling of K and epsilon.
+
+review:
+  status: "self-assessed"
+  reviewers:
+    - "Gabriel Dahia"
+  notes: >-
+    The declarations compile without sorries and their axiom dependencies have
+    been checked. No independent mathematical peer review is recorded here.
+
+alignment:
+  namespace: "DenseSetsWithoutLargeSumsets"
+  statements:
+    - source: "Dense sets without large sumsets, Theorem 1.1"
+      lean: "DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets"
+      module: "DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets"
+      status: "proved"
+      note: >-
+        Keeps the probability argument over subsets of [n]. Images in ZMod q are
+        used only to construct proper GAPs, whose carriers are pulled back along the
+        model embedding to obtain containers in [n].
+    - source: "A polynomial bound in Freiman's theorem, proper-GAP consequence"
+      lean: "DenseSetsWithoutLargeSumsets.exists_properGAP_of_small_sumset"
+      module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction"
+      status: "proved"
+      note: >-
+        Cyclic small-doubling form used by the main proof. Its derivation follows
+        Chang's argument while remaining in ZMod q, without an integer pullback or
+        inputs from Cwalina--Schoen. The dimension bound is preserved, but the
+        progression-size exponent is worse because the coarse container budget is
+        followed by the formalization's quartic properization and transport costs.
+    - source: "Counting sets with small sumset, Sections 3 and 4"
+      lean: "DenseSetsWithoutLargeSumsets.exists_smallRestrictedSumsetFreimanClassCover"
+      module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SmallSumsetIsomorphismClasses.ClassCountBounds"
+      status: "proved"
+      note: >-
+        Representative result from the development of relation classes, core
+        decompositions, dimension bounds, and realization counts.
+    - source: "Sum of sets in several dimensions, main sharp lower bound"
+      lean: "DenseSetsWithoutLargeSumsets.card_add_lower_bound_of_affineDim"
+      module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumOfSetsInSeveralDimensions"
+      status: "proved"
+    - source: "Large sumsets from medium-sized subsets, Theorem 2"
+      lean: "DenseSetsWithoutLargeSumsets.exists_medium_sized_subsets_with_large_sumset_subsets"
+      module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets"
+      status: "proved"
+      note: >-
+        Uses a single penalized-potential minimizer, direct small-doubling arithmetic
+        removal, and an elementary covering argument. The normalized result retains
+        a (1 - epsilon / 4)-fraction and has sampling constant
+        36 / (epsilon alpha) for alpha = delta / (36 K).
+
+acknowledgements: >-
+  Built on Mathlib and the APAP project; APAP supplies additive-combinatorics
+  and discrete-Fourier-analysis infrastructure used in the proof of the weak
+  version of Chang's theorem.
