@@ -41,3 +41,26 @@ Build the project:
 lake exe cache get
 lake build
 ```
+
+## Palomar submission
+
+The repository is packaged for submission to the
+[Palomar registry](https://palomar-registry.org/):
+
+- `Challenge.lean` records the statement of the main theorem. It depends only on Mathlib, and
+  states the theorem with the density exponent quantified existentially rather than as the
+  explicit constant `denseSubsetDensityExponent` used inside the development.
+- `Solution.lean` proves that statement from
+  `DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets`.
+- `comparator.json` is the [Comparator](https://github.com/leanprover/comparator) configuration
+  which checks the two against each other, permitting only the axioms `propext`, `Quot.sound`
+  and `Classical.choice`.
+- `formalization.yaml` holds the registry metadata (schema v0.4).
+
+Both modules are default targets, so `lake build` builds them; the `sorry` warning from
+`Challenge.lean` is expected, since the challenge file states the theorem without proving it.
+With `landrun` and `lean4export` on `PATH`, the pair is checked by:
+
+```bash
+lake env path/to/comparator comparator.json
+```

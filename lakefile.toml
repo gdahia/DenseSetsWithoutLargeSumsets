@@ -1,7 +1,7 @@
 name = "DenseSetsWithoutLargeSumsets"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["DenseSetsWithoutLargeSumsets"]
+defaultTargets = ["DenseSetsWithoutLargeSumsets", "Challenge", "Solution"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -22,3 +22,11 @@ rev = "de5ce8a9a66a4aa68a9bdbb35b63a06d34d9ca11"
 
 [[lean_lib]]
 name = "DenseSetsWithoutLargeSumsets"
+
+# Palomar registry submission: `Challenge` records the statement (Mathlib only),
+# `Solution` proves it from the development.  See `comparator.json`.
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"

@@ -1,10 +1,22 @@
-version: "v0.3"
+version: "v0.4"
 
 project:
   name: "DenseSetsWithoutLargeSumsets"
   authors:
     - "Gabriel Dahia"
+  responsible_maintainers:
+    - "Gabriel Dahia"
   license: "Apache-2.0"
+
+repository:
+  role: "substantive-development"
+
+classification:
+  msc2020:
+    - "11B30"
+    - "11B13"
+  arxiv:
+    - "math.CO"
 
 sources:
   - title: "Dense sets without large sumsets"
@@ -15,11 +27,16 @@ sources:
     id: "arXiv:2607.15269v1"
     type: "preprint"
     license: "CC-BY-4.0"
+    location: "Theorem 1.1"
+    relationship: "formalizes"
+    author_endorsement: "participated"
   - title: "A polynomial bound in Freiman's theorem"
     authors:
       - "Mei-Chu Chang"
     id: "doi:10.1215/S0012-7094-02-11331-3"
     type: "journal article"
+    relationship: "adapts"
+    author_endorsement: "not-contacted"
   - title: "Counting sets with small sumset, and the clique number of random Cayley graphs"
     authors:
       - "Ben Green"
@@ -30,11 +47,16 @@ sources:
     volume: 25
     issue: 3
     pages: "307--326"
+    location: "Sections 3 and 4"
+    relationship: "formalizes"
+    author_endorsement: "not-contacted"
   - title: "Sum of sets in several dimensions"
     authors:
       - "Imre Z. Ruzsa"
     id: "doi:10.1007/BF01302969"
     type: "journal article"
+    relationship: "formalizes"
+    author_endorsement: "not-contacted"
   - title: "Large sumsets from medium-sized subsets"
     authors:
       - "Béla Bollobás"
@@ -43,6 +65,9 @@ sources:
     id: "arXiv:2206.09366v1"
     type: "preprint"
     license: "CC-BY-4.0"
+    location: "Theorem 2"
+    relationship: "adapts"
+    author_endorsement: "not-contacted"
 
 status:
   scope: >-
@@ -50,7 +75,8 @@ status:
     sumsets", including its probabilistic construction and the estimates for
     small, moderate, and very large sumsets. The project also formalizes the
     additive-combinatorics results from Chang, Green, Ruzsa, and
-    Bollobás--Leader--Tiba described in the README.
+    Bollobás--Leader--Tiba described in the README. The registered statement
+    lives in `Challenge.lean` and is proved in `Solution.lean`.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms:
@@ -58,6 +84,15 @@ status:
     - "Classical.choice"
     - "Quot.sound"
   main_results:
+    - declaration: "dense_sets_without_large_sumsets"
+      file: "Solution.lean"
+      comparator_config: "comparator.json"
+      sorry_count: 0
+      axioms:
+        - "propext"
+        - "Classical.choice"
+        - "Quot.sound"
+      literature_dependencies: []
     - declaration: "DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets"
       file: "DenseSetsWithoutLargeSumsets/DenseSubsetsWithoutLargeSumsets.lean"
       sorry_count: 0
@@ -77,6 +112,16 @@ automation:
       tool_setup: >-
         Codex agents guided by the repository's AGENTS.md instructions, with
         Lean proofs checked using the pinned Lake environment.
+    - method: "agent"
+      models:
+        - "claude opus 5"
+      framework: "Claude Code"
+      tool_setup: >-
+        Maintenance phase only: the port to Lean v4.34.0-rc1 (toolchain, Mathlib
+        and APAP bumps, and the resulting proof repairs) and the packaging of the
+        Palomar submission (Challenge.lean, Solution.lean, comparator.json), with
+        Lean proofs checked using the pinned Lake environment. No mathematical
+        content of the formalization was produced in this phase.
   notes: >-
 
 fidelity:
@@ -121,11 +166,28 @@ review:
     - "claude opus 5"
   notes: >-
     The declarations compile without sorries and their axiom dependencies have
-    been checked. No independent mathematical peer review is recorded here.
+    been checked. The statements of `Challenge.lean` and `Solution.lean` were
+    checked to be identical by comparing their fully elaborated types
+    (`set_option pp.all true`); Comparator itself has not been run in the
+    development environment, since `landrun` and `lean4export` are not installed
+    there. No independent mathematical peer review is recorded here.
 
 alignment:
   namespace: "DenseSetsWithoutLargeSumsets"
   statements:
+    - source: "Dense sets without large sumsets, Theorem 1.1"
+      lean: "dense_sets_without_large_sumsets"
+      module: "Solution"
+      challenge_module: "Challenge"
+      status: "proved"
+      note: >-
+        The registered form of the main theorem. It quantifies existentially over
+        the density exponent instead of naming the explicit constant used inside
+        the development, so that the statement in `Challenge.lean` depends only on
+        Mathlib. It is deduced from
+        `DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets` together
+        with `DenseSetsWithoutLargeSumsets.denseSubsetDensityExponent_pos`, which
+        supplies the positivity of that constant.
     - source: "Dense sets without large sumsets, Theorem 1.1"
       lean: "DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets"
       module: "DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets"
