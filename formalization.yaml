@@ -50,7 +50,8 @@ status:
     sumsets", including its probabilistic construction and the estimates for
     small, moderate, and very large sumsets. The project also formalizes the
     additive-combinatorics results from Chang, Green, Ruzsa, and
-    Bollobás--Leader--Tiba described in the README.
+    Bollobás--Leader--Tiba described in the README, together with a reduction of
+    the complementary lower bound to Mathlib's Zarankiewicz function.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms:
@@ -60,6 +61,14 @@ status:
   main_results:
     - declaration: "DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets"
       file: "DenseSetsWithoutLargeSumsets/DenseSubsetsWithoutLargeSumsets.lean"
+      sorry_count: 0
+      axioms:
+        - "propext"
+        - "Classical.choice"
+        - "Quot.sound"
+      literature_dependencies: []
+    - declaration: "DenseSetsWithoutLargeSumsets.exists_pairEvent_of_zarankiewicz_lt"
+      file: "DenseSetsWithoutLargeSumsets/Combinatorics/Additive/SumsetFromZarankiewicz.lean"
       sorry_count: 0
       axioms:
         - "propext"

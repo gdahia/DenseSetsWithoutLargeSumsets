@@ -32,6 +32,10 @@ The repository also develops a substantial amount of reusable additive combinato
   [*Large sumsets from medium-sized subsets*](https://arxiv.org/abs/2206.09366).
 - Supporting results about generalized arithmetic progressions, finite probability spaces,
   binomial random finite sets, and concentration estimates needed for the main argument.
+- A reduction of the complementary *lower* bound — every sufficiently dense $S \subseteq [n]$
+  does contain a sumset $A + B$ with $\min\{|A|, |B|\} \ge k$ — to Mathlib's Zarankiewicz
+  function, obtained by encoding $[n]$ in base $\lfloor\sqrt{n}\rfloor + 1$ as a bipartite
+  relation (`DenseSetsWithoutLargeSumsets.exists_pairEvent_of_zarankiewicz_lt`).
 
 ## Build
 
