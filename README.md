@@ -9,6 +9,19 @@ summands are sufficiently large. The formalization includes the probabilistic co
 the estimates for small, moderate, and very large sumsets which are combined in the final
 theorem `DenseSetsWithoutLargeSumsets.dense_subset_without_large_sumsets`.
 
+Following the introduction of the paper, `DenseSetsWithoutLargeSumsets.phi` is the threshold
+function $\varphi(\delta, N)$: the largest integer $k$ such that *every* $A \subseteq [N]$ with
+$|A| \ge \delta N$ contains a sumset $B + C$ with $B, C \subseteq [N]$ and
+$\min\{|B|, |C|\} \ge k$. Both directions formalized here are bounds on $\varphi$, and the main
+theorem takes the asymptotic form
+`DenseSetsWithoutLargeSumsets.limsup_phi_mul_log_div_log_le_three`:
+
+$$\limsup_{N \to \infty} \frac{\varphi(\delta, N) \log (1 / \delta)}{\log N} \le 3
+\qquad \text{for every fixed } \delta \in (0, 1).$$
+
+It bounds the $\limsup$ rather than only the $\liminf$ because the construction produces a dense
+sumset-free subset of $[N]$ for *every* sufficiently large $N$.
+
 The only dependencies are Mathlib and the [`APAP` project](https://yaeldillies.github.io/apap/),
 where the latter is used for additive combinatorics / discrete Fourier analysis machinery
 in Chang's theorem.
@@ -35,7 +48,8 @@ The repository also develops a substantial amount of reusable additive combinato
 - A reduction of the complementary *lower* bound — every sufficiently dense $S \subseteq [n]$
   does contain a sumset $A + B$ with $\min\{|A|, |B|\} \ge k$ — to Mathlib's Zarankiewicz
   function, obtained by encoding $[n]$ in base $\lfloor\sqrt{n}\rfloor + 1$ as a bipartite
-  relation (`DenseSetsWithoutLargeSumsets.exists_pairEvent_of_zarankiewicz_lt`).
+  relation (`DenseSetsWithoutLargeSumsets.exists_pairEvent_of_zarankiewicz_lt`).  Read through
+  $\varphi$, this is the lower bound `DenseSetsWithoutLargeSumsets.le_phi_of_zarankiewicz_lt`.
 
 ## Build
 

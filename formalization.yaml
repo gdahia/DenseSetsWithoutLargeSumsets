@@ -51,7 +51,9 @@ status:
     small, moderate, and very large sumsets. The project also formalizes the
     additive-combinatorics results from Chang, Green, Ruzsa, and
     Bollobás--Leader--Tiba described in the README, together with a reduction of
-    the complementary lower bound to Mathlib's Zarankiewicz function.
+    the complementary lower bound to Mathlib's Zarankiewicz function, and the
+    threshold function phi(delta, N) of the paper's introduction, through which
+    both directions are stated as bounds on a single quantity.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms:
@@ -69,6 +71,14 @@ status:
       literature_dependencies: []
     - declaration: "DenseSetsWithoutLargeSumsets.exists_pairEvent_of_zarankiewicz_lt"
       file: "DenseSetsWithoutLargeSumsets/Combinatorics/Additive/SumsetFromZarankiewicz.lean"
+      sorry_count: 0
+      axioms:
+        - "propext"
+        - "Classical.choice"
+        - "Quot.sound"
+      literature_dependencies: []
+    - declaration: "DenseSetsWithoutLargeSumsets.limsup_phi_mul_log_div_log_le_three"
+      file: "DenseSetsWithoutLargeSumsets/SumsetThresholdFunction.lean"
       sorry_count: 0
       axioms:
         - "propext"
@@ -143,6 +153,16 @@ alignment:
         Keeps the probability argument over subsets of [n]. Images in ZMod q are
         used only to construct proper GAPs, whose carriers are pulled back along the
         model embedding to obtain containers in [n].
+    - source: "Dense sets without large sumsets, Theorem 1.1, asymptotic form"
+      lean: "DenseSetsWithoutLargeSumsets.limsup_phi_mul_log_div_log_le_three"
+      module: "DenseSetsWithoutLargeSumsets.SumsetThresholdFunction"
+      status: "proved"
+      note: >-
+        Restates the main theorem as the upper bound
+        limsup_N phi(delta, N) log (1 / delta) / log N <= 3 on the threshold
+        function phi of the paper's introduction, for every constant density
+        delta in (0, 1). It is a limsup and not a liminf bound because the
+        construction supplies a witness for every sufficiently large N.
     - source: "A polynomial bound in Freiman's theorem, proper-GAP consequence"
       lean: "DenseSetsWithoutLargeSumsets.exists_properGAP_of_small_sumset"
       module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction"
