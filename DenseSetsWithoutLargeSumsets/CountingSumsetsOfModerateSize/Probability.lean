@@ -266,6 +266,14 @@ private lemma medium_large_exponential_part_le {γ C q c : ℝ} {n k : ℕ}
 def moderateSumsetGapConstant (γ c : ℝ) : ℝ :=
   Real.exp (96 * densityCoefficient (2 + γ) c / γ)
 
+lemma one_le_moderateSumsetGapConstant {γ c : ℝ} (hγ_pos : 0 < γ)
+    (hc_pos : 0 < c) (hc_lt : c < 1) :
+    1 ≤ moderateSumsetGapConstant γ c := by
+  have hq : 1 < densityCoefficient (2 + γ) c :=
+    densityCoefficient_gt_one (by linarith) hc_pos hc_lt
+  rw [moderateSumsetGapConstant, Real.one_le_exp_iff]
+  positivity
+
 private lemma moderateSumsetGapConstant_ge_two_pow_twelve {γ c : ℝ}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 2) (hc_pos : 0 < c) (hc_lt : c < 1) :
     (2 : ℝ) ^ (12 : ℕ) ≤ moderateSumsetGapConstant γ c := by
@@ -490,6 +498,12 @@ private lemma moderateSumsetCardScale_pos (γ c : ℝ) :
   dsimp [moderateSumsetCardScale]
   exact lt_of_lt_of_le (by exact_mod_cast smallSumsetClassCountThreshold_pos)
     (le_max_left _ _)
+
+lemma moderateSumsetDensityExponent_pos {γ c : ℝ} (hγ_pos : 0 < γ) :
+    0 < moderateSumsetDensityExponent γ c := by
+  have hscale := moderateSumsetCardScale_pos γ c
+  rw [moderateSumsetDensityExponent]
+  positivity
 
 private lemma moderateSumsetCardScale_bounds {γ c : ℝ} (hγ_pos : 0 < γ)
     (hc_pos : 0 < c) (hc_lt : c < 1) {k : ℕ}

@@ -139,7 +139,7 @@ private lemma chang_size_threshold_pos (C : ℝ) :
     0 < Real.exp (changContainerExponent (κ C)) :=
   Real.exp_pos _
 
-private lemma lowerDensityExponent_pos_of_one_le {C γ : ℝ} (hγ : 0 < γ) (hC : 1 ≤ C) :
+lemma lowerDensityExponent_pos_of_one_le {C γ : ℝ} (hγ : 0 < γ) (hC : 1 ≤ C) :
     0 < lowerDensityExponent C γ := by
   unfold lowerDensityExponent
   apply div_pos

@@ -268,6 +268,13 @@ def denseSubsetDensityExponent (γ c : ℝ) : ℝ :=
     (min (lowerDensityExponent (moderateSumsetGapConstant (1 + γ) c) γ)
       (moderateSumsetDensityExponent (1 + γ) c))
 
+lemma denseSubsetDensityExponent_pos {γ c : ℝ} (hγ_pos : 0 < γ) (hc_pos : 0 < c)
+    (hc_lt : c < 1) :
+    0 < denseSubsetDensityExponent γ c := by
+  refine lt_min (by norm_num) (lt_min ?_ (moderateSumsetDensityExponent_pos (by linarith)))
+  exact lowerDensityExponent_pos_of_one_le hγ_pos
+    (one_le_moderateSumsetGapConstant (by linarith) hc_pos hc_lt)
+
 /- Formal statement of the final combination proving `stmt:randomMain`.
 
 The remaining threshold selection is isolated in `eventuallyForDensities`; the finite
