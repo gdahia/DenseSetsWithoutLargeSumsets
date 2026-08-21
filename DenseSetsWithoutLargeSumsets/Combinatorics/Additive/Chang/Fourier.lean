@@ -135,7 +135,7 @@ private lemma fourthMoment_changIndicatorComplex
     {G : Type*} [AddCommGroup G] [Fintype G] [DecidableEq G]
     (X : Finset G) :
     𝔼 ψ, ‖dft (changIndicatorComplex X) ψ‖ ^ 4 = boringEnergy 2 X := by
-  letI : MeasurableSpace G := ⊤
+  let : MeasurableSpace G := ⊤
   rw [← cLpNorm_pow_eq_expect_norm (by norm_num)
     (dft (changIndicatorComplex X)), changIndicatorComplex]
   simpa using cLpNorm_dft_indicator_one_pow 2 X
@@ -145,7 +145,7 @@ private lemma secondMoment_changIndicatorComplex
     (X : Finset G) :
     𝔼 ψ, ‖dft (changIndicatorComplex X) ψ‖ ^ 2 = X.card := by
   classical
-  letI : MeasurableSpace G := ⊤
+  let : MeasurableSpace G := ⊤
   rw [← cLpNorm_pow_eq_expect_norm (by norm_num)
     (dft (changIndicatorComplex X)), changIndicatorComplex]
   convert cLpNorm_dft_indicator_one_pow 1 X using 1
@@ -272,7 +272,7 @@ theorem changLargeSpectrum_chord_subset_fourfold
     {x | ∀ ψ ∈ changLargeSpectrum X (Real.sqrt ((8 * κ)⁻¹)),
       ‖1 - ψ x‖ ≤ (1 : ℝ) / 4} ⊆
       ((X + X) - (X + X) : Finset (ZMod q)) := by
-  letI : MeasurableSpace (ZMod q) := ⊤
+  let : MeasurableSpace (ZMod q) := ⊤
   apply spectrum_chord_subset_fourfold X (by norm_num)
   have hκpos : 0 < κ := by linarith
   have hinvpos : 0 < (8 * κ)⁻¹ := inv_pos.mpr (by positivity)
@@ -318,7 +318,7 @@ theorem exists_changLargeSpectrum_generators {q : ℕ} [NeZero q]
         ⌈changConst * Real.exp 1 *
           ⌈1 + Real.log (((X.card : ℝ) / q)⁻¹)⌉₊ / η ^ 2⌉₊ ∧
       changLargeSpectrum X η ⊆ Δ.addSpan := by
-  letI : MeasurableSpace (ZMod q) := ⊤
+  let : MeasurableSpace (ZMod q) := ⊤
   convert chang (changIndicatorComplex_ne_zero hX) hη using 1
   rw [changIndicator_density_parameter, ZMod.card]
   rfl

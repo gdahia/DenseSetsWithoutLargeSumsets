@@ -465,7 +465,7 @@ lemma veryLargeSumsetEvent_measure_le_sum
       ∀ m (p : Finset ℕ × Finset ℕ), p ∈ veryLargeSumsetPairSlice n k m →
         (binomialFinsetSubset (Set.Icc 1 n) δ).real
           {S : Finset ℕ | p.1 + p.2 ⊆ S} ≤ prob m) :
-    (binomialFinsetSubset (Set.Icc 1 n) δ).real (veryLargeSumsetEvent n k) ≤
+    (binomialFinsetSubset (Set.Icc 1 n) δ).real {S : Finset ℕ | veryLargeSumsetEvent n k S} ≤
       ∑ m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
         (n ^ (k + m / k) * Nat.choose (k ^ 3) k : ℝ) * prob m := by
   classical
@@ -764,7 +764,7 @@ lemma veryLargeSumsetEvent_measure_le
     (γ : ℝ) (n : ℕ) (δ : unitInterval)
     (hanalytic : veryLargeSumsetAnalyticBound γ n δ) :
     (binomialFinsetSubset (Set.Icc 1 n) δ).real
-      (veryLargeSumsetEvent n (pairCardThreshold (3 + γ) n δ)) ≤
+      {S : Finset ℕ | veryLargeSumsetEvent n (pairCardThreshold (3 + γ) n δ) S} ≤
       (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
         (n : ℝ) ^ (γ * (pairCardThreshold (3 + γ) n δ : ℝ) / 3) := by
   classical
@@ -789,7 +789,7 @@ theorem very_large_sumset_probability_le
     (hδ_lower : (n : ℝ) ^ (-(1 / 2 : ℝ)) < (δ : ℝ))
     (hδ_upper : (δ : ℝ) ≤ 1 - c) :
     (binomialFinsetSubset (Set.Icc 1 n) δ).real
-      (veryLargeSumsetEvent n (pairCardThreshold (3 + γ) n δ)) ≤
+      {S : Finset ℕ | veryLargeSumsetEvent n (pairCardThreshold (3 + γ) n δ) S} ≤
       (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
         (n : ℝ) ^ (γ * (pairCardThreshold (3 + γ) n δ : ℝ) / 3) := by
   exact veryLargeSumsetEvent_measure_le γ n δ

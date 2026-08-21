@@ -229,7 +229,7 @@ the packed set. This is the structural part of Ruzsa's covering argument, retain
 rather than replacing it by a cardinal estimate. -/
 lemma exists_maximal_disjoint_translates (A Q : Finset G) (hQ : Q.Nonempty) :
     ∃ F ⊆ A, (F : Set G).PairwiseDisjoint (· +ᵥ Q) ∧ A ⊆ F + (Q - Q) := by
-  haveI : ∀ F : Finset G, Decidable ((F : Set G).PairwiseDisjoint (· +ᵥ Q)) :=
+  have : ∀ F : Finset G, Decidable ((F : Set G).PairwiseDisjoint (· +ᵥ Q)) :=
     fun F ↦ Classical.dec _
   set C := {F ∈ A.powerset | (SetLike.coe F).PairwiseDisjoint (· +ᵥ Q)}
   obtain ⟨F, hFmax⟩ := C.exists_maximal (Finset.filter_nonempty_iff.mpr
@@ -354,7 +354,7 @@ theorem exists_chang_batch_packing [Finite G] (A Q : Finset G)
       (Q + batchSum batches).card = Q.card * m ^ batches.length ∧
       F ⊆ A ∧ F.card < m ∧
       A ⊆ F + ((Q + batchSum batches) - (Q + batchSum batches)) := by
-  letI := Fintype.ofFinite G
+  let := Fintype.ofFinite G
   induction hmeasure : Fintype.card G - Q.card using Nat.strong_induction_on generalizing Q with
   | h n ih =>
       obtain ⟨F, hFA, hFdisjoint, hcover⟩ :=

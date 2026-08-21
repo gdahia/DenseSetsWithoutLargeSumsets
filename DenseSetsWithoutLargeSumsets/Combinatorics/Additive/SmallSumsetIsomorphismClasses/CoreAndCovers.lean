@@ -438,13 +438,13 @@ lemma freimanEquivalent_of_canonicalCode_eq {s t : ℕ} (ht : 0 < t) (X Y : Size
   have hrelations : ∀ p : FreimanRelationIndex s t,
       freimanRelationHolds a p ↔ freimanRelationHolds b p :=
     freimanRelations_iff_of_code_eq ht hcode'
-  haveI : Nonempty (Fin t) := ⟨⟨0, ht⟩⟩
+  have : Nonempty (Fin t) := ⟨⟨0, ht⟩⟩
   classical
   let f : ℕ → ℕ := fun x =>
     if hx : x ∈ Set.range a then b (Function.invFun a x) else 0
   have hf_on_range (i : Fin t) : f (a i) = b i := by
     dsimp [f]
-    rw [if_pos (Set.mem_range_self i), Function.leftInverse_invFun ha_inj]
+    rw [ite_eq_left (Set.mem_range_self i), Function.leftInverse_invFun ha_inj]
   unfold FreimanEquivalent
   use f
   rw [ha_range, hb_range]
@@ -481,14 +481,14 @@ lemma freimanEquivalent_of_canonicalCode_eq {s t : ℕ} (ht : 0 < t) (X Y : Size
       apply Multiset.map_congr rfl
       intro x hx
       dsimp [f]
-      rw [if_pos (hu_range x hx)]
+      rw [ite_eq_left (hu_range x hx)]
     have hv_map_f_eq_map_b : v.map f = v'.map b := by
       dsimp only [v']
       rw [Multiset.map_map]
       apply Multiset.map_congr rfl
       intro x hx
       dsimp [f]
-      rw [if_pos (hv_range x hx)]
+      rw [ite_eq_left (hv_range x hx)]
     let Lu := u'.sort (· ≤ ·)
     let Lv := v'.sort (· ≤ ·)
     have hLu_len : Lu.length = s := by
@@ -585,7 +585,7 @@ lemma freimanEquivalent_implies_freimanRelationEquivalent {s t : ℕ} (ht : 0 < 
         exact Set.mem_range_self _)
       (by simp [u]) (by simp [v])
     simpa [u, v, Finset.sum_map_val, List.sum_ofFn, Function.comp_apply] using hsum.symm
-  haveI : Nonempty (Fin t) := ⟨⟨0, ht⟩⟩
+  have : Nonempty (Fin t) := ⟨⟨0, ht⟩⟩
   let e_raw : Fin t → Fin t := fun i => Function.invFun b ((f ∘ a) i)
   have h_e_b (i : Fin t) : b (e_raw i) = (f ∘ a) i := by
     apply Function.invFun_eq
@@ -695,7 +695,7 @@ lemma exists_extensionFreimanClassCover (base : Finset ℕ) (d : ℕ)
           ∀ p : FreimanRelationIndex 4 l,
             freimanRelationHolds (extensionBaseTuple (label X)) p ↔
               freimanRelationHolds (finsetTuple base hbase_card_val) p := by
-      simp only [label, dif_pos hX]
+      simp only [label, dite_eq_left hX]
       exact Classical.choose_spec (h_exists_label X hX)
     have hbound : (S.image fun X =>
         canonicalFreimanRelationCode (s := 2) hl_d_pos X).card ≤
@@ -746,7 +746,7 @@ lemma exists_extensionFreimanClassCover (base : Finset ℕ) (d : ℕ)
     refine ⟨Y.1, ?_, ?_⟩
     · apply Finset.mem_image.mpr
       refine ⟨canonicalFreimanRelationCode (s := 2) hl_d_pos X, hcode, ?_⟩
-      simp only [pick, dif_pos hcode]
+      simp only [pick, dite_eq_left hcode]
       rfl
     · exact freimanEquivalent_of_canonicalCode_eq hl_d_pos X Y hY_spec.2.symm
   · exact Finset.card_image_le.trans hcodes_card_le
@@ -847,12 +847,12 @@ lemma exists_remainderFreimanClassCover (core : Finset ℕ) (u : ℕ)
         apply Finset.mem_image.mpr
         refine ⟨canonicalFreimanRelationCode (s := 4) hu_pos X, hcode_finset, ?_⟩
         dsimp [pick]
-        rw [dif_pos hcode_finset]
+        rw [dite_eq_left hcode_finset]
       refine ⟨Y.1, hY_rep, ?_⟩
       exact freimanEquivalent_of_canonicalCode_eq (s := 4) hu_pos X Y hY_spec.2.symm
     · intro R hR
       rcases Finset.mem_image.mp hR with ⟨code, hcode, rfl⟩
-      simp only [pick, dif_pos hcode]
+      simp only [pick, dite_eq_left hcode]
       exact (chosen code hcode).2
     · exact Finset.card_image_le.trans hcodes_card_le
 
@@ -924,13 +924,13 @@ private lemma exists_exactSmallCoreFreimanClassCover (l m : ℕ) (hl : 0 < l) :
     refine ⟨Y.1, ?_, ?_⟩
     · apply Finset.mem_image.mpr
       refine ⟨code, hcode, ?_⟩
-      simp only [pick, dif_pos hcode]
+      simp only [pick, dite_eq_left hcode]
       rfl
     · exact freimanEquivalent_of_canonicalCode_eq (s := 8) hl X Y
         (Classical.choose_spec (h_exists code hcode)).2.symm
   · intro C hC
     rcases Finset.mem_image.mp hC with ⟨code, hcode, rfl⟩
-    simp only [pick, dif_pos hcode]
+    simp only [pick, dite_eq_left hcode]
     exact ⟨(Classical.choose (h_exists code hcode)).2,
       (Classical.choose_spec (h_exists code hcode)).1⟩
   · calc
@@ -1043,14 +1043,14 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
   have hcore_cover (l : ℕ) (hl : 0 < l) :
       CoversFreimanClasses 8
         {A | A.card = l ∧ (restrictedSumset A).card ≤ m} (coreReps l) := by
-    simpa only [coreReps, dif_pos hl] using (coreCover l hl).2.1
+    simpa only [coreReps, dite_eq_left hl] using (coreCover l hl).2.1
   have hcore_spec (l : ℕ) (hl : 0 < l) (C : Finset ℕ) (hC : C ∈ coreReps l) :
       C.card = l ∧ (restrictedSumset C).card ≤ m := by
-    simp only [coreReps, dif_pos hl] at hC
+    simp only [coreReps, dite_eq_left hl] at hC
     exact (coreCover l hl).2.2.1 C hC
   have hcore_card (l : ℕ) (hl : 0 < l) :
       (coreReps l).card ≤ l ^ (16 * l) := by
-    simpa only [coreReps, dif_pos hl] using (coreCover l hl).2.2.2
+    simpa only [coreReps, dite_eq_left hl] using (coreCover l hl).2.2.2
   let RemainderCover (C : Finset ℕ) (u : ℕ) := { representatives : Finset (Finset ℕ) //
     CoversFreimanClasses 4 (remaindersFromCoreClass C u) representatives ∧
       (∀ R ∈ representatives, R.card = u) ∧
@@ -1065,17 +1065,17 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
     else ∅
   have hremainder_cover (C : Finset ℕ) (u : ℕ) (hC : C.Nonempty) :
       CoversFreimanClasses 4 (remaindersFromCoreClass C u) (remainderReps C u) := by
-    simpa only [remainderReps, dif_pos hC] using (remainderCover C u hC).2.1
+    simpa only [remainderReps, dite_eq_left hC] using (remainderCover C u hC).2.1
   have hremainder_spec (C : Finset ℕ) (u : ℕ) (hC : C.Nonempty)
       (R : Finset ℕ) (hR : R ∈ remainderReps C u) : R.card = u := by
-    simp only [remainderReps, dif_pos hC] at hR
+    simp only [remainderReps, dite_eq_left hC] at hR
     exact (remainderCover C u hC).2.2.1 R hR
   have hremainder_card (C : Finset ℕ) (u : ℕ) :
       (remainderReps C u).card ≤ (restrictedSumset C).card.choose u := by
     by_cases hC : C.Nonempty
-    · simp only [remainderReps, dif_pos hC]
+    · simp only [remainderReps, dite_eq_left hC]
       exact (remainderCover C u hC).2.2.2
-    · simp only [remainderReps, dif_neg hC, Finset.card_empty, Nat.zero_le]
+    · simp only [remainderReps, dite_eq_right hC, Finset.card_empty, Nat.zero_le]
   let ExtensionCover (R : Finset ℕ) (d : ℕ) := { representatives : Finset (Finset ℕ) //
     CoversFreimanClasses 2 (extensionsOfFreimanClass R d) representatives ∧
       representatives.card ≤ (1 + R.card ^ 4) ^ ((d + 1) ^ 4) }
@@ -1089,13 +1089,13 @@ lemma exists_smallRestrictedSumsetFreimanClassCover_raw (t m : ℕ)
     else ∅
   have hextension_cover (R : Finset ℕ) (d : ℕ) (hR : R.Nonempty) :
       CoversFreimanClasses 2 (extensionsOfFreimanClass R d) (extensionReps R d) := by
-    simpa only [extensionReps, dif_pos hR] using (extensionCover R d hR).2.1
+    simpa only [extensionReps, dite_eq_left hR] using (extensionCover R d hR).2.1
   have hextension_card (R : Finset ℕ) (d : ℕ) :
       (extensionReps R d).card ≤ (1 + R.card ^ 4) ^ ((d + 1) ^ 4) := by
     by_cases hR : R.Nonempty
-    · simp only [extensionReps, dif_pos hR]
+    · simp only [extensionReps, dite_eq_left hR]
       exact (extensionCover R d hR).2.2
-    · simp only [extensionReps, dif_neg hR, Finset.card_empty, Nat.zero_le]
+    · simp only [extensionReps, dite_eq_right hR, Finset.card_empty, Nat.zero_le]
   let representatives := (Finset.range (exceptionCardBound t m + 1)).biUnion fun d =>
     (Finset.Icc 1 (coreCardBound t m)).biUnion fun l =>
       (coreReps l).biUnion fun C =>

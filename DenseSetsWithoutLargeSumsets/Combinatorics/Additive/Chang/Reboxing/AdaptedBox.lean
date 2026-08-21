@@ -61,7 +61,7 @@ lemma centeredBoxGAP_proper (step : Fin s → (Fin s → ℤ)) (m : Fin s → �
     (hinj : Function.Injective (stepsHom step)) :
     (centeredBoxGAP step m).Proper := by
   intro w₁ w₂ hw
-  rw [centeredBoxGAP_gapMap, centeredBoxGAP_gapMap] at hw
+  rw [centeredBoxGAP_gapMap step m w₁, centeredBoxGAP_gapMap step m w₂] at hw
   have hcoords := hinj hw
   funext i
   apply Fin.ext

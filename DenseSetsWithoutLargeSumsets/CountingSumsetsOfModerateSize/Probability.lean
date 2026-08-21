@@ -89,14 +89,14 @@ private lemma moderateSumsetEvent_measure_le_sum
         let ℙ : MeasureTheory.Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
         ℙ.real {S : Finset ℕ | Y ⊆ S} ≤ prob m) :
     let ℙ : MeasureTheory.Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
-    ℙ.real (moderateSumsetEvent n k C) ≤
+    ℙ.real {S : Finset ℕ | moderateSumsetEvent n k C S} ≤
       ∑ m ∈ moderateSumsetCardRange k C, ((pairSumsetsFamily n k m).ncard : ℝ) * prob m := by
   classical
   let ℙ : MeasureTheory.Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
   let M : Finset ℕ := moderateSumsetCardRange k C
   let E : ℕ → Set (Finset ℕ) := fun m =>
     ⋃ Y ∈ moderateSumsetSumsetSlice n k m, {S : Finset ℕ | Y ⊆ S}
-  change ℙ.real (moderateSumsetEvent n k C) ≤
+  change ℙ.real {S : Finset ℕ | moderateSumsetEvent n k C S} ≤
     ∑ m ∈ M, ((pairSumsetsFamily n k m).ncard : ℝ) * prob m
   apply le_trans (b := ℙ.real (⋃ m ∈ M, E m))
   · rw [MeasureTheory.measureReal_def, MeasureTheory.measureReal_def]
@@ -153,7 +153,7 @@ private lemma moderateSumsetEvent_measure_le_of_slice_bound
       ∀ m ∈ moderateSumsetCardRange k C,
         ((pairSumsetsFamily n k m).ncard : ℝ) * (δ : ℝ) ^ m ≤ B) :
     let ℙ : MeasureTheory.Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
-    ℙ.real (moderateSumsetEvent n k C) ≤
+    ℙ.real {S : Finset ℕ | moderateSumsetEvent n k C S} ≤
       2 * (k : ℝ) ^ 2 * B := by
   classical
   let ℙ : MeasureTheory.Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
@@ -671,7 +671,7 @@ theorem moderate_sumset_probability_le
     let k := pairCardThreshold (2 + γ) n δ
     let C := moderateSumsetGapConstant γ c
     let ℙ : MeasureTheory.Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
-    ℙ.real (moderateSumsetEvent n k C) ≤
+    ℙ.real {S : Finset ℕ | moderateSumsetEvent n k C S} ≤
       2 * (k : ℝ) ^ 2 / (n : ℝ) ^ (γ * C / 2) := by
   let R := moderateSumsetCardScale γ c
   let α := moderateSumsetDensityExponent γ c

@@ -124,7 +124,7 @@ theorem exists_proper_GAP_reboxing_image_realBox {d s : ℕ} (m : Fin d → ℕ)
   let L : AddSubgroup (Fin s → ℝ) :=
     (⊤ : AddSubgroup (Fin s → ℤ)).map
       (BoxLattice.intCastHom : (Fin s → ℤ) →+ (Fin s → ℝ))
-  letI : DiscreteTopology L := BoxLattice.discreteTopology_map ⊤
+  let : DiscreteTopology L := BoxLattice.discreteTopology_map ⊤
   let B := Classical.choice <|
     exists_gaugeControlledLatticeBox_aux s L K (by simp)
       ((BoxLattice.convex_realBox m).linear_image π) hcompact.isClosed
@@ -553,7 +553,7 @@ lemma smithQuotientMap_lift {d n : ℕ} {S : Finset (Fin d → ℤ)}
     ?_ (fun h ↦ absurd (Finset.mem_univ i) h)).trans ?_
   · intro k _ hki
     rw [Finsupp.applyAddHom_apply, Finsupp.single_apply,
-      if_neg fun h ↦ hki (hinj (Subtype.ext h))]
+      ite_eq_right fun h ↦ hki (hinj (Subtype.ext h))]
   · rw [Finsupp.applyAddHom_apply, Finsupp.single_eq_same]
 
 lemma smithQuotientMap_eq_zero_iff {d n : ℕ} {S : Finset (Fin d → ℤ)}
@@ -624,7 +624,7 @@ lemma smithRealQuotientMap_surjective {d n : ℕ} {S : Finset (Fin d → ℤ)}
   rw [Finset.sum_eq_single i]
   · simp
   · intro k _ hki
-    rw [if_neg fun h ↦ hki ((smithComplementEquiv snf.f).injective (Subtype.ext h)),
+    rw [ite_eq_right fun h ↦ hki ((smithComplementEquiv snf.f).injective (Subtype.ext h)),
       mul_zero]
   · simp
 

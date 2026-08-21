@@ -95,8 +95,8 @@ at most `(q - 1) / m`, so at most `(|D| - 1) * ((q - 1) / m) < q - 1` dilations 
 altogether. -/
 lemma exists_isGoodDilation (hq : q.Prime) {D : Finset (ZMod q)} (h0 : (0 : ZMod q) ∈ D)
     (hD : D.card ≤ m) : ∃ l : ZMod q, l ≠ 0 ∧ IsGoodDilation m D l := by
-  haveI : NeZero q := ⟨hq.pos.ne'⟩
-  haveI := Fact.mk hq
+  have : NeZero q := ⟨hq.pos.ne'⟩
+  have := Fact.mk hq
   have hq2 : 2 ≤ q := hq.two_le
   have hDpos : 0 < D.card := Finset.card_pos.2 ⟨0, h0⟩
   have hcard : ((D.erase 0).biUnion fun d ↦ (dvdResidues q m).image (· * d⁻¹)).card
@@ -345,8 +345,8 @@ theorem exists_ruzsa_model {q s m : ℕ} (hq : q.Prime) (hs : 0 < s) {X : Finset
     (hX : X.Nonempty) (hm : (s • X - s • X).card ≤ m) :
     ∃ X₁ ⊆ X, X.card ≤ s * X₁.card ∧ ∃ φ : ZMod q → ZMod m,
       IsAddFreimanIso s (X₁ : Set (ZMod q)) (X₁.image φ : Set (ZMod m)) φ := by
-  haveI : NeZero q := ⟨hq.pos.ne'⟩
-  haveI := Fact.mk hq
+  have : NeZero q := ⟨hq.pos.ne'⟩
+  have := Fact.mk hq
   have := hq.two_le
   obtain ⟨l, hl0, hgood⟩ := exists_isGoodDilation hq (zero_mem_nsmul_sub_nsmul hX s) hm
   obtain ⟨L, hL, hcover, hwrap⟩ : ∃ L, 0 < L ∧ q ≤ s * L ∧ s * L < q + s := by

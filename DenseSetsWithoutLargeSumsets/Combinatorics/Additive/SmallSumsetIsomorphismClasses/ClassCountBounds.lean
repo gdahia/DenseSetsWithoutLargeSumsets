@@ -574,7 +574,7 @@ lemma ncard_freimanClassRealizations_le (n r t : ℕ) (representative : Finset �
     norm_num only [Nat.cast_zero]
     exact pow_nonneg (Nat.cast_nonneg n : (0 : ℝ) ≤ n) _
   · let Member := {X : Finset ℕ // X ∈ family}
-    letI : Fintype Member := hfinite.fintype
+    let : Fintype Member := hfinite.fintype
     let X₀ : Member := ⟨Classical.choose (Set.nonempty_iff_ne_empty.mpr hfamily),
       Classical.choose_spec (Set.nonempty_iff_ne_empty.mpr hfamily)⟩
     have hX₀_card : X₀.1.card = t := X₀.2.2.1

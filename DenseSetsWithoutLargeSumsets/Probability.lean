@@ -125,12 +125,12 @@ lemma binomialFinsetSubset_real_superset_nat
           intro x hxΩfin
           have hxΩ : x ∈ Ω := hΩ.mem_toFinset.mp hxΩfin
           by_cases hxF : x ∈ F
-          · rw [if_pos hxF]
+          · rw [ite_eq_left hxF]
             have : x ∈ g S := by
               rw [hSF]
               exact hxF
             simpa [g, hxΩ] using this
-          · rw [if_neg hxF]
+          · rw [ite_eq_right hxF]
             intro hxS
             have : x ∈ g S := by simp [g, hxS, hxΩ]
             rw [hSF] at this
@@ -219,12 +219,12 @@ lemma binomialFinsetSubset_real_singleton_nat_of_subset
           intro x hxΩfin
           have hxΩ : x ∈ Ω := hΩ.mem_toFinset.mp hxΩfin
           by_cases hxF : x ∈ F
-          · rw [if_pos hxF]
+          · rw [ite_eq_left hxF]
             have : x ∈ g S := by
               rw [hSF]
               exact hxF
             simpa [g, hxΩ] using this
-          · rw [if_neg hxF]
+          · rw [ite_eq_right hxF]
             intro hxS
             have : x ∈ g S := by simp [g, hxS, hxΩ]
             rw [hSF] at this
@@ -1301,7 +1301,7 @@ private lemma binomialFinsetSubset_real_dense_event_eq_upperTail
         {S : Finset ℕ | ((S : Finset ℕ) : Set ℕ) ⊆ Set.Icc 1 n ∧
           ⌈(δ : ℝ) * (n : ℝ)⌉₊ ≤ S.card} := by
     ext S
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     have hsubset :
         S ⊆ interval n ↔ ((S : Finset ℕ) : Set ℕ) ⊆ Set.Icc 1 n := by
       unfold interval

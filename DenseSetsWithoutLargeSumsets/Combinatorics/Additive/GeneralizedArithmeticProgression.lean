@@ -97,11 +97,11 @@ private lemma encodeGapAsParams_injective {q d s : ℕ} :
 
 private lemma properGAPsZModOfDimSet_finite {q : ℕ} (d s : ℕ) (hq : 0 < q) :
     (properGAPsZModOfDimSet q d s).Finite := by
-  haveI : NeZero q := ⟨Nat.ne_of_gt hq⟩
-  haveI : Finite (gapEncodingParams q d s) := by
+  have : NeZero q := ⟨Nat.ne_of_gt hq⟩
+  have : Finite (gapEncodingParams q d s) := by
     dsimp [gapEncodingParams]
     infer_instance
-  haveI : Finite (properGAPsZModOfDimSet q d s) :=
+  have : Finite (properGAPsZModOfDimSet q d s) :=
     Finite.of_injective
       (fun P : properGAPsZModOfDimSet q d s =>
         encodeGapAsParams P.1 P.2.1 (by exact_mod_cast P.2.2))
@@ -118,7 +118,7 @@ private lemma encodeGapAsParams_card {q d s : ℕ} [NeZero q] :
 
 lemma properGAPsZModOfDim_card {q d s : ℕ} (_hs : 0 < s) (hq : 0 < q) :
     (properGAPsZModOfDim d s hq).card ≤ q ^ (d + 1) * s ^ d := by
-  haveI : NeZero q := ⟨Nat.ne_of_gt hq⟩
+  have : NeZero q := ⟨Nat.ne_of_gt hq⟩
   rw [properGAPsZModOfDim,
     ← Set.ncard_eq_toFinset_card (properGAPsZModOfDimSet q d s)
       (properGAPsZModOfDimSet_finite d s hq)]

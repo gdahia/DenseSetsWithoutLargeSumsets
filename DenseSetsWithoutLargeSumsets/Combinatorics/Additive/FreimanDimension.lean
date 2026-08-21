@@ -106,7 +106,7 @@ lemma le_freimanDim_of_model {G : Type*} [DecidableEq G] [AddCommMonoid G]
 lemma finsetAffineDim_add_one_le_card {d : ℕ} (S : Finset (Fin d → ℝ))
     (hS : S.Nonempty) : finsetAffineDim S + 1 ≤ S.card := by
   classical
-  letI : Nonempty S := hS.to_subtype
+  let : Nonempty S := hS.to_subtype
   let p : S → (Fin d → ℝ) := Subtype.val
   have hp : Set.range p = (S : Set (Fin d → ℝ)) := by
     ext x

@@ -68,7 +68,7 @@ lemma exists_hasIndependentShort_dim {q : ℕ} (hq : q ≠ 0) (P : GAP (ZMod q))
     intro c hc k
     have hk := congr_fun hc k
     simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_zero,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true, Pi.zero_apply] at hk
+      Finset.sum_ite_eq, Finset.mem_univ, ite_true, Pi.zero_apply] at hk
     exact (mul_eq_zero.mp hk).resolve_right (Int.natCast_ne_zero.mpr hq)
   · intro k
     constructor
@@ -271,7 +271,7 @@ lemma mem_saturatedSpan_shortRelations {q : ℕ} (hq : q ≠ 0)
 /-- Multiples of a nonzero element of a prime cyclic group are distinct below the modulus. -/
 lemma nsmul_left_injective_of_ne_zero {q : ℕ} (hq : Nat.Prime q) {a : ZMod q} (ha : a ≠ 0)
     {m n : ℕ} (hm : m < q) (hn : n < q) (h : m • a = n • a) : m = n := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   rw [nsmul_eq_mul, nsmul_eq_mul] at h
   rw [← ZMod.val_cast_of_lt hm, ← ZMod.val_cast_of_lt hn, mul_right_cancel₀ ha h]
 
@@ -285,7 +285,7 @@ theorem saturatedSpan_shortRelations_le_relations {q r : ℕ} (hq : Nat.Prime q)
     (hshort : ∀ j, IsShort P.halfWidth 3 (v j)) (hrd : r ≤ P.dim)
     (hroom : (2 * (3 * P.dim) + 1) ^ P.dim * P.carrier.card < q) :
     (saturatedSpan (Finset.univ.image v)).toAddSubgroup ≤ P.relations := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   intro x hx
   change stepHom P x = 0
   by_contra hxne
@@ -403,7 +403,7 @@ lemma smithQuotientIntegerPoints_finite (P : GAP G) {n : ℕ}
     (P.smithQuotientIntegerPoints snf).Finite := by
   let L : AddSubgroup (Fin (P.dim - n) → ℝ) :=
     (⊤ : AddSubgroup (Fin (P.dim - n) → ℤ)).map BoxLattice.intCastHom
-  letI : DiscreteTopology L := BoxLattice.discreteTopology_map ⊤
+  let : DiscreteTopology L := BoxLattice.discreteTopology_map ⊤
   have hinter : (P.smithQuotientBody snf ∩
       (L : Set (Fin (P.dim - n) → ℝ))).Finite :=
     Metric.finite_isBounded_inter_isClosed DiscreteTopology.isDiscrete

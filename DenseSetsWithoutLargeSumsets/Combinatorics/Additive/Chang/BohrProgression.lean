@@ -93,7 +93,7 @@ lemma hasIndependentShort_freqLattice (r : Fin k → ZMod q) {D : ℕ} (hq : 0 <
     intro c hc i
     have hi := congr_fun hc i
     simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_zero,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true, Pi.zero_apply] at hi
+      Finset.sum_ite_eq, Finset.mem_univ, ite_true, Pi.zero_apply] at hi
     exact (mul_eq_zero.mp hi).resolve_right (Int.natCast_ne_zero.mpr hq.ne')
   · intro i
     constructor
@@ -216,7 +216,7 @@ lemma proper_symmetricGAP
     omega
   funext i
   have := h _ hbound hrel i
-  simp only [Pi.sub_apply] at this
+  change ((w i : ℕ) : ℤ) - (L i : ℤ) - (((w' i : ℕ) : ℤ) - (L i : ℤ)) = 0 at this
   exact Fin.ext (by omega)
 
 end SymmetricGAP

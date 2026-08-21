@@ -31,7 +31,7 @@ lemma effectiveLatticeMap_eq_on {y : Fin d → ℤ} (hy : y ∈ latticeDomain D)
     effectiveLatticeMap D y =
       integerGeneratedLatticeCoordHom D (latticeEmbed D ⟨y, hy⟩) := by
   unfold effectiveLatticeMap
-  rw [dif_pos hy]
+  rw [dite_eq_left hy]
 
 lemma intVectorToReal_effectiveLatticeMap {y : Fin d → ℤ} (hy : y ∈ latticeDomain D) :
     intVectorToReal (effectiveLatticeMap D y) =

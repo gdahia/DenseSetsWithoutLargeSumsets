@@ -88,7 +88,7 @@ noncomputable def latticeModelMap (y : Fin d → ℤ) :
 lemma latticeModelMap_eq_on {y : Fin d → ℤ} (hy : y ∈ latticeDomain S) :
     latticeModelMap S y = modelMapOnLattice S ⟨y, hy⟩ := by
   unfold latticeModelMap
-  rw [dif_pos hy]
+  rw [dite_eq_left hy]
 
 lemma latticeModelMap_injective_on :
     Set.InjOn (latticeModelMap S) (latticeDomain S) := by

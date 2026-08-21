@@ -50,7 +50,7 @@ theorem exists_gaugeControlledLatticeBox_aux :
       simpa [gaugeReboxingDilation] using gaugeControlledLatticeBoxZero L K hrank
   | succ m ih =>
       intro E _ _ _ L _ K hrank hconv hclosed hK₀ hbdd hsymm hspan
-      haveI : Nontrivial E := Module.nontrivial_of_finrank_eq_succ hrank
+      have : Nontrivial E := Module.nontrivial_of_finrank_eq_succ hrank
       have hex : ∃ x, x ∈ K ∧ x ∈ L ∧ x ≠ 0 := by
         by_contra! hcon
         have hbot : Submodule.span ℝ (K ∩ (L : Set E)) = ⊥ := by
@@ -107,7 +107,7 @@ theorem exists_gaugeControlledLatticeBox_aux :
             (Submodule.projection_apply_mem hcompl y), sub_self]
         obtain ⟨s, hs⟩ := Submodule.mem_span_singleton.mp hmem
         exact ⟨s, hs.symm⟩
-      haveI : DiscreteTopology (L.map (π : E →+ W)) := by
+      have : DiscreteTopology (L.map (π : E →+ W)) := by
         apply discreteTopology_of_exists_pos_forall_norm_lt
         obtain ⟨r, hrpos, hr⟩ :=
           exists_pos_forall_norm_apply_lt (L := L) p hvL hpv hsplit

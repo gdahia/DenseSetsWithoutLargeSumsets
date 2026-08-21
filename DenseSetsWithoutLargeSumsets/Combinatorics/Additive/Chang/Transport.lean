@@ -43,7 +43,7 @@ noncomputable def latticeIntMap (y : Fin d → ℤ) :
 lemma latticeIntMap_eq_on {y : Fin d → ℤ} (hy : y ∈ latticeDomain S) :
     latticeIntMap S y = integerGeneratedLatticeCoordHom S (latticeEmbed S ⟨y, hy⟩) := by
   unfold latticeIntMap
-  rw [dif_pos hy]
+  rw [dite_eq_left hy]
 
 lemma latticeIntMap_injective_on : Set.InjOn (latticeIntMap S) (latticeDomain S) := by
   intro a ha b hb h
@@ -296,7 +296,7 @@ lemma mem_sliceCoords_iff {P : GAP G} {S : Finset (Fin P.dim → ℤ)}
     by_cases hdom : w ∈ latticeDomain S
     · rw [intVectorToReal_latticeIntMap S hdom]
       exact ⟨latticeEmbed S ⟨w, hdom⟩, intVectorToReal_mem_realSymBox hw, rfl⟩
-    · rw [latticeIntMap, dif_neg hdom, intVectorToReal_zero]
+    · rw [latticeIntMap, dite_eq_right hdom, intVectorToReal_zero]
       exact zero_mem_sliceBody P S
   · rintro ⟨p, hp, hep⟩
     have hcoord : integerGeneratedCoordinateEquiv S (latticePoint S v) = intVectorToReal v := by
@@ -351,7 +351,7 @@ theorem exists_proper_GAP_reboxing_sliceCoords
   let L : AddSubgroup (Fin r → ℝ) :=
     (⊤ : AddSubgroup (Fin r → ℤ)).map
       (BoxLattice.intCastHom : (Fin r → ℤ) →+ (Fin r → ℝ))
-  letI : DiscreteTopology L := BoxLattice.discreteTopology_map ⊤
+  let : DiscreteTopology L := BoxLattice.discreteTopology_map ⊤
   have hsymm : ∀ x, x ∈ sliceBody P S ↔ -x ∈ sliceBody P S := by
     intro x
     exact ⟨neg_mem_sliceBody, fun hx ↦ by simpa using neg_mem_sliceBody hx⟩

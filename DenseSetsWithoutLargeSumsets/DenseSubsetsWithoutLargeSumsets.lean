@@ -119,7 +119,7 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
       small_sumset_pair_probability_le (γ := γ) (C := C) (c := c)
         hγ_pos hγ_le hC_pos hc_pos hn_low hδ_lower_low hδ_upper
   · change (binomialFinsetSubset (Set.Icc 1 n) δ).real
-        (moderateSumsetEvent n k C) ≤ _
+        {S : Finset ℕ | moderateSumsetEvent n k C S} ≤ _
     convert moderate_sumset_probability_le hγ_mid_pos hγ_mid_le hc_pos (by omega)
       hδ_lower_mid hδ_upper using 1
     all_goals
@@ -128,7 +128,7 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
       | dsimp [k, C]
         ring_nf
   · change (binomialFinsetSubset (Set.Icc 1 n) δ).real
-        (veryLargeSumsetEvent n k) ≤ _
+        {S : Finset ℕ | veryLargeSumsetEvent n k S} ≤ _
     simpa [largeSumsetEvent, k] using
       very_large_sumset_probability_le hγ_pos hγ_le hc_pos hn_large
         (by

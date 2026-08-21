@@ -232,14 +232,14 @@ private theorem exists_model_gap {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
         (Q₁.dim : ℝ) ≤ (changGapDim κ : ℝ) ∧
         Q₁.carrier ⊆ (X + X) - (X + X) ∧
         (X.card : ℝ) ≤ 8 * 2 ^ (12 * changGapDim κ ^ 2) * Q₁.carrier.card := by
-  haveI : NeZero q := ⟨hq.pos.ne'⟩
+  have : NeZero q := ⟨hq.pos.ne'⟩
   have hκ0 : (0 : ℝ) < κ := by linarith
   have hXpos : (0 : ℝ) < X.card := (Real.exp_pos _).trans hXlower
   have hXne : X.Nonempty := Finset.card_pos.1 (by exact_mod_cast hXpos)
   -- Stage M: the Ruzsa model
   obtain ⟨m, X₁, φ, hm0, hmle, hX₁X, hX₁card, hφ⟩ :=
     exists_ruzsa_model_of_doubling (s := 8) hq (by norm_num) hXne hXX
-  haveI : NeZero m := ⟨hm0.ne'⟩
+  have : NeZero m := ⟨hm0.ne'⟩
   have hX₁cardR : (X.card : ℝ) ≤ 8 * X₁.card := by exact_mod_cast hX₁card
   have hX₁pos : (0 : ℝ) < X₁.card := by linarith
   have hX₁ne : X₁.Nonempty := Finset.card_pos.1 (by exact_mod_cast hX₁pos)
@@ -358,7 +358,7 @@ theorem exists_coarseGAP_container {q : ℕ} {κ : ℝ} (X : Finset (ZMod q))
         (∀ i, 1 < P.length i) ∧
         ((P.dim : ℝ) ≤ changContainerExponent κ) ∧
         (P.carrier.card : ℝ) ≤ Real.exp (changContainerExponent κ) * X.card := by
-  haveI : NeZero q := ⟨hq.pos.ne'⟩
+  have : NeZero q := ⟨hq.pos.ne'⟩
   have hκ0 : (0 : ℝ) < κ := by linarith
   have hXpos : (0 : ℝ) < X.card := (Real.exp_pos _).trans hXlower
   have hXne : X.Nonempty := Finset.card_pos.1 (by exact_mod_cast hXpos)

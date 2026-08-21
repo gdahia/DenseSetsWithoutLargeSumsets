@@ -131,10 +131,10 @@ private lemma exists_freimanRelationCode {s t : ℕ} (ht : 0 < t) (a : Fin t →
     rintro _ ⟨_, ⟨i, rfl⟩, rfl⟩
     by_cases hi : i.val < d
     · dsimp only [code]
-      rw [dif_pos hi, hindex]
+      rw [dite_eq_left hi, hindex]
       exact Submodule.subset_span ⟨⟨i.val, hi⟩, rfl⟩
     · dsimp only [code]
-      rw [dif_neg hi, hzero]
+      rw [dite_eq_right hi, hzero]
       exact Submodule.zero_mem _
   · apply Submodule.span_le.mpr
     rintro _ ⟨i, rfl⟩
@@ -174,7 +174,7 @@ private lemma freimanRelationCode_eq_of_space_eq {s t : ℕ} (ht : 0 < t)
     {a b : Fin t → ℕ}
     (hspace : freimanRelationSpace (s := s) a = freimanRelationSpace (s := s) b) :
     freimanRelationCode (s := s) ht a = freimanRelationCode ht b := by
-  letI : LinearOrder (Fin t → FreimanRelationIndex s t) :=
+  let : LinearOrder (Fin t → FreimanRelationIndex s t) :=
     freimanRelationCodeLinearOrder s t
   have hcodes : freimanRelationCodes (s := s) a = freimanRelationCodes (s := s) b := by
     unfold freimanRelationCodes
@@ -787,9 +787,9 @@ private lemma representationAvoidanceIndicator_eq_boole
     representationAvoidanceIndicator A x ω =
       if x ∉ restrictedSumset (selectedElements A ω) then 1 else 0 := by
   by_cases hx : x ∉ restrictedSumset (selectedElements A ω)
-  · rw [if_pos hx]
+  · rw [ite_eq_left hx]
     exact (representationAvoidanceIndicator_eq_one_iff A x ω).mpr hx
-  · rw [if_neg hx]
+  · rw [ite_eq_right hx]
     have hzero_or_one : representationAvoidanceIndicator A x ω = 0 ∨
         representationAvoidanceIndicator A x ω = 1 := by
       unfold representationAvoidanceIndicator allPairAssignmentsAvoidIndicator
@@ -841,12 +841,12 @@ private lemma sum_representationAvoidance_le (A : Finset ℕ) {a : ℕ}
       have hterm0 : 0 ≤ term := pow_nonneg hbase0 _
       have hterm1 : term ≤ 1 := pow_le_one₀ hbase0 hbase1
       by_cases hba : b = a
-      · simp only [hba, if_pos]
+      · simp only [hba, ite_eq_left]
         split_ifs <;> nlinarith [pow_nonneg hbase0 (Q / 2)]
       · by_cases hbad : b ∈ unpopularNeighbors A Q a
-        · simp only [hba, hbad, if_false, if_pos, zero_add]
+        · simp only [hba, hbad, ite_false, ite_eq_left, zero_add]
           nlinarith [pow_nonneg hbase0 (Q / 2)]
-        · simp only [hba, hbad, if_false, zero_add]
+        · simp only [hba, hbad, ite_false, zero_add]
           have hpopular : Q ≤ (restrictedRepresentationPairs A (a + b)).card := by
             by_contra hQ
             apply hbad
@@ -857,7 +857,7 @@ private lemma sum_representationAvoidance_le (A : Finset ℕ) {a : ℕ}
     _ = 1 + (unpopularNeighbors A Q a).card +
         A.card * (1 - q ^ 2) ^ (Q / 2) := by
       simp_rw [Finset.sum_add_distrib]
-      simp only [Finset.sum_ite_eq', ha, if_true]
+      simp only [Finset.sum_ite_eq', ha, ite_true]
       have hunpopular : unpopularNeighbors A Q a ⊆ A := by
         intro b hb
         rw [unpopularNeighbors, Finset.mem_filter, Finset.mem_erase] at hb

@@ -538,7 +538,7 @@ theorem exists_pos_forall_norm_apply_lt [ProperSpace E] [DiscreteTopology L] (p 
       · exact hAfin.mem_toFinset.mpr hyv
       · exact norm_pos_iff.mpr hpy
     refine absurd hylt (not_lt.mpr ?_)
-    rw [dif_pos ⟨_, hmemN⟩]
+    rw [dite_eq_left ⟨_, hmemN⟩]
     exact min_le_of_left_le (N.min'_le _ hmemN)
 
 omit [NormedSpace ℝ E] in
@@ -604,7 +604,7 @@ theorem ncard_inter_le_prod_aux :
   induction n with
   | zero =>
     intro E _ _ _ L _ K hrank _ _ _ _ _
-    haveI : Subsingleton E := Module.finrank_zero_iff.mp hrank
+    have : Subsingleton E := Module.finrank_zero_iff.mp hrank
     rw [Fin.prod_univ_zero]
     have hle : (K ∩ (L : Set E)).ncard ≤ 1 :=
       (Set.ncard_le_one (Set.toFinite _)).mpr fun a _ b _ ↦ Subsingleton.elim a b
@@ -695,7 +695,7 @@ theorem ncard_inter_le_prod_aux :
           (Submodule.projection_apply_mem hcompl y), sub_self]
       obtain ⟨s, hs⟩ := Submodule.mem_span_singleton.mp hmem
       exact ⟨s, hs.symm⟩
-    haveI : DiscreteTopology (L.map (π : E →+ W)) := by
+    have : DiscreteTopology (L.map (π : E →+ W)) := by
       apply discreteTopology_of_exists_pos_forall_norm_lt
       obtain ⟨r, hrpos, hr⟩ := exists_pos_forall_norm_apply_lt (L := L) p hvL hpv hsplit
       refine ⟨r, hrpos, ?_⟩

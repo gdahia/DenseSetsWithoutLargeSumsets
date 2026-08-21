@@ -231,7 +231,7 @@ private lemma signedTransport_spec {B : Finset H} (ψ : H → G) {z : H}
       (signedRep B z).2.2.1 ∈ B ∧ (signedRep B z).2.2.2 ∈ B) ∧
       z = (signedRep B z).1 + (signedRep B z).2.1 - (signedRep B z).2.2.1 -
         (signedRep B z).2.2.2 := by
-    rw [signedRep, dif_pos hex]
+    rw [signedRep, dite_eq_left hex]
     exact hex.choose_spec
   exact ⟨_, ha, _, hb, _, hc, _, hd, he, rfl⟩
 
@@ -246,7 +246,7 @@ private lemma pairRep_spec {B : Finset H} {z : H} (hz : z ∈ B + B) :
   have hex : ∃ p : H × H, (p.1 ∈ B ∧ p.2 ∈ B) ∧ z = p.1 + p.2 := by
     obtain ⟨a, ha, b, hb, rfl⟩ := Finset.mem_add.1 hz
     exact ⟨(a, b), ⟨ha, hb⟩, rfl⟩
-  rw [pairRep, dif_pos hex]
+  rw [pairRep, dite_eq_left hex]
   exact hex.choose_spec
 
 /-- A Freiman `2`-isomorphism does not increase the size of the sumset: the induced map on sums of

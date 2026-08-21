@@ -94,7 +94,7 @@ lemma neg_mem_realBox (L : Fin d → ℕ) : ∀ x ∈ realBox L, -x ∈ realBox 
 lemma isClosed_realBox (L : Fin d → ℕ) : IsClosed (realBox L) := by
   have hinter : realBox L = ⋂ i, {x : Fin d → ℝ | |x i| ≤ (L i : ℝ)} := by
     ext x
-    simp only [mem_realBox, Set.mem_iInter, Set.mem_setOf_eq]
+    simp only [mem_realBox, Set.mem_iInter, Set.mem_ofPred_eq]
   rw [hinter]
   exact isClosed_iInter fun i ↦ isClosed_le ((continuous_apply i).abs) continuous_const
 
@@ -255,7 +255,7 @@ theorem ncard_latticeBoxPoints_le (Λ : AddSubgroup (Fin d → ℤ)) {L : Fin d 
     (hL : ∀ i, 0 < L i) :
     ((latticeBoxPoints Λ L).ncard : ℝ) ≤
       ∏ i : Fin d, ((2 : ℝ) ^ (d + 1) / successiveMinimum Λ L ((i : ℕ) + 1) + 1) := by
-  haveI := discreteTopology_map Λ
+  have := discreteTopology_map Λ
   have hcount := ConvexGeometry.ncard_inter_le_prod_successiveMinimum
     (Λ.map (intCastHom : (Fin d → ℤ) →+ (Fin d → ℝ))) (realBox L) (convex_realBox L)
     (isClosed_realBox L) (realBox_mem_nhds hL) (isBounded_realBox L) (neg_mem_realBox L)

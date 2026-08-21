@@ -162,7 +162,7 @@ theorem exists_ne_zero_mem_of_index_lt (Λ : AddSubgroup (Fin d → ℤ)) [Λ.Fi
     {m : Fin d → ℕ} (hindex : Λ.index < ∏ i, (m i + 1)) :
     ∃ v ∈ Λ, v ≠ 0 ∧ ∀ i, |v i| ≤ (m i : ℤ) := by
   classical
-  haveI : Fintype ((Fin d → ℤ) ⧸ Λ) :=
+  have : Fintype ((Fin d → ℤ) ⧸ Λ) :=
     AddSubgroup.fintypeOfIndexNeZero AddSubgroup.FiniteIndex.index_ne_zero
   have hcard : (Finset.univ : Finset ((Fin d → ℤ) ⧸ Λ)).card < ∏ i, (m i + 1) := by
     rw [Finset.card_univ, ← Nat.card_eq_fintype_card]

@@ -422,12 +422,12 @@ private lemma sum_sq_sampledReprs_le (hX : 0 < #X) (hY : 0 < #Y) :
     intro p hp q hq
     by_cases hpq : p = q
     · subst hpq
-      rw [if_pos rfl, inter_self, inter_self]
+      rw [ite_eq_left rfl, inter_self, inter_self]
       have hnn : (0 : ℝ) ≤ (#(hits X k₁ p.1) : ℝ) * #(hits Y k₂ p.2)
           * ((#(hits X k₁ p.1) : ℝ) * #(hits Y k₂ p.2))
           / ((#X : ℝ) ^ k₁ * (#Y : ℝ) ^ k₂) := by positivity
       linarith
-    · rw [if_neg hpq]
+    · rw [ite_eq_right hpq]
       obtain ⟨hne₁, hne₂⟩ := repr_ne_of_ne hp hq hpq
       have hx : (#(hits X k₁ p.1 ∩ hits X k₁ q.1) : ℝ) * (#X : ℝ) ^ k₁
           ≤ (#(hits X k₁ p.1) : ℝ) * #(hits X k₁ q.1) := by
@@ -458,7 +458,7 @@ private lemma sum_sq_sampledReprs_le (hX : 0 < #X) (hY : 0 < #Y) :
             * (∑ q ∈ reprs X Y s, (#(hits X k₁ q.1) : ℝ) * #(hits Y k₂ q.2))
             / ((#X : ℝ) ^ k₁ * (#Y : ℝ) ^ k₂) := by
     intro p hp
-    rw [sum_add_distrib, sum_ite_eq, if_pos hp, ← sum_div, ← mul_sum]
+    rw [sum_add_distrib, sum_ite_eq, ite_eq_left hp, ← sum_div, ← mul_sum]
   rw [sum_congr rfl hrow, sum_add_distrib, ← sum_div, ← sum_mul, sq]
 
 /-- The core second-moment bound: the probability that `s` is seen is at least `W / (N + W)`,
@@ -500,7 +500,7 @@ private lemma hitProb_ge (hs : s ∈ X + Y) (hk₁ : 1 ≤ k₁) (hk₂ : 1 ≤ 
       have : (0 : ℝ) ≤ if s ∈ bltSample X ω.1 + bltSample Y ω.2 then (1 : ℝ) else 0 := by
         split_ifs <;> norm_num
       simpa using this
-    · rw [if_pos (mem_add_of_sampledReprs_pos h)]
+    · rw [ite_eq_left (mem_add_of_sampledReprs_pos h)]
       nlinarith [sq_nonneg (1 - c * sampledReprs X Y k₁ k₂ s ω)]
   have hsum : c * W
       ≤ ∑ ω : (Fin k₁ → ↥X) × (Fin k₂ → ↥Y),

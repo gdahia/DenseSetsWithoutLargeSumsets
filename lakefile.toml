@@ -13,12 +13,12 @@ maxSynthPendingDepth = 3
 [[require]]
 name = "APAP"
 git = "https://github.com/YaelDillies/apap.git"
-rev = "c1d84416f68bb14a4ada9b79f284a0478c6f0bf5"
+rev = "d88d51452d738fc9c7834002ab9c07db22effb4c"
 
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "24fff1c8867e78ff5160257c95219b399508236d"
+rev = "de5ce8a9a66a4aa68a9bdbb35b63a06d34d9ca11"
 
 [[lean_lib]]
 name = "DenseSetsWithoutLargeSumsets"

@@ -157,10 +157,10 @@ private lemma exists_relation_code {t : ℕ} (ht : 0 < t) (a : Fin t → ℕ) :
     rintro _ ⟨_, ⟨i, rfl⟩, rfl⟩
     by_cases hi : i.val < d
     · dsimp only [code]
-      rw [dif_pos hi, hindex]
+      rw [dite_eq_left hi, hindex]
       exact Submodule.subset_span ⟨⟨i.val, hi⟩, rfl⟩
     · dsimp only [code]
-      rw [dif_neg hi, hzero]
+      rw [dite_eq_right hi, hzero]
       exact Submodule.zero_mem _
   · apply Submodule.span_le.mpr
     rintro _ ⟨i, rfl⟩
@@ -561,7 +561,7 @@ lemma canonicalFreimanRelationCode_eq_of_equivalent {s t : ℕ} (ht : 0 < t)
     {X Y : SizedNatFinset t} (hXY : FreimanRelationEquivalent (s := s) X Y) :
     canonicalFreimanRelationCode (s := s) ht X =
       canonicalFreimanRelationCode (s := s) ht Y := by
-  letI : LinearOrder (Fin t → FreimanRelationIndex s t) :=
+  let : LinearOrder (Fin t → FreimanRelationIndex s t) :=
     freimanRelationCodeLinearOrder s t
   unfold canonicalFreimanRelationCode
   apply (Finset.min'_eq_iff
@@ -850,7 +850,7 @@ lemma tuple_freimanIso {t : ℕ} {G H : Type*} [AddCommMonoid G] [AddCommMonoid 
     (hrelations : ∀ i j k l, a i + a j = a k + a l ↔ b i + b j = b k + b l) :
     ∃ f : G → H, IsAddFreimanIso 2 (Set.range a) (Set.range b) f := by
   classical
-  letI : Nonempty (Fin t) := ⟨⟨0, ht⟩⟩
+  let : Nonempty (Fin t) := ⟨⟨0, ht⟩⟩
   let f : G → H := fun x ↦ b (Function.invFun a x)
   have hf (i : Fin t) : f (a i) = b i := by
     dsimp only [f]
@@ -996,9 +996,7 @@ lemma exists_determiningCoordinates {t r : ℕ} (ht : 0 < t) (a : Fin t → ℕ)
       (Submodule.span ℚ (Set.range (coordinateClass a))) := i.isLt
   have hanchor : anchor j = index i := by
     dsimp only [anchor]
-    rw [dif_pos hj]
-    apply congrArg index
-    exact Fin.ext rfl
+    rw [dite_eq_left hj]
   rw [hanchor, hindex]
 
 lemma tuple_eq_of_relations_of_determiningCoordinates {t r : ℕ}
@@ -1071,14 +1069,14 @@ private lemma classRepresentativeTuple_code {n r t : ℕ} (ht : 0 < t)
     (code : Fin t → RelationIndex t) (hcode : HasFreimanClassCode n r t ht code) :
     relationCode ht (classRepresentativeTuple n r t ht code) = code := by
   classical
-  rw [classRepresentativeTuple, dif_pos hcode]
+  rw [classRepresentativeTuple, dite_eq_left hcode]
   exact Classical.choose_spec hcode
 
 private lemma classRepresentativeTuple_dim_le {n r t : ℕ} (ht : 0 < t)
     (code : Fin t → RelationIndex t) (hcode : HasFreimanClassCode n r t ht code) :
     relationModelDim (classRepresentativeTuple n r t ht code) ≤ r := by
   classical
-  rw [classRepresentativeTuple, dif_pos hcode]
+  rw [classRepresentativeTuple, dite_eq_left hcode]
   exact (relationModelDim_le_freimanDim ht
     (boundedFreimanDimMemberSized (Classical.choose hcode))).trans
       (Classical.choose hcode).2.2.2
@@ -1097,7 +1095,7 @@ private lemma classAnchor_span {n r t : ℕ} (ht : 0 < t)
     Submodule.span ℚ (Set.range (coordinateClass
       (classRepresentativeTuple n r t ht code) ∘ classAnchor n r t ht code)) = ⊤ := by
   classical
-  rw [classAnchor, dif_pos hcode]
+  rw [classAnchor, dite_eq_left hcode]
   exact Classical.choose_spec (exists_determiningCoordinates ht
     (classRepresentativeTuple n r t ht code)
     (classRepresentativeTuple_dim_le ht code hcode))
@@ -1169,7 +1167,7 @@ private theorem card_boundedFreimanDimSets_nat (n r t : ℕ) (ht : 0 < t) :
     intro X hX
     rw [Finset.mem_coe, Finset.mem_powerset]
     exact hX.1
-  letI : Fintype (BoundedFreimanDimMember n r t) := hfinite.fintype
+  let : Fintype (BoundedFreimanDimMember n r t) := hfinite.fintype
   have hcard := Fintype.card_le_of_injective (freimanClassEncoding n r t ht)
     (freimanClassEncoding_injective n r t ht)
   rw [Set.fintypeCard_eq_ncard] at hcard

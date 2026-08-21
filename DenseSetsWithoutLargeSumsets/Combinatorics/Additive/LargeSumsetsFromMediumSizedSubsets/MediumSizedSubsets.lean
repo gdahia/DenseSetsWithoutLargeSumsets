@@ -505,8 +505,8 @@ private lemma exists_medium_sized_subsets_with_large_sumset_subsets_card_le {σ 
   obtain ⟨A₀, B₀, hA₀, hB₀, hA₀A, hB₀B, hA₀card, hB₀card, hexpect⟩ :=
     exists_medium_sized_subsets_with_large_sumset_sample hσ hε hA hB c₁ c₂ hc₁pos hc₁A hc₂pos
       hc₂B hcprod
-  letI : Nonempty ↥A₀ := hA₀.to_subtype
-  letI : Nonempty ↥B₀ := hB₀.to_subtype
+  let : Nonempty ↥A₀ := hA₀.to_subtype
+  let : Nonempty ↥B₀ := hB₀.to_subtype
   obtain ⟨⟨a, b⟩, _, hab⟩ := exists_lt_of_lt_expect univ_nonempty hexpect
   exact ⟨bltSample A₀ a, A₀, bltSample B₀ b, B₀,
     bltSample_subset A₀ a, hA₀A, bltSample_subset B₀ b, hB₀B,

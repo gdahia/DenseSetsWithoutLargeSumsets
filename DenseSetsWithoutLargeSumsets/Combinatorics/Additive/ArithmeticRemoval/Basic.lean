@@ -65,7 +65,7 @@ lemma card_removedPairs_add_le (hle : H' ≤ H) {p q : ↥W → V} (hp : Functio
   apply Nat.add_le_add_right
   apply card_le_card_of_injOn (fun z => s(p z.1, q z.2))
   · intro z hz
-    simp only [removedPairs, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hz
+    simp only [removedPairs, coe_filter, mem_univ, true_and, Set.mem_ofPred_eq] at hz
     simp [hz.1, hz.2]
   · intro z _ z' _ h
     rw [Sym2.eq_iff] at h
@@ -209,7 +209,7 @@ private lemma arithmetic_removal_aux {X A B C W : Finset G} {K ε δ : ℝ}
   have hS₁card : #S₁ ≤ removedLabelCard (tripartiteGraph W A B C) H' in₀ in₁ a := by
     apply card_le_card_of_injOn (fun x => (u x, v x))
     · intro x hx
-      simp only [hS₁, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hx
+      simp only [hS₁, coe_filter, mem_univ, true_and, Set.mem_ofPred_eq] at hx
       simp only [mem_coe, mem_filter, removedPairs, mem_univ, true_and, hu, hv]
       exact ⟨⟨adj_in₀_in₁ (hmem x), hx⟩, add_sub_cancel_left _ _⟩
     · intro x _ y _ h
@@ -217,7 +217,7 @@ private lemma arithmetic_removal_aux {X A B C W : Finset G} {K ε δ : ℝ}
   have hS₂card : #S₂ ≤ removedLabelCard (tripartiteGraph W A B C) H' in₁ in₂ b := by
     apply card_le_card_of_injOn (fun x => (v x, w x))
     · intro x hx
-      simp only [hS₂, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hx
+      simp only [hS₂, coe_filter, mem_univ, true_and, Set.mem_ofPred_eq] at hx
       simp only [mem_coe, mem_filter, removedPairs, mem_univ, true_and, hv, hw]
       exact ⟨⟨adj_in₁_in₂ (hmem x), hx⟩, by rw [add_sub_add_left_eq_sub, hba]⟩
     · intro x _ y _ h
@@ -226,7 +226,7 @@ private lemma arithmetic_removal_aux {X A B C W : Finset G} {K ε δ : ℝ}
   have hS₃card : #S₃ ≤ removedLabelCard (tripartiteGraph W A B C) H' in₀ in₂ c := by
     apply card_le_card_of_injOn (fun x => (u x, w x))
     · intro x hx
-      simp only [hS₃, coe_filter, mem_univ, true_and, Set.mem_setOf_eq] at hx
+      simp only [hS₃, coe_filter, mem_univ, true_and, Set.mem_ofPred_eq] at hx
       simp only [mem_coe, mem_filter, removedPairs, mem_univ, true_and, hu, hw]
       exact ⟨⟨adj_in₀_in₂ (hmem x), hx⟩, add_sub_cancel_left _ _⟩
     · intro x _ y _ h

@@ -66,7 +66,7 @@ noncomputable def coefficientsFin (x : G) : (i : Fin P.dim) → Fin (P.length i)
 lemma coefficientsFin_spec {x : G} (hx : x ∈ P.carrier) :
     gapMap P.origin P.step P.length (P.coefficientsFin x) = x := by
   unfold coefficientsFin
-  rw [dif_pos hx]
+  rw [dite_eq_left hx]
   exact Classical.choose_spec (show ∃ w, gapMap P.origin P.step P.length w = x from by
     simpa [P.carrier_eq] using hx)
 
