@@ -35,6 +35,19 @@ sources:
       - "Imre Z. Ruzsa"
     id: "doi:10.1007/BF01302969"
     type: "journal article"
+  - title: "Problems on infinite sumset configurations in the integers and beyond"
+    authors:
+      - "Bryna Kra"
+      - "Joel Moreira"
+      - "Florian K. Richter"
+      - "Donald Robertson"
+    id: "arXiv:2311.06197"
+    type: "journal article"
+    journal: "Bulletin of the American Mathematical Society"
+    year: 2025
+    volume: 62
+    issue: 4
+    pages: "537--574"
   - title: "Large sumsets from medium-sized subsets"
     authors:
       - "Béla Bollobás"
@@ -53,7 +66,9 @@ status:
     Bollobás--Leader--Tiba described in the README, together with a reduction of
     the complementary lower bound to Mathlib's Zarankiewicz function, and the
     threshold function phi(delta, N) of the paper's introduction, through which
-    both directions are stated as bounds on a single quantity.
+    both directions are stated as bounds on a single quantity, including the
+    upper-bound half of the paper's Corollary 1.2 and its reading at vanishing
+    densities.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms:
@@ -163,6 +178,35 @@ alignment:
         function phi of the paper's introduction, for every constant density
         delta in (0, 1). It is a limsup and not a liminf bound because the
         construction supplies a witness for every sufficiently large N.
+    - source: "Dense sets without large sumsets, Corollary 1.2, upper bound"
+      lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_le"
+      module: "DenseSetsWithoutLargeSumsets.SumsetThresholdFunction"
+      status: "proved"
+      note: >-
+        The phi(delta, n) / log n <= (3 + gamma) / log (1 / delta) half of
+        Corollary 1.2, in the limsup form limsup_N phi(delta, N) / log N <=
+        4 / log (1 / delta) at each fixed delta in (0, 1). The matching lower
+        bound of Corollary 1.2 is quoted there from Hernández and Hetzel and is not
+        formalized; the project instead reduces a lower bound on phi to Mathlib's
+        Zarankiewicz function.
+    - source: >-
+        Dense sets without large sumsets, Corollary 1.2, negative answer to
+        Question 4.12 of "Problems on infinite sumset configurations in the
+        integers and beyond"
+      lean: "DenseSetsWithoutLargeSumsets.liminf_phi_div_log_eq_zero"
+      module: "DenseSetsWithoutLargeSumsets.SumsetThresholdFunction"
+      status: "proved"
+      note: >-
+        Corollary 1.2 answers Question 4.12 of Bryna Kra, Joel Moreira,
+        Florian K. Richter and Donald Robertson -- whether
+        liminf_N phi(delta_N, N) / log N > 0 for some sequence delta_N -> 0 --
+        in the negative. The formalization records this reading, and since phi is
+        monotone in the density it holds for every sequence delta_N -> 0, not only
+        those within the delta >= n^(-alpha) range of Corollary 1.2: the whole
+        limit is 0. The specific sequence delta_N = 1 / log N of that question is
+        liminf_phi_logDensity_div_log_eq_zero, with the rate
+        phi(1 / log N, N) < 4 log N / log log N given by
+        eventually_phi_logDensity_lt_log_div_log_log.
     - source: "A polynomial bound in Freiman's theorem, proper-GAP consequence"
       lean: "DenseSetsWithoutLargeSumsets.exists_properGAP_of_small_sumset"
       module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction"
