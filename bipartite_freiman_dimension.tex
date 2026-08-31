@@ -1,0 +1,630 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\aff}{\operatorname{aff}}
+\newcommand{\affdim}{\operatorname{affdim}}
+\newcommand{\spann}{\operatorname{span}}
+\newcommand{\dimx}{\dim_{\times}}
+\newcommand{\eps}{\varepsilon}
+
+\title{A Bipartite Freiman Dimension and Dense Sets Without Large Sumsets}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We introduce a bipartite analogue of Freiman dimension which records only relations of the form
+\[
+ a+b=a'+b',\qquad a,a'\in A,\quad b,b'\in B.
+\]
+If $|A|=|B|=k$, we prove the bipartite Freiman lemma
+\[
+ \dim \cH(A,B)\le \frac{2|A+B|}{k},
+\]
+where $\cH(A,B)$ is the vector space of bipartite Freiman homomorphisms.  The proof uses the asymmetric form of Freiman's lemma due to Ruzsa.  We then use the associated hyperplane arrangement to show that the number of pairs $(A,B)\in\binom{[n]}{k}^2$ satisfying $|A+B|\le m$ is at most
+\[
+ k^{10k}n^{2m/k}.
+\]
+This estimate is effective in the large-sumset range.  Combined with the small- and moderate-sumset estimates of Dahia--Marciano--Souza, it yields the constant $2+\gamma$ in the random dense-set problem: a $\delta$-random subset of $[n]$ contains no sumset $A+B$ with both shores larger than $(2+\gamma)\log n/\log(1/\delta)$ with high probability, in the same range of $\delta$ considered there.
+\end{abstract}
+
+\section{Introduction}
+
+For finite sets $A,B\subseteq\N$, write
+\[
+ A+B=\{a+b:a\in A,\ b\in B\}.
+\]
+A subset $S\subseteq[n]$ is called $\delta$-random if every element of $[n]$ is included independently with probability $\delta$.
+
+Dahia, Marciano and Souza proved that, in a wide range of densities, a $\delta$-random subset of $[n]$ contains with high probability no sumset $A+B$ for which
+\[
+ \min\{|A|,|B|\}\ge (3+\gamma)\frac{\log n}{\log(1/\delta)};
+\]
+see \cite[Theorem 1.3]{DMS}.  Their proof separates pairs $(A,B)$ according to the size of $A+B$.  Two parts of their argument already work with the constant $2+\gamma$: the small-sumset range is handled in \cite[Lemma 2.1]{DMS}, and the moderate-sumset range
+\[
+ Ck<|A+B|<\frac{k(k+1)}2
+\]
+is handled in \cite[Corollary 3.3]{DMS}, where
+\[
+ k=(2+\gamma)\frac{\log n}{\log(1/\delta)}.
+\]
+The loss from $2$ to $3$ occurs in their treatment of the remaining range $|A+B|\ge k(k+1)/2$; see \cite[Lemma 4.1]{DMS}.
+
+The purpose of this note is to give a counting estimate for this large-sumset range.  The main new ingredient is a notion of dimension which ignores additive relations internal to $A+A$ and $B+B$, and remembers only the cross-relations relevant to $A+B$.
+
+Whenever a real expression is used to define a cardinality parameter such as $k$, we take its ceiling.  This convention only strengthens the probabilistic inequalities below.
+
+Our main result is the following.
+
+\begin{theorem}\label{thm:random-main}
+For every $0<\gamma\le 1$ and $c>0$, there exists $\alpha>0$ such that the following holds for all sufficiently large $n$.  If
+\[
+ n^{-\alpha}<\delta\le 1-c
+\]
+and $S\subseteq[n]$ is a $\delta$-random set, then
+\[
+ \Prob\left(\exists A,B\subseteq\N:\ \min\{|A|,|B|\}\ge k,\ A+B\subseteq S\right)=o(1),
+\]
+where
+\[
+ k=\left\lceil(2+\gamma)\frac{\log n}{\log(1/\delta)}\right\rceil.
+\]
+\end{theorem}
+
+For fixed density this immediately gives the desired deterministic consequence.
+
+\begin{corollary}\label{cor:dense}
+Fix $0<\delta<1$ and $\eps>0$.  For all sufficiently large $n$ there exists $S\subseteq[n]$ with $|S|\ge\delta n$ such that
+\[
+ A+B\subseteq S
+ \quad\Longrightarrow\quad
+ \min\{|A|,|B|\}< (2+\eps)\frac{\log n}{\log(1/\delta)}
+\]
+for all finite $A,B\subseteq\N$.
+\end{corollary}
+
+\section{Bipartite Freiman dimension}
+
+We work with finite nonempty subsets of $\R$.  The two copies of a point which may occur in $A\cap B$ are regarded as belonging to different shores.
+
+\begin{definition}\label{def:hom}
+Let $A,B\subseteq\R$ be finite and nonempty.  A \emph{bipartite Freiman homomorphism} on $(A,B)$ is a pair of functions
+\[
+ f:A\to\R,\qquad g:B\to\R
+\]
+such that
+\[
+ a+b=a'+b'
+ \quad\Longrightarrow\quad
+ f(a)+g(b)=f(a')+g(b')
+\]
+for all $a,a'\in A$ and $b,b'\in B$.  We write $\cH(A,B)$ for the real vector space of all such pairs $(f,g)$, and define
+\[
+ \dimx(A,B):=\dim \cH(A,B)-2.
+\]
+We call $\dimx(A,B)$ the \emph{bipartite Freiman dimension} of $(A,B)$.
+\end{definition}
+
+The subtraction of $2$ removes the two trivial degrees of freedom obtained by taking $f$ and $g$ to be independently constant.
+
+Fix enumerations
+\[
+ A=\{a_1,\ldots,a_k\},\qquad B=\{b_1,\ldots,b_\ell\}.
+\]
+Equivalently, $\cH(A,B)$ is the solution space in the variables
+\[
+ x_1,\ldots,x_k,y_1,\ldots,y_\ell
+\]
+of the homogeneous equations
+\[
+ x_i+y_j=x_{i'}+y_{j'}
+ \qquad\text{whenever}\qquad
+ a_i+b_j=a_{i'}+b_{j'}.
+\]
+
+The next proposition realizes the cross-addition table faithfully in the dual space $\cH(A,B)^*$.
+
+\begin{proposition}[Universal bipartite Freiman model]\label{prop:universal}
+Let $H=\cH(A,B)$.  For $a\in A$ and $b\in B$, define $\alpha_a,\beta_b\in H^*$ by
+\[
+ \alpha_a(f,g)=f(a),\qquad \beta_b(f,g)=g(b).
+\]
+Set
+\[
+ A^\sharp=\{\alpha_a:a\in A\},\qquad B^\sharp=\{\beta_b:b\in B\}.
+\]
+Then the maps $a\mapsto\alpha_a$ and $b\mapsto\beta_b$ are injective, and
+\[
+ \alpha_a+\beta_b=\alpha_{a'}+\beta_{b'}
+ \quad\Longleftrightarrow\quad
+ a+b=a'+b'.
+\]
+Consequently,
+\[
+ |A^\sharp+B^\sharp|=|A+B|
+\]
+and
+\[
+ \affdim(A^\sharp+B^\sharp)=\dimx(A,B).
+\]
+\end{proposition}
+
+\begin{proof}
+If $a+b=a'+b'$, the equality
+\[
+ \alpha_a+\beta_b=\alpha_{a'}+\beta_{b'}
+\]
+follows directly from the definition of $H$.  Conversely, the pair
+\[
+ f_0(a)=a,\qquad g_0(b)=b
+\]
+belongs to $H$.  Thus equality of the two functionals, evaluated at $(f_0,g_0)$, implies $a+b=a'+b'$.  The same evaluation shows that $a\mapsto\alpha_a$ and $b\mapsto\beta_b$ are injective.  Hence $|A^\sharp+B^\sharp|=|A+B|$.
+
+Fix $a_0\in A$ and $b_0\in B$, and let
+\[
+ W=\spann\bigl((A^\sharp-\alpha_{a_0})\cup(B^\sharp-\beta_{b_0})\bigr)\subseteq H^*.
+\]
+The annihilator $W^\perp\subseteq H$ consists precisely of those $(f,g)\in H$ for which $f$ is constant on $A$ and $g$ is constant on $B$.  This space has dimension $2$.  Therefore
+\[
+ \dim W=\dim H-2=\dimx(A,B).
+\]
+On the other hand,
+\[
+ \spann\bigl((A^\sharp+B^\sharp)-(\alpha_{a_0}+\beta_{b_0})\bigr)=W,
+\]
+so $\affdim(A^\sharp+B^\sharp)=\dim W=\dimx(A,B)$.
+\end{proof}
+
+\section{A bipartite Freiman lemma}
+
+We use the following asymmetric form of Freiman's lemma due to Ruzsa.
+
+\begin{theorem}[Ruzsa]\label{thm:ruzsa}
+The following is \cite[Theorem 1 and Corollary 1.1]{Ruzsa94}.  Let $X,Y\subseteq\R^d$ be finite, with $|Y|\le |X|$, and suppose that
+\[
+ \affdim(X+Y)=d.
+\]
+Then
+\[
+ |X+Y|\ge |X|+\sum_{t=1}^{|Y|-1}\min\{d,|X|-t\}.
+\]
+In particular,
+\[
+ |X+Y|\ge |X|+d|Y|-\binom{d+1}{2}.
+\]
+\end{theorem}
+
+We first isolate the geometric statement needed below.
+
+\begin{lemma}\label{lem:geometric}
+Let $C,D$ be $k$-element subsets of a real vector space, where $k\ge2$, and set
+\[
+ d=\dim\bigl(\spann(C-C)+\spann(D-D)\bigr).
+\]
+Then
+\[
+ |C+D|\ge \frac{k(d+2)}2.
+\]
+\end{lemma}
+
+\begin{proof}
+Let
+\[
+ V=\spann(D-D),\qquad s=\dim V,
+\]
+and let $\pi$ denote the quotient map by $V$.  Suppose that $C$ meets exactly $p$ cosets of $V$, and write
+\[
+ C=C_1\sqcup\cdots\sqcup C_p,
+ \qquad c_i=|C_i|.
+\]
+Since
+\[
+ \dim\spann\bigl(\pi(C)-\pi(C)\bigr)=d-s,
+\]
+we have
+\begin{equation}\label{eq:p-lower}
+ p\ge d-s+1.
+\end{equation}
+
+The sets $C_i+D$ lie in distinct cosets of $V$, and hence are pairwise disjoint.  Moreover,
+\[
+ \affdim(C_i+D)=s,
+\]
+because $C_i+D$ lies in a coset of $V$ and contains a translate of $D$.  Applying Theorem~\ref{thm:ruzsa} with the larger set $D$ and the smaller set $C_i$ gives
+\[
+ |C_i+D|\ge F_s(c_i),
+\]
+where
+\[
+ F_s(c):=k+\sum_{t=1}^{c-1}\min\{s,k-t\},\qquad 1\le c\le k.
+\]
+Thus
+\begin{equation}\label{eq:fiber-sum}
+ |C+D|\ge\sum_{i=1}^pF_s(c_i).
+\end{equation}
+
+The successive increments of $F_s$ are
+\[
+ F_s(c+1)-F_s(c)=\min\{s,k-c\},
+\]
+which are nonincreasing in $c$.  Hence $F_s$ is discretely concave.  Subject to
+\[
+ c_i\ge1,\qquad \sum_{i=1}^pc_i=k,
+\]
+the right-hand side of \eqref{eq:fiber-sum} is therefore minimized when
+\[
+ (c_1,\ldots,c_p)=(k-p+1,1,\ldots,1).
+\]
+Consequently,
+\begin{equation}\label{eq:basic-geometric}
+ |C+D|\ge pk+\sum_{h=p}^{k-1}\min\{s,h\}.
+\end{equation}
+The right-hand side is increasing in $p$, since increasing $p$ by $1$ changes it by
+\[
+ k-\min\{s,p\}>0.
+\]
+In view of \eqref{eq:p-lower}, it is enough to prove the desired bound when
+\[
+ p=d-s+1,
+\]
+so that $d=s+p-1$.
+
+If $p\ge s+1$, then
+\[
+ pk\ge \frac{k(s+p+1)}2=\frac{k(d+2)}2,
+\]
+and the result follows from \eqref{eq:basic-geometric}.
+
+Suppose now that $p\le s$.  It remains to show
+\begin{equation}\label{eq:last-geometric}
+ \sum_{h=p}^{k-1}\min\{s,h\}\ge \frac{k(s-p+1)}2.
+\end{equation}
+For $k=s+1$, the left-hand side equals
+\[
+ \sum_{h=p}^{s}h=\frac{(s-p+1)(s+p)}2
+ \ge \frac{(s-p+1)(s+1)}2.
+\]
+When $k$ is increased by $1$, the left-hand side of \eqref{eq:last-geometric} increases by $s$, whereas the right-hand side increases by $(s-p+1)/2\le s$.  Hence \eqref{eq:last-geometric} holds for every $k\ge s+1$.  Combining this with \eqref{eq:basic-geometric} proves the lemma.
+\end{proof}
+
+The bipartite analogue of Freiman's lemma follows immediately from the universal model.
+
+\begin{theorem}[Bipartite Freiman lemma]\label{thm:bip-freiman}
+Let $A,B\subseteq\R$ satisfy
+\[
+ |A|=|B|=k\ge2.
+\]
+Then
+\[
+ |A+B|\ge \frac{k}{2}\bigl(\dimx(A,B)+2\bigr).
+\]
+Equivalently,
+\[
+ \dim \cH(A,B)\le \frac{2|A+B|}{k}.
+\]
+\end{theorem}
+
+\begin{proof}
+Apply Proposition~\ref{prop:universal} and Lemma~\ref{lem:geometric} to
+\[
+ C=A^\sharp,\qquad D=B^\sharp.
+\]
+By Proposition~\ref{prop:universal},
+\[
+ |C+D|=|A+B|
+\]
+and
+\[
+ \dim\bigl(\spann(C-C)+\spann(D-D)\bigr)
+ =\affdim(C+D)=\dimx(A,B).
+\]
+Lemma~\ref{lem:geometric} gives
+\[
+ |A+B|\ge \frac{k}{2}\bigl(\dimx(A,B)+2\bigr).
+\]
+Since $\dim\cH(A,B)=\dimx(A,B)+2$, the equivalent form follows.
+\end{proof}
+
+\begin{remark}\label{rem:endpoints}
+The estimate is sharp at two natural endpoints.  If all $k^2$ cross-sums $a_i+b_j$ are distinct, then $\cH(A,B)=\R^{2k}$, so the theorem gives $|A+B|\ge k^2$.  If $A=B$ is a Sidon set, then the only nontrivial cross-relations are the symmetries $a_i+a_j=a_j+a_i$, one has $\dim\cH(A,A)=k+1$, and the theorem gives $|A+A|\ge k(k+1)/2$.
+\end{remark}
+
+\section{Counting pairs by the cross-relation arrangement}
+
+Fix $k\ge2$.  In $\R^{2k}$, with coordinates
+\[
+ x_1,\ldots,x_k,y_1,\ldots,y_k,
+\]
+consider the central hyperplane arrangement
+\[
+ \cA_k=\left\{
+ x_i+y_j=x_{i'}+y_{j'}:
+ (i,j)\ne(i',j')
+ \right\}.
+\]
+There are fewer than $k^4$ hyperplanes in $\cA_k$.
+
+\begin{lemma}\label{lem:flats}
+The arrangement $\cA_k$ has at most $k^{10k}$ flats.
+\end{lemma}
+
+\begin{proof}
+Every flat is an intersection of members of $\cA_k$.  Since the ambient dimension is $2k$, every such intersection can be defined using at most $2k$ linearly independent hyperplanes.  Writing $M<k^4$ for the number of hyperplanes, the number of flats is therefore at most
+\[
+ \sum_{r=0}^{2k}\binom Mr
+ \le \sum_{r=0}^{2k}M^r
+ \le (2k+1)k^{8k}
+ \le k^{10k}.
+\]
+\end{proof}
+
+\begin{lemma}\label{lem:lattice-flat}
+If $F\subseteq\R^{2k}$ is a $q$-dimensional linear subspace, then
+\[
+ |F\cap[n]^{2k}|\le n^q.
+\]
+\end{lemma}
+
+\begin{proof}
+The restrictions to $F$ of the $2k$ coordinate functionals span $F^*$.  Hence one may choose $q$ coordinate functionals whose restrictions form a basis of $F^*$.  Projection onto the corresponding $q$ coordinates is injective on $F$.  There are at most $n^q$ possible projected vectors for points of $F\cap[n]^{2k}$.
+\end{proof}
+
+We now obtain the counting estimate which replaces the large-sumset count in \cite[Section 4]{DMS}.
+
+\begin{theorem}\label{thm:pair-count}
+Let $n,k,m\in\N$ with $k\ge2$.  The number of ordered pairs
+\[
+ (A,B)\in\binom{[n]}{k}^2
+\]
+satisfying
+\[
+ |A+B|\le m
+\]
+is at most
+\[
+ k^{10k}n^{2m/k}.
+\]
+In particular, the same bound holds for pairs satisfying $|A+B|=m$.
+\end{theorem}
+
+\begin{proof}
+Order the elements of $A$ and $B$ arbitrarily,
+\[
+ A=(a_1,\ldots,a_k),\qquad B=(b_1,\ldots,b_k).
+\]
+The corresponding space $\cH(A,B)\subseteq\R^{2k}$ is a flat of $\cA_k$: it is the intersection of precisely the hyperplanes associated with equalities
+\[
+ a_i+b_j=a_{i'}+b_{j'}.
+\]
+By Theorem~\ref{thm:bip-freiman}, if $|A+B|\le m$, then
+\[
+ \dim\cH(A,B)\le \frac{2m}{k}.
+\]
+
+Conversely, every ordered pair of $k$-sets with $|A+B|\le m$ determines a point
+\[
+ (a_1,\ldots,a_k,b_1,\ldots,b_k)\in[n]^{2k}
+\]
+which lies in a flat of $\cA_k$ of dimension at most $2m/k$.  By Lemmas~\ref{lem:flats} and \ref{lem:lattice-flat}, the number of such ordered tuples is at most
+\[
+ k^{10k}n^{2m/k}.
+\]
+This also bounds the number of unordered set-pairs $(A,B)$.
+\end{proof}
+
+\section{The large-sumset range}
+
+We next combine Theorem~\ref{thm:pair-count} with the elementary identity
+\[
+ \Prob(A+B\subseteq S)=\delta^{|A+B|}
+\]
+whenever $A+B\subseteq[n]$.  If $A+B\not\subseteq[n]$, the event has probability $0$, so the same expression is an admissible upper bound in a union bound.
+
+\begin{lemma}\label{lem:large-random}
+For every $0<\gamma\le1$ and $c>0$, there exists $\alpha>0$ such that the following holds for all sufficiently large $n$.  Let
+\[
+ n^{-\alpha}<\delta\le1-c,
+\qquad
+ k=\left\lceil(2+\gamma)\frac{\log n}{\log(1/\delta)}\right\rceil,
+\]
+and let $S\subseteq[n]$ be a $\delta$-random set.  Then
+\[
+ \Prob\left(
+ \exists(A,B)\in\binom{[n]}{k}^2:\
+ |A+B|\ge\frac{k(k+1)}2,\ A+B\subseteq S
+ \right)
+ \le \frac{k^2}{n^2}.
+\]
+\end{lemma}
+
+\begin{proof}
+Set
+\[
+ L=\log(1/\delta),\qquad m_0=\frac{k(k+1)}2.
+\]
+Since
+\[
+ k\ge (2+\gamma)\frac{\log n}{L},
+\]
+we have
+\begin{equation}\label{eq:delta-decay}
+ \delta^m=e^{-Lm}\le n^{-(2+\gamma)m/k}
+\end{equation}
+for every $m\ge1$.  Taking a union bound over the possible values of $m=|A+B|$ and applying Theorem~\ref{thm:pair-count}, we obtain
+\begin{align*}
+ &\Prob\left(
+ \exists(A,B)\in\binom{[n]}{k}^2:\
+ |A+B|\ge m_0,\ A+B\subseteq S
+ \right)\\
+ &\qquad\le
+ \sum_{m=m_0}^{k^2}k^{10k}n^{2m/k}\delta^m
+ \le
+ \sum_{m=m_0}^{k^2}k^{10k}n^{-\gamma m/k}.
+\end{align*}
+
+Since $\delta\le1-c$,
+\[
+ k\le \frac{4\log n}{\log(1/(1-c))}+1,
+\]
+so uniformly in the permitted range of $\delta$ we have $\log k=o(\log n)$.  Thus, for all sufficiently large $n$,
+\[
+ 10k\log k\le \frac{\gamma k}{6}\log n.
+\]
+As $m\ge m_0$ implies $m/k\ge(k+1)/2$, every summand above is at most
+\[
+ \exp\left(10k\log k-\frac{\gamma(k+1)}2\log n\right)
+ \le n^{-\gamma k/3}.
+\]
+Choose $\alpha>0$ sufficiently small that
+\[
+ \alpha\le \frac{\gamma(2+\gamma)}{15}.
+\]
+The assumption $\delta>n^{-\alpha}$ gives $L<\alpha\log n$, and therefore
+\[
+ k\ge\frac{2+\gamma}{\alpha}\ge\frac{15}{\gamma}.
+\]
+Hence
+\[
+ \sum_{m=m_0}^{k^2}k^{10k}n^{-\gamma m/k}
+ \le k^2n^{-\gamma k/3}
+ \le \frac{k^2}{n^5}
+ \le \frac{k^2}{n^2},
+\]
+as required.
+\end{proof}
+
+\section{Proof of the main theorem}
+
+We now use the two estimates of Dahia--Marciano--Souza which already operate at the constant $2+\gamma$.  We record precisely the forms needed here.
+
+For every $0<\gamma\le2$, $c>0$ and $C>1$, \cite[Lemma 2.1]{DMS} gives an $\alpha_1>0$ such that, whenever $n^{-\alpha_1}<\delta\le1-c$ and
+\[
+ k=\left\lceil(2+\gamma)\frac{\log n}{\log(1/\delta)}\right\rceil,
+\]
+a $\delta$-random set $S\subseteq[n]$ satisfies
+\begin{equation}\label{eq:DMS-small}
+ \Prob\left(
+ \exists(A,B)\in\binom{[n]}{k}^2:\
+ |A+B|\le Ck,\ A+B\subseteq S
+ \right)
+ \le \frac{2k}{n^{\gamma/64}}.
+\end{equation}
+For every $0<\gamma\le2$ and $c>0$, \cite[Corollary 3.3]{DMS} gives $C>1$ and $\alpha_2>0$ such that, under the same hypotheses,
+\begin{equation}\label{eq:DMS-moderate}
+ \Prob\left(
+ \exists(A,B)\in\binom{[n]}{k}^2:\
+ Ck<|A+B|<\frac{k(k+1)}2,\ A+B\subseteq S
+ \right)
+ \le \frac{2k^2}{n^2}.
+\end{equation}
+
+\begin{proof}[Proof of Theorem~\ref{thm:random-main}]
+Fix $0<\gamma\le1$ and $c>0$.  Choose $C$ and $\alpha_2$ from \cite[Corollary 3.3]{DMS}, choose $\alpha_1$ from \cite[Lemma 2.1]{DMS} with this $C$, and choose $\alpha_3$ from Lemma~\ref{lem:large-random}.  Set
+\[
+ \alpha=\min\{\alpha_1,\alpha_2,\alpha_3\}.
+\]
+
+Let $S\subseteq[n]$ be $\delta$-random with $n^{-\alpha}<\delta\le1-c$.  If there exist finite $A,B\subseteq\N$ with
+\[
+ \min\{|A|,|B|\}\ge k
+ \qquad\text{and}\qquad
+ A+B\subseteq S,
+\]
+then taking arbitrary $k$-element subsets $A'\subseteq A$ and $B'\subseteq B$ gives
+\[
+ A'+B'\subseteq S.
+\]
+Since $S\subseteq[n]$, such $A'$ and $B'$ may be regarded as subsets of $[n]$.
+
+Partition the possible pairs $(A',B')$ into the three ranges
+\[
+ |A'+B'|\le Ck,
+\]
+\[
+ Ck<|A'+B'|<\frac{k(k+1)}2,
+\]
+and
+\[
+ |A'+B'|\ge\frac{k(k+1)}2.
+\]
+Applying \eqref{eq:DMS-small}, \eqref{eq:DMS-moderate}, and Lemma~\ref{lem:large-random}, respectively, gives
+\[
+ \Prob\left(\exists A,B\subseteq\N:\ \min\{|A|,|B|\}\ge k,\ A+B\subseteq S\right)
+ \le
+ \frac{2k}{n^{\gamma/64}}+\frac{3k^2}{n^2}.
+\]
+Because $\delta\le1-c$ implies $k=O_c(\log n)$, the right-hand side tends to $0$.
+\end{proof}
+
+\begin{proof}[Proof of Corollary~\ref{cor:dense}]
+Fix $0<\delta<1$ and $\eps>0$.  Choose $0<\gamma<\min\{\eps,1\}$ and then choose $\delta'$ with
+\[
+ \delta<\delta'<1
+\]
+so close to $\delta$ that
+\begin{equation}\label{eq:density-perturb}
+ \frac{2+\gamma}{\log(1/\delta')}
+ <
+ \frac{2+\eps}{\log(1/\delta)}.
+\end{equation}
+This is possible by continuity.
+
+Apply Theorem~\ref{thm:random-main} to a $\delta'$-random subset $S$ of $[n]$, taking for example
+\[
+ c=\frac{1-\delta'}2.
+\]
+With high probability, $S$ contains no $A+B$ with
+\[
+ \min\{|A|,|B|\}\ge
+ \left\lceil(2+\gamma)\frac{\log n}{\log(1/\delta')}\right\rceil.
+\]
+Also, by a standard Chernoff bound,
+\[
+ \Prob(|S|<\delta n)=o(1),
+\]
+since $\delta'-\delta>0$ is fixed.  Therefore, for all sufficiently large $n$, there exists a realization satisfying both properties.  By \eqref{eq:density-perturb}, this realization has the required conclusion.
+\end{proof}
+
+\begin{remark}
+Corollary~\ref{cor:dense} may equivalently be stated with a threshold
+\[
+ \left(2+o(1)\right)\frac{\log n}{\log(1/\delta)}
+\]
+for every fixed $0<\delta<1$, by a diagonal choice of $\eps\to0$.
+\end{remark}
+
+\begin{thebibliography}{9}
+
+\bibitem{DMS}
+G.~Dahia, J.~P.~Marciano and V.~Souza,
+\emph{Dense sets without large sumsets},
+arXiv:2607.15269v2, 2026.
+
+\bibitem{Ruzsa94}
+I.~Z.~Ruzsa,
+\emph{Sum of sets in several dimensions},
+Combinatorica \textbf{14} (1994), no.~4, 485--490.
+
+\end{thebibliography}
+
+\end{document}
