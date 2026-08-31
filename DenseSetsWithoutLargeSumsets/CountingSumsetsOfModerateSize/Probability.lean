@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Enumeration
+import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
 
 /-!
 # Probability bounds for moderate sumsets

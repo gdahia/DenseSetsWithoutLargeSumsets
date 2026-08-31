@@ -111,7 +111,7 @@ lemma pairCardThreshold_pos_of_density {τ : ℝ} {n : ℕ} {δ : unitInterval}
 
 lemma one_lt_densityCoefficient {γ c : ℝ} (hγ_pos : 0 < γ)
     (hc_pos : 0 < c) (hc_lt : c < 1) :
-    1 < densityCoefficient (3 + γ) c :=
+    1 < densityCoefficient (2 + γ) c :=
   densityCoefficient_gt_one (by linarith) hc_pos hc_lt
 
 private lemma one_le_lowerGapSqrtScale {C γ c : ℝ} (hγ_pos : 0 < γ)
@@ -119,14 +119,14 @@ private lemma one_le_lowerGapSqrtScale {C γ c : ℝ} (hγ_pos : 0 < γ)
     (hc_pos : 0 < c) (hc_lt : c < 1) :
     1 ≤ lowerGapSqrtScale C γ c hC hε := by
   rw [lowerGapSqrtScale, le_div_iff₀ hε]
-  have hsqrt : 1 ≤ Real.sqrt (densityCoefficient (3 + γ) c) := by
+  have hsqrt : 1 ≤ Real.sqrt (densityCoefficient (2 + γ) c) := by
     rw [Real.one_le_sqrt]
     exact (one_lt_densityCoefficient hγ_pos hc_pos hc_lt).le
   nlinarith [one_le_lowerBltConstant hC hε,
     ε_le_one_twelfth hγ_pos hγ_le,
     mul_nonneg (by nlinarith [one_le_lowerBltConstant hC hε] :
       0 ≤ lowerBltConstant C γ hC hε - 1)
-      (by nlinarith [hsqrt] : 0 ≤ Real.sqrt (densityCoefficient (3 + γ) c) - 1)]
+      (by nlinarith [hsqrt] : 0 ≤ Real.sqrt (densityCoefficient (2 + γ) c) - 1)]
 
 lemma κ_ge_six_of_one_le {C : ℝ} (hC : 1 ≤ C) : 6 ≤ κ C := by
   unfold κ
@@ -262,8 +262,8 @@ lemma log_one_div_unitInterval_pos {γ C : ℝ} {n : ℕ} {δ : unitInterval}
   linarith
 
 lemma pairCardThreshold_arg_le {γ : ℝ} {n : ℕ} {δ : unitInterval} :
-    (3 + γ) * Real.log (n : ℝ) / Real.log (1 / δ) ≤
-      (pairCardThreshold (3 + γ) n δ : ℝ) := by
+    (2 + γ) * Real.log (n : ℝ) / Real.log (1 / δ) ≤
+      (pairCardThreshold (2 + γ) n δ : ℝ) := by
   rw [pairCardThreshold]
   apply Nat.le_ceil
 
@@ -295,7 +295,7 @@ private lemma two_mul_ceil_κ_sub_one_le_fourteen_sq {C : ℝ} (hC_one : 1 ≤ C
 
 private lemma two_mul_ceil_κ_sub_one_mul_lowerDensityExponent_lt {C γ : ℝ}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) :
-    ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ) * lowerDensityExponent C γ < 3 + γ := by
+    ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ) * lowerDensityExponent C γ < 2 + γ := by
   apply lt_of_le_of_lt (b := (7 / 48) * γ)
   · refine le_trans (b := (14 * C ^ (2 : ℕ)) * lowerDensityExponent C γ) ?_ ?_
     · apply mul_le_mul_of_nonneg_right
@@ -314,10 +314,10 @@ private lemma pairCardThreshold_gt_of_mul_lowerDensityExponent_lt {γ C R : ℝ}
   unitInterval}
     (_hR_pos : 0 < R) (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
-    (hRα_lt : R * lowerDensityExponent C γ < 3 + γ) :
-    R < (pairCardThreshold (3 + γ) n δ : ℝ) := by
+    (hRα_lt : R * lowerDensityExponent C γ < 2 + γ) :
+    R < (pairCardThreshold (2 + γ) n δ : ℝ) := by
   refine lt_of_lt_of_le ?_ pairCardThreshold_arg_le
-  apply lt_trans (b := (3 + γ) * Real.log (n : ℝ) /
+  apply lt_trans (b := (2 + γ) * Real.log (n : ℝ) /
       (lowerDensityExponent C γ * Real.log (n : ℝ)))
   · rw [lt_div_iff₀ (mul_pos (lowerDensityExponent_pos_of_one_le hγ_pos hC_one)
       (Real.log_pos (by exact_mod_cast hn_one : (1 : ℝ) < n)))]
@@ -339,7 +339,7 @@ private lemma pairCardThreshold_gt_of_mul_lowerDensityExponent_lt {γ C R : ℝ}
 private lemma two_mul_chang_size_threshold_mul_lowerDensityExponent_lt {γ C : ℝ}
     (hγ_pos : 0 < γ) :
     (2 * (Real.exp (changContainerExponent (κ C)))) * lowerDensityExponent C γ <
-      3 + γ := by
+      2 + γ := by
   have hT : (0 : ℝ) < Real.exp (changContainerExponent (κ C)) := chang_size_threshold_pos C
   apply lt_of_le_of_lt (mul_le_mul_of_nonneg_left
     (lowerDensityExponent_le_second_component_half C γ) (by positivity))
@@ -351,7 +351,7 @@ lemma two_mul_chang_size_threshold_lt_pairCardThreshold {γ C : ℝ} {n : ℕ}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
     2 * (Real.exp (changContainerExponent (κ C))) <
-      (pairCardThreshold (3 + γ) n δ : ℝ) := by
+      (pairCardThreshold (2 + γ) n δ : ℝ) := by
   apply pairCardThreshold_gt_of_mul_lowerDensityExponent_lt
   · apply mul_pos
     · norm_num
@@ -365,7 +365,7 @@ lemma two_mul_chang_size_threshold_lt_pairCardThreshold {γ C : ℝ} {n : ℕ}
 
 private lemma fourteen_mul_sq_div_ε_mul_lowerDensityExponent_lt {γ C : ℝ}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) :
-    (14 * C ^ (2 : ℕ) / ε γ) * lowerDensityExponent C γ < 3 + γ := by
+    (14 * C ^ (2 : ℕ) / ε γ) * lowerDensityExponent C γ < 2 + γ := by
   apply lt_of_le_of_lt (b := 14 * (2 + γ) / 24)
   · refine le_trans (b :=
       (14 * C ^ (2 : ℕ) / ε γ) *
@@ -385,8 +385,8 @@ lemma fourteen_mul_sq_lt_ε_mul_pairCardThreshold {γ C : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (_hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    14 * C ^ (2 : ℕ) < ε γ * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  rw [mul_comm (ε γ) ((pairCardThreshold (3 + γ) n δ : ℕ) : ℝ)]
+    14 * C ^ (2 : ℕ) < ε γ * (pairCardThreshold (2 + γ) n δ : ℝ) := by
+  rw [mul_comm (ε γ) ((pairCardThreshold (2 + γ) n δ : ℕ) : ℝ)]
   rw [← div_lt_iff₀ (ε_pos hγ_pos)]
   apply pairCardThreshold_gt_of_mul_lowerDensityExponent_lt
   · apply div_pos
@@ -407,7 +407,7 @@ lemma two_mul_ceil_κ_sub_one_le_ε_mul_pairCardThreshold {γ C : ℝ} {n : ℕ}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
     ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ) ≤
-      ε γ * (pairCardThreshold (3 + γ) n δ : ℝ) := by
+      ε γ * (pairCardThreshold (2 + γ) n δ : ℝ) := by
   exact (two_mul_ceil_κ_sub_one_le_fourteen_sq hC_one).trans
     (le_of_lt
       (fourteen_mul_sq_lt_ε_mul_pairCardThreshold hγ_pos hγ_le hC_one hn_one hδ_lower
@@ -417,7 +417,7 @@ lemma two_mul_ceil_κ_sub_one_le_pairCardThreshold {γ C : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    2 * ⌈κ C⌉₊ - 1 ≤ pairCardThreshold (3 + γ) n δ := by
+    2 * ⌈κ C⌉₊ - 1 ≤ pairCardThreshold (2 + γ) n δ := by
   apply le_of_lt
   exact_mod_cast pairCardThreshold_gt_of_mul_lowerDensityExponent_lt
     (R := ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ))
@@ -446,9 +446,9 @@ private lemma log_nat_le_two_sqrt_of_old_model_threshold {C γ : ℝ} {n : ℕ}
 lemma density_coeff_log_lt_exp_neg_mul_q {C γ c : ℝ} {n q : ℕ}
     (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hc_lt : c < 1)
     (hn : lowerGapThreshold C γ c < n) (hq_lower : 2 * n ≤ q) :
-    2 * densityCoefficient (3 + γ) c * Real.log (n : ℝ) <
+    2 * densityCoefficient (2 + γ) c * Real.log (n : ℝ) <
       Real.exp (-(changExponent C)) * q := by
-  let K := densityCoefficient (3 + γ) c
+  let K := densityCoefficient (2 + γ) c
   have hK_pos : 0 < K := by
     dsimp [K, densityCoefficient]
     have : 0 < Real.log (1 / (1 - c)) := by
@@ -487,7 +487,7 @@ lemma lowerLogScale_log_bound_of_gap {C γ c : ℝ} {n : ℕ}
     (hC : 0 < 2 * C) (hε : 0 < ε γ)
     (hn : lowerGapThreshold C γ c < n) :
     lowerLogScale γ * Real.log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC hε *
+        (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstant C γ hC hε *
           Real.log (n : ℝ)) ≤
       Real.log (n : ℝ) := by
   have hn_old : lowerSizeThreshold C γ < n := (lowerSizeThreshold_le_lowerGapThreshold C γ
@@ -500,22 +500,22 @@ lemma lowerLogScale_log_bound_of_gap {C γ c : ℝ} {n : ℕ}
   rw [← lowerConstantDefault_eq C γ hC hε]
   apply le_of_lt
   rw [← Real.log_exp (2 * lowerLogScale γ * Real.log
-    (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
+    (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ *
       lowerLogScale γ))]
   apply Real.log_lt_log (Real.exp_pos _)
   apply (Real.exp_le_exp.mpr (le_max_left
     (2 * lowerLogScale γ * Real.log
-      (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
+      (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
     ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
-      (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
+      (2 * max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ *
         lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ)))).trans_lt
   exact ((le_max_right
-    ((2 * densityCoefficient (3 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ))
+    ((2 * densityCoefficient (2 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ))
     (Real.exp (max
       (2 * lowerLogScale γ * Real.log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
+        (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
       ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
-        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
+        (2 * max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ *
           lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ))))).trans
     (le_max_right (lowerSizeThreshold C γ) _)).trans_lt hn
 
@@ -523,29 +523,29 @@ private lemma lowerGapSqrtScale_threshold_bound {C γ c : ℝ} {n : ℕ}
     (hC : 0 < 2 * C) (hε : 0 < ε γ)
     (hn : lowerGapThreshold C γ c < n) :
     4 * lowerGapSqrtScale C γ c hC hε * Real.log
-        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC hε *
+        (2 * max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstant C γ hC hε *
           lowerGapSqrtScale C γ c hC hε) ≤
       Real.sqrt (Real.log (n : ℝ)) := by
   apply Real.le_sqrt_of_sq_le
   rw [← lowerConstantDefault_eq C γ hC hε, ← lowerGapSqrtScaleDefault_eq C γ c hC hε]
   apply le_of_lt
   rw [← Real.log_exp ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
-    (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
+    (2 * max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ *
       lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ))]
   apply Real.log_lt_log (Real.exp_pos _)
   apply (Real.exp_le_exp.mpr (le_max_right
     (2 * lowerLogScale γ * Real.log
-      (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
+      (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
     ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
-      (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
+      (2 * max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ *
         lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ)))).trans_lt
   exact ((le_max_right
-    ((2 * densityCoefficient (3 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ))
+    ((2 * densityCoefficient (2 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ))
     (Real.exp (max
       (2 * lowerLogScale γ * Real.log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
+        (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
       ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
-        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
+        (2 * max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ *
           lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ))))).trans
     (le_max_right (lowerSizeThreshold C γ) _)).trans_lt hn
 
@@ -554,13 +554,13 @@ lemma lowerGapSqrtScale_log_bound {C γ c : ℝ} {n : ℕ}
     (hc_pos : 0 < c) (hc_lt : c < 1)
     (hn : lowerGapThreshold C γ c < n) :
     lowerGapSqrtScale C γ c hC hε * Real.log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC hε *
+        (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstant C γ hC hε *
           Real.log (n : ℝ)) ≤
       Real.sqrt (Real.log (n : ℝ)) := by
-  let M := max 42 (3 * densityCoefficient (3 + γ) c)
+  let M := max 42 (3 * densityCoefficient (2 + γ) c)
   have hM : (42 : ℝ) ≤ M := le_max_left _ _
   have hM_pos : 0 < M := (by norm_num : (0 : ℝ) < 42).trans_le hM
-  have hK_pos : 0 < densityCoefficient (3 + γ) c :=
+  have hK_pos : 0 < densityCoefficient (2 + γ) c :=
     zero_lt_one.trans (one_lt_densityCoefficient hγ_pos hc_pos hc_lt)
   have hn_old : lowerSizeThreshold C γ < n := (lowerSizeThreshold_le_lowerGapThreshold C γ
     c).trans_lt hn

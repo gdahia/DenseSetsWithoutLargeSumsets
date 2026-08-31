@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import DenseSetsWithoutLargeSumsets.Probability
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.BipartiteFreimanCounting
 import Mathlib.Combinatorics.Additive.RuzsaCovering
 
 /-!
@@ -405,6 +406,145 @@ private lemma pairCardThreshold_log_le_gamma_log {γ c : ℝ} (hγ_pos : 0 < γ)
     mul_le_mul_of_nonneg_left hlog_le (by norm_num)
   exact hmul18.trans (veryLargeSumset_log_log_bound hγ_pos hγ_le hc_pos hc_lt hn)
 
+/--
+The explicit threshold from the very-large-sumset estimate.
+-/
+def bipartiteVeryLargeSumsetThreshold (γ c : ℝ) : ℕ :=
+  Nat.ceil (((48 * densityCoefficient (2 + γ) c) / γ) ^ ((96 : ℝ) / γ))
+
+/--
+Threshold used in the final analytic step of the very-large-sumset proof.
+
+The surrounding statements use strict hypotheses of the form
+`bipartiteVeryLargeSumsetStrictThreshold γ < n`. Subtracting one makes this equivalent to
+the non-strict threshold `n ≥ bipartiteVeryLargeSumsetThreshold γ c` when `0 < γ`.
+-/
+def bipartiteVeryLargeSumsetStrictThreshold (γ c : ℝ) : ℕ :=
+  bipartiteVeryLargeSumsetThreshold γ c - 1
+
+private lemma bipartiteVeryLargeSumsetThreshold_pos {γ c : ℝ} (hγ_pos : 0 < γ)
+    (hc_pos : 0 < c) (hc_lt : c < 1) :
+    0 < bipartiteVeryLargeSumsetThreshold γ c := by
+  rw [bipartiteVeryLargeSumsetThreshold, Nat.ceil_pos]
+  have hq_pos : 0 < densityCoefficient (2 + γ) c :=
+    lt_trans zero_lt_one
+      (densityCoefficient_gt_one (by linarith : 0 < 2 + γ) hc_pos hc_lt)
+  exact Real.rpow_pos_of_pos
+    (div_pos (mul_pos (by norm_num) hq_pos) hγ_pos) _
+
+private lemma two_le_bipartiteVeryLargeSumsetThreshold {γ c : ℝ}
+    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
+    (hc_pos : 0 < c) (hc_lt : c < 1) :
+    2 ≤ bipartiteVeryLargeSumsetThreshold γ c := by
+  rw [bipartiteVeryLargeSumsetThreshold]
+  norm_num [Nat.add_one_le_ceil_iff]
+  have hbase : 1 < (48 * densityCoefficient (2 + γ) c) / γ := by
+    rw [one_lt_div hγ_pos]
+    nlinarith [densityCoefficient_gt_one (by linarith : 0 < 2 + γ) hc_pos hc_lt]
+  simpa using Real.one_lt_rpow hbase (by positivity : 0 < (96 : ℝ) / γ)
+
+private lemma bipartiteVeryLargeSumsetThreshold_le_of_bipartiteVeryLargeSumsetStrictThreshold_lt
+    {γ c : ℝ} (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hc_lt : c < 1) {n : ℕ}
+    (hn : bipartiteVeryLargeSumsetStrictThreshold γ c < n) :
+    bipartiteVeryLargeSumsetThreshold γ c ≤ n := by
+  have hpos : 0 < bipartiteVeryLargeSumsetThreshold γ c :=
+    bipartiteVeryLargeSumsetThreshold_pos hγ_pos hc_pos hc_lt
+  rw [bipartiteVeryLargeSumsetStrictThreshold] at hn
+  omega
+
+private lemma bipartiteVeryLargeSumset_log_log_bound {γ c : ℝ} (hγ_pos : 0 < γ)
+    (hγ_le : γ ≤ 1) (hc_pos : 0 < c) (hc_lt : c < 1)
+    {n : ℕ} (hn : bipartiteVeryLargeSumsetStrictThreshold γ c < n) :
+    48 * Real.log (densityCoefficient (2 + γ) c * Real.log (n : ℝ)) ≤
+      γ * Real.log (n : ℝ) := by
+  let q := densityCoefficient (2 + γ) c
+  generalize hx : Real.log (n : ℝ) = x
+  generalize hy : γ * x / 48 = y
+  generalize hL : Real.log ((48 * q) / γ) = L
+  have hNle : bipartiteVeryLargeSumsetThreshold γ c ≤ n :=
+    bipartiteVeryLargeSumsetThreshold_le_of_bipartiteVeryLargeSumsetStrictThreshold_lt
+      hγ_pos hc_pos hc_lt hn
+  have hNtwo : 2 ≤ bipartiteVeryLargeSumsetThreshold γ c :=
+    two_le_bipartiteVeryLargeSumsetThreshold hγ_pos hγ_le hc_pos hc_lt
+  have hn_two : 2 ≤ n := le_trans hNtwo hNle
+  have hx_pos : 0 < x := by
+    rw [← hx]
+    exact Real.log_pos (by exact_mod_cast lt_of_lt_of_le (by norm_num : 1 < 2) hn_two)
+  have hq_gt_one : 1 < q :=
+    densityCoefficient_gt_one (by linarith : 0 < 2 + γ) hc_pos hc_lt
+  have hbase_pos : 0 < (48 * q) / γ := by positivity
+  have hbase_gt_one : 1 < (48 * q) / γ := by
+    rw [one_lt_div hγ_pos]
+    nlinarith
+  have hL_pos : 0 < L := by
+    rw [← hL]
+    exact Real.log_pos hbase_gt_one
+  have hvalue_le_n : ((48 * q) / γ) ^ ((96 : ℝ) / γ) ≤ (n : ℝ) :=
+    (Nat.le_ceil _).trans (by exact_mod_cast hNle)
+  have hlog_value_le :
+      Real.log (((48 * q) / γ) ^ ((96 : ℝ) / γ)) ≤ x := by
+    rw [← hx]
+    exact Real.log_le_log (Real.rpow_pos_of_pos hbase_pos _) hvalue_le_n
+  have hlog_value_eq :
+      Real.log (((48 * q) / γ) ^ ((96 : ℝ) / γ)) = ((96 : ℝ) / γ) * L := by
+    rw [← hL, Real.log_rpow hbase_pos]
+  have hy_bound : 2 * L ≤ y := by
+    have hmul := mul_le_mul_of_nonneg_left hlog_value_le (by positivity : 0 ≤ γ / 48)
+    rw [hlog_value_eq] at hmul
+    have hleft : (γ / 48) * ((96 / γ) * L) = 2 * L := by
+      field_simp [hγ_pos.ne']
+      ring
+    have hright : (γ / 48) * x = y := by rw [← hy]; ring
+    rwa [hleft, hright] at hmul
+  have hy_pos : 0 < y := lt_of_lt_of_le (by linarith : 0 < 2 * L) hy_bound
+  have hlogqx_eq : Real.log (q * x) = L + Real.log y := by
+    have hprod : q * x = ((48 * q) / γ) * y := by
+      rw [← hy]
+      field_simp [hγ_pos.ne']
+    rw [hprod, Real.log_mul (ne_of_gt hbase_pos) (ne_of_gt hy_pos), hL]
+  have hlogqx_le : Real.log (q * x) ≤ y := by
+    rw [hlogqx_eq]
+    linarith [log_le_half_self hy_pos]
+  apply (mul_le_mul_of_nonneg_left hlogqx_le (by norm_num)).trans_eq
+  rw [← hy, ← hx]
+  ring
+
+private lemma bipartitePairCardThreshold_pos (n : ℕ) (τ : ℝ) (δ : unitInterval)
+    (hτ : 0 < τ) (hδ : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) (hn : 1 < n) :
+    0 < pairCardThreshold τ n δ := by
+  rw [pairCardThreshold, Nat.ceil_pos]
+  have hnlog : 0 < Real.log (n : ℝ) := Real.log_pos (by exact_mod_cast hn)
+  have hlog_inv_pos : 0 < Real.log (1 / δ) := by
+    apply Real.log_pos
+    rw [one_lt_div hδ]
+    exact hδ_lt
+  positivity
+
+lemma bipartitePairCardThreshold_log_le_gamma_log {γ c : ℝ}
+    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hc_pos : 0 < c) {n : ℕ}
+    (hn : bipartiteVeryLargeSumsetStrictThreshold γ c < n) {δ : unitInterval}
+    (hδ_pos : 0 < (δ : ℝ)) (hδ_upper : (δ : ℝ) ≤ 1 - c)
+    (hkpos : 0 < pairCardThreshold (2 + γ) n δ) :
+    48 * Real.log (pairCardThreshold (2 + γ) n δ : ℝ) ≤ γ * Real.log (n : ℝ) := by
+  have hc_lt : c < 1 := by linarith
+  have hNle : bipartiteVeryLargeSumsetThreshold γ c ≤ n :=
+    bipartiteVeryLargeSumsetThreshold_le_of_bipartiteVeryLargeSumsetStrictThreshold_lt
+      hγ_pos hc_pos hc_lt hn
+  have hNtwo : 2 ≤ bipartiteVeryLargeSumsetThreshold γ c :=
+    two_le_bipartiteVeryLargeSumsetThreshold hγ_pos hγ_le hc_pos hc_lt
+  have hn_two : 2 ≤ n := le_trans hNtwo hNle
+  have hk_le : (pairCardThreshold (2 + γ) n δ : ℝ) ≤
+      densityCoefficient (2 + γ) c * Real.log (n : ℝ) :=
+    pairCardThreshold_le_densityCoefficient_mul_log (by linarith) hc_pos hn_two hδ_pos hδ_upper
+  have hlog_le :
+      Real.log (pairCardThreshold (2 + γ) n δ : ℝ) ≤
+        Real.log (densityCoefficient (2 + γ) c * Real.log (n : ℝ)) :=
+    Real.log_le_log (by exact_mod_cast hkpos) hk_le
+  have hmul48 : 48 * Real.log (pairCardThreshold (2 + γ) n δ : ℝ) ≤
+      48 * Real.log (densityCoefficient (2 + γ) c * Real.log (n : ℝ)) :=
+    mul_le_mul_of_nonneg_left hlog_le (by norm_num)
+  exact hmul48.trans (bipartiteVeryLargeSumset_log_log_bound hγ_pos hγ_le hc_pos hc_lt hn)
+
 private def veryLargeSumsetPairSlice (n k m : ℕ) : Finset (Finset ℕ × Finset ℕ) :=
   ((interval n).powersetCard k ×ˢ (interval n).powersetCard k).filter fun p =>
     (p.1 + p.2).card = m
@@ -447,6 +587,25 @@ lemma veryLargeSumsetPairSlice_card_le (n k m : ℕ) :
   apply (Set.ncard_le_ncard hsubset hTfinite).trans
   rw [← hTdef]
   apply pair_small_sumset_family_card_le
+
+/-- The bipartite Freiman-dimension argument gives the sharper count needed for the
+constant `2`: a pair with sumset of cardinality `m` is encoded using `2 * m / k`
+ambient coordinates, up to `k ^ (8 * k)` possible relation tables. -/
+lemma veryLargeSumsetPairSlice_card_le_bipartite (n k m : ℕ) (hk : 0 < k) :
+    (veryLargeSumsetPairSlice n k m).card ≤ k ^ (8 * k) * n ^ (2 * m / k) := by
+  classical
+  have hfinite : (boundedBipartiteSumsetPairs n k m).Finite := by
+    apply ((((interval n).powerset ×ˢ (interval n).powerset) :
+      Finset (Finset ℕ × Finset ℕ))).finite_toSet.subset
+    intro p hp
+    simp only [Finset.mem_coe, Finset.mem_product, Finset.mem_powerset]
+    exact ⟨hp.1, hp.2.1⟩
+  rw [← Set.ncard_coe_finset]
+  exact (Set.ncard_le_ncard (by
+      intro p hp
+      have hp' := mem_veryLargeSumsetPairSlice.mp hp
+      exact ⟨hp'.1, hp'.2.1, hp'.2.2.1, hp'.2.2.2.1, le_of_eq hp'.2.2.2.2⟩)
+      hfinite).trans (ncard_boundedBipartiteSumsetPairs_le n k m hk)
 
 def veryLargeSumsetEvent (n k : ℕ) (S : Finset ℕ) : Prop :=
   ∃ A B : Finset ℕ,
@@ -509,6 +668,59 @@ lemma veryLargeSumsetEvent_measure_le_sum
       intro m hm
       exact mul_le_mul_of_nonneg_right
         (by exact_mod_cast veryLargeSumsetPairSlice_card_le n k m)
+        (hprob_nonneg m)
+
+/-- Union bound using the bipartite Freiman-dimension enumeration. -/
+lemma veryLargeSumsetEvent_measure_le_bipartite_sum
+    (n k : ℕ) (hk : 0 < k) {δ : unitInterval}
+    (prob : ℕ → ℝ)
+    (hprob_nonneg : ∀ m, 0 ≤ prob m)
+    (hpair :
+      ∀ m (p : Finset ℕ × Finset ℕ), p ∈ veryLargeSumsetPairSlice n k m →
+        (binomialFinsetSubset (Set.Icc 1 n) δ).real
+          {S : Finset ℕ | p.1 + p.2 ⊆ S} ≤ prob m) :
+    (binomialFinsetSubset (Set.Icc 1 n) δ).real {S : Finset ℕ | veryLargeSumsetEvent n k S} ≤
+      ∑ m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
+        (k ^ (8 * k) * n ^ (2 * m / k) : ℝ) * prob m := by
+  classical
+  have hevent_subset : {S : Finset ℕ | veryLargeSumsetEvent n k S} ⊆
+      ⋃ m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
+        ⋃ p ∈ veryLargeSumsetPairSlice n k m, {S : Finset ℕ | p.1 + p.2 ⊆ S} := by
+    intro S hS
+    rcases hS with ⟨A, B, hA, hB, hAcard, hBcard, hlarge, hsumS⟩
+    have hm_upper : (A + B).card ≤ k * k := by
+      apply Finset.card_add_le.trans
+      rw [hAcard, hBcard]
+    refine Set.mem_iUnion₂.mpr ⟨(A + B).card,
+      Finset.mem_Icc.mpr ⟨hlarge, hm_upper⟩, ?_⟩
+    refine Set.mem_iUnion₂.mpr ⟨(A, B), ?_, hsumS⟩
+    exact mem_veryLargeSumsetPairSlice.mpr ⟨hA, hB, hAcard, hBcard, rfl⟩
+  refine le_trans ?_
+      ((MeasureTheory.measureReal_biUnion_finset_le
+        (μ := binomialFinsetSubset (Set.Icc 1 n) δ)
+        (Finset.Icc ((k + 1) * k / 2) (k * k))
+        (fun m => ⋃ p ∈ veryLargeSumsetPairSlice n k m,
+          {S : Finset ℕ | p.1 + p.2 ⊆ S})).trans ?_)
+  · rw [MeasureTheory.measureReal_def, MeasureTheory.measureReal_def]
+    exact ENNReal.toReal_mono
+      (MeasureTheory.measure_ne_top (binomialFinsetSubset (Set.Icc 1 n) δ) _)
+      (MeasureTheory.measure_mono hevent_subset)
+  · refine le_trans (b := ∑ m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
+      (veryLargeSumsetPairSlice n k m).card * prob m) ?_ ?_
+    · refine Finset.sum_le_sum ?_
+      intro m hm
+      apply le_trans
+        (MeasureTheory.measureReal_biUnion_finset_le
+          (μ := binomialFinsetSubset (Set.Icc 1 n) δ) (veryLargeSumsetPairSlice n k m)
+          fun p => {S : Finset ℕ | p.1 + p.2 ⊆ S})
+      refine (Finset.sum_le_sum (g := fun _ => prob m) ?_).trans ?_
+      · intro p hp
+        exact hpair m p hp
+      · simp [mul_comm]
+    · refine Finset.sum_le_sum ?_
+      intro m hm
+      exact mul_le_mul_of_nonneg_right
+        (by exact_mod_cast veryLargeSumsetPairSlice_card_le_bipartite n k m hk)
         (hprob_nonneg m)
 
 /--
@@ -581,10 +793,58 @@ private lemma veryLargeSumset_nat_div_lower {k m : ℕ} (hk : 0 < k)
     conv_lhs => rw [(Nat.div_add_mod m k).symm]
     apply (Nat.add_lt_add_left hmod _).trans_eq
     ring
-  have hA : (m / k + 1) * k ≤ ((k + 1) * k) / 2 := by
-    apply (Nat.le_div_iff_mul_le (by norm_num : 0 < 2)).2
-    nlinarith
+  have hm_lt' : m < ((k + 1) * k) / 2 := by
+    have hA : (m / k + 1) * k ≤ ((k + 1) * k) / 2 := by
+      apply (Nat.le_div_iff_mul_le (by norm_num : 0 < 2)).2
+      nlinarith
+    exact hm_lt.trans_le hA
   omega
+
+private lemma bipartiteVeryLargeSumset_summand_le
+    {γ : ℝ} (hγ : 0 < γ) {n k m : ℕ} (hn : 1 < n) (hk : 0 < k)
+    {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1)
+    (hm : (k + 1) * k / 2 ≤ m)
+    (hkdef : k = pairCardThreshold (2 + γ) n δ) :
+    ((k ^ (8 * k) * n ^ (2 * m / k) : ℕ) : ℝ) * (δ : ℝ) ^ m ≤
+      (k : ℝ) ^ (8 * k) * (n : ℝ) ^ (-γ * (k : ℝ) / 2) := by
+  have hnR_pos : 0 < (n : ℝ) := by positivity
+  have hnR_one : 1 ≤ (n : ℝ) := by exact_mod_cast (le_of_lt hn)
+  have hkR_pos : 0 < (k : ℝ) := by exact_mod_cast hk
+  have hδpow : (δ : ℝ) ^ m ≤
+      (n : ℝ) ^ (-(2 + γ) * (m : ℝ) / (k : ℝ) : ℝ) := by
+    rw [hkdef]
+    exact unitInterval_pow_le_exp_div_mul_log n m (2 + γ) δ (by linarith)
+      hδ_pos hδ_lt hn
+      (pairCardThreshold_pos n (2 + γ) δ (by linarith) hδ_pos hδ_lt hn)
+  have he : ((2 * m / k : ℕ) : ℝ) ≤ 2 * (m : ℝ) / (k : ℝ) := by
+    rw [le_div_iff₀ hkR_pos]
+    exact_mod_cast Nat.div_mul_le_self (2 * m) k
+  have hmhalf : (k : ℝ) / 2 ≤ (m : ℝ) / (k : ℝ) := by
+    have hnat := veryLargeSumset_nat_div_lower hk hm
+    have hcast : (k : ℝ) ≤ 2 * ((m / k : ℕ) : ℝ) := by exact_mod_cast hnat
+    have hdiv : ((m / k : ℕ) : ℝ) ≤ (m : ℝ) / (k : ℝ) := by
+      rw [le_div_iff₀ hkR_pos]
+      exact_mod_cast Nat.div_mul_le_self m k
+    nlinarith
+  have hexp : ((2 * m / k : ℕ) : ℝ) +
+        (-(2 + γ) * (m : ℝ) / (k : ℝ)) ≤ -γ * (k : ℝ) / 2 := by
+    have hγmul := mul_le_mul_of_nonneg_left hmhalf hγ.le
+    calc
+      ((2 * m / k : ℕ) : ℝ) + (-(2 + γ) * (m : ℝ) / (k : ℝ)) ≤
+          2 * (m : ℝ) / (k : ℝ) + (-(2 + γ) * (m : ℝ) / (k : ℝ)) :=
+        by simpa [add_comm] using
+          (add_le_add_right he (-(2 + γ) * (m : ℝ) / (k : ℝ)))
+      _ = -γ * ((m : ℝ) / (k : ℝ)) := by ring
+      _ ≤ -γ * (k : ℝ) / 2 := by nlinarith
+  have hnpart : ((n ^ (2 * m / k) : ℕ) : ℝ) * (δ : ℝ) ^ m ≤
+      (n : ℝ) ^ (-γ * (k : ℝ) / 2) := by
+    refine (mul_le_mul_of_nonneg_left hδpow (by positivity)).trans ?_
+    rw [Nat.cast_pow, ← Real.rpow_natCast,
+      ← Real.rpow_add hnR_pos]
+    exact Real.rpow_le_rpow_of_exponent_le hnR_one hexp
+  rw [Nat.cast_mul, Nat.cast_pow]
+  simpa [mul_assoc] using
+    (mul_le_mul_of_nonneg_left hnpart (pow_nonneg (Nat.cast_nonneg k) (8 * k)))
 
 private lemma veryLargeSumset_summand_le {γ : ℝ} (hγ_pos : 0 < γ) {n k m : ℕ}
     (hn : 1 < n) (hk : 0 < k) {δ : unitInterval}
@@ -795,6 +1055,98 @@ theorem very_large_sumset_probability_le
   exact veryLargeSumsetEvent_measure_le γ n δ
     (veryLargeSumsetAnalyticBound_of_density_bounds
       hγ_pos hγ_le hc_pos hn hδ_lower hδ_upper)
+
+/-- Probability estimate for the very-large range at the sharp threshold `2 + γ`.
+The subexponential relation-table factor is left explicit for the final asymptotic step. -/
+theorem bipartite_very_large_sumset_probability_le
+    {γ : ℝ} (hγ : 0 < γ) {n : ℕ} (hn : 1 < n) {δ : unitInterval}
+    (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
+    (binomialFinsetSubset (Set.Icc 1 n) δ).real
+      {S : Finset ℕ | veryLargeSumsetEvent n (pairCardThreshold (2 + γ) n δ) S} ≤
+      (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 *
+        (pairCardThreshold (2 + γ) n δ : ℝ) ^
+          (8 * pairCardThreshold (2 + γ) n δ) /
+        (n : ℝ) ^ (γ * (pairCardThreshold (2 + γ) n δ : ℝ) / 2) := by
+  let k := pairCardThreshold (2 + γ) n δ
+  have hk : 0 < k := by
+    dsimp [k]
+    exact pairCardThreshold_pos n (2 + γ) δ (by linarith) hδ_pos hδ_lt hn
+  have hprob_nonneg : ∀ m : ℕ, 0 ≤ (δ : ℝ) ^ m :=
+    fun m => pow_nonneg δ.2.1 m
+  have hpair : ∀ m (p : Finset ℕ × Finset ℕ),
+      p ∈ veryLargeSumsetPairSlice n k m →
+        (binomialFinsetSubset (Set.Icc 1 n) δ).real
+          {S : Finset ℕ | p.1 + p.2 ⊆ S} ≤ (δ : ℝ) ^ m := by
+    intro m p hp
+    have hcard : (p.1 + p.2).card = m :=
+      (mem_veryLargeSumsetPairSlice.mp hp).2.2.2.2
+    simpa [hcard] using fixed_pair_sumset_probability_le n δ p.1 p.2
+  refine (veryLargeSumsetEvent_measure_le_bipartite_sum n k hk
+    (fun m => (δ : ℝ) ^ m) hprob_nonneg hpair).trans ?_
+  have hterm : ∀ m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
+      ((k ^ (8 * k) * n ^ (2 * m / k) : ℕ) : ℝ) * (δ : ℝ) ^ m ≤
+        (k : ℝ) ^ (8 * k) * (n : ℝ) ^ (-γ * (k : ℝ) / 2) := by
+    intro m hm
+    exact bipartiteVeryLargeSumset_summand_le hγ hn hk hδ_pos hδ_lt
+      (Finset.mem_Icc.mp hm).1 rfl
+  apply le_trans (b := ∑ _m ∈ Finset.Icc ((k + 1) * k / 2) (k * k),
+      (k : ℝ) ^ (8 * k) * (n : ℝ) ^ (-γ * (k : ℝ) / 2))
+  · refine Finset.sum_le_sum ?_
+    intro m hm
+    simpa [Nat.cast_mul, Nat.cast_pow] using hterm m hm
+  · have hcard : ((Finset.Icc ((k + 1) * k / 2) (k * k)).card : ℝ) ≤
+      (k : ℝ) ^ 2 := by
+      exact_mod_cast (show (Finset.Icc ((k + 1) * k / 2) (k * k)).card ≤ k ^ 2 by
+        simpa [pow_two] using veryLargeSumset_mRange_card_le k hk)
+    rw [Finset.sum_const, nsmul_eq_mul]
+    have hnonneg : 0 ≤ (k : ℝ) ^ (8 * k) *
+        (n : ℝ) ^ (-γ * (k : ℝ) / 2) := by positivity
+    refine (mul_le_mul_of_nonneg_right hcard hnonneg).trans_eq ?_
+    dsimp [k]
+    have hneg : -γ * (pairCardThreshold (2 + γ) n δ : ℝ) / 2 =
+        -(γ * (pairCardThreshold (2 + γ) n δ : ℝ) / 2) := by ring
+    rw [hneg, Real.rpow_neg (by positivity : (0 : ℝ) ≤ n)]
+    ring
+
+/-- For the explicit uniform threshold, the relation-table factor is absorbed by one sixth of
+the exponent saved by the sharp `2 + γ` threshold. -/
+theorem bipartite_very_large_sumset_factor_bound
+    {γ c : ℝ} (hγ : 0 < γ) (hγ_le : γ ≤ 1) (hc : 0 < c)
+    {n : ℕ} (hn : bipartiteVeryLargeSumsetStrictThreshold γ c < n)
+    {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ)) (hδ_upper : (δ : ℝ) ≤ 1 - c) :
+    let k := pairCardThreshold (2 + γ) n δ
+    (k : ℝ) ^ 2 * (k : ℝ) ^ (8 * k) /
+          (n : ℝ) ^ (γ * (k : ℝ) / 2) ≤
+      (k : ℝ) ^ 2 / (n : ℝ) ^ (γ * (k : ℝ) / 3) := by
+  let k := pairCardThreshold (2 + γ) n δ
+  have hc_lt : c < 1 := by linarith
+  have hNle : bipartiteVeryLargeSumsetThreshold γ c ≤ n :=
+    bipartiteVeryLargeSumsetThreshold_le_of_bipartiteVeryLargeSumsetStrictThreshold_lt
+      hγ hc hc_lt hn
+  have hn_two : 2 ≤ n :=
+    (two_le_bipartiteVeryLargeSumsetThreshold hγ hγ_le hc hc_lt).trans hNle
+  have hnR_pos : 0 < (n : ℝ) := by positivity
+  have hk : 0 < k := by
+    dsimp [k]
+    exact pairCardThreshold_pos n (2 + γ) δ (by linarith) hδ_pos
+      (lt_of_le_of_lt hδ_upper (by linarith)) (by omega)
+  have hlog := bipartitePairCardThreshold_log_le_gamma_log hγ hγ_le hc hn hδ_pos
+    hδ_upper (by simpa [k] using hk)
+  have hpow : (k : ℝ) ^ (8 * k) ≤ (n : ℝ) ^ (γ * (k : ℝ) / 6) := by
+    rw [← Real.rpow_natCast, Real.rpow_def_of_pos (by exact_mod_cast hk),
+      Real.rpow_def_of_pos hnR_pos]
+    apply Real.exp_le_exp.mpr
+    have hmul := mul_le_mul_of_nonneg_left (a := (k : ℝ) / 6) hlog (by positivity)
+    norm_num [Nat.cast_mul] at *
+    nlinarith
+  have hnum : (k : ℝ) ^ 2 * (k : ℝ) ^ (8 * k) ≤
+      (k : ℝ) ^ 2 * (n : ℝ) ^ (γ * (k : ℝ) / 6) :=
+    mul_le_mul_of_nonneg_left hpow (by positivity)
+  refine (div_le_div_of_nonneg_right hnum (by positivity)).trans_eq ?_
+  have hexp : γ * (k : ℝ) / 2 = γ * (k : ℝ) / 6 + γ * (k : ℝ) / 3 := by ring
+  rw [hexp, Real.rpow_add hnR_pos]
+  field_simp
+  simp [k, mul_comm]
 
 end
 

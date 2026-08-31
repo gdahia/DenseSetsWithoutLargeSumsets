@@ -479,6 +479,13 @@ private lemma boundedPairAnchor_castLE {n k m : ℕ} (hk : 0 < k)
         (tupleRealImage (boundedPairRepresentativeLeftTuple n k m hk code))
         (tupleRealImage (boundedPairRepresentativeRightTuple n k m hk code)) := i.isLt
   rw [dite_eq_left hi]
+  have hind : (⟨(Fin.castLE (representativeHomDim_le hk code hcode) i).val, hi⟩ :
+      Fin (bipartiteFreimanHomDim
+        (tupleRealImage (boundedPairRepresentativeLeftTuple n k m hk code))
+        (tupleRealImage (boundedPairRepresentativeRightTuple n k m hk code)))) = i := by
+    apply Fin.ext
+    rfl
+  rw [hind]
 
 private def tupleValueAtIndex {k : ℕ} (a b : Fin k → ℕ) :
     Sum (Fin k) (Fin k) → ℕ
@@ -500,6 +507,163 @@ private def boundedPairEncoding (n k m : ℕ) (hk : 0 < k)
     ⟨tupleValueAtIndex (boundedPairLeftTuple P) (boundedPairRightTuple P)
       (boundedPairAnchor n k m hk code i),
       boundedPairTuple_mem_interval P _⟩)
+
+private noncomputable def boundedPairRealizationHom {n k m : ℕ} (hk : 0 < k)
+    (code : Fin (2 * k) → BipartiteRelationIndex k)
+    (hcode : HasBoundedPairCode n k m hk code) (P : BoundedBipartitePair n k m)
+    (hPcode : boundedPairCode hk P = code) :
+    bipartiteFreimanHom (representativeLeftReal n k m hk code)
+      (representativeRightReal n k m hk code) := by
+  let a := boundedPairRepresentativeLeftTuple n k m hk code
+  let b := boundedPairRepresentativeRightTuple n k m hk code
+  let aP := boundedPairLeftTuple P
+  let bP := boundedPairRightTuple P
+  let hinj := representativeTuples_injective hk code hcode
+  let ea := tupleRealEquiv a hinj.1
+  let eb := tupleRealEquiv b hinj.2
+  refine ⟨(fun x ↦ (aP (ea.symm x) : ℝ), fun y ↦ (bP (eb.symm y) : ℝ)), ?_⟩
+  intro x x' y y' hxy
+  let p : BipartiteRelationIndex k :=
+    ((ea.symm x, eb.symm y), (ea.symm x', eb.symm y'))
+  have href : bipartiteRelationHolds a b p := by
+    unfold bipartiteRelationHolds
+    have hxa : ((x : representativeLeftReal n k m hk code) : ℝ) = a (ea.symm x) := by
+      calc
+        (x : ℝ) = ((ea (ea.symm x) : tupleRealImage a) : ℝ) :=
+          congrArg Subtype.val (ea.apply_symm_apply x).symm
+        _ = a (ea.symm x) := tupleRealEquiv_coe a hinj.1 _
+    have hxa' : ((x' : representativeLeftReal n k m hk code) : ℝ) = a (ea.symm x') := by
+      calc
+        (x' : ℝ) = ((ea (ea.symm x') : tupleRealImage a) : ℝ) :=
+          congrArg Subtype.val (ea.apply_symm_apply x').symm
+        _ = a (ea.symm x') := tupleRealEquiv_coe a hinj.1 _
+    have hyb : ((y : representativeRightReal n k m hk code) : ℝ) = b (eb.symm y) := by
+      calc
+        (y : ℝ) = ((eb (eb.symm y) : tupleRealImage b) : ℝ) :=
+          congrArg Subtype.val (eb.apply_symm_apply y).symm
+        _ = b (eb.symm y) := tupleRealEquiv_coe b hinj.2 _
+    have hyb' : ((y' : representativeRightReal n k m hk code) : ℝ) = b (eb.symm y') := by
+      calc
+        (y' : ℝ) = ((eb (eb.symm y') : tupleRealImage b) : ℝ) :=
+          congrArg Subtype.val (eb.apply_symm_apply y').symm
+        _ = b (eb.symm y') := tupleRealEquiv_coe b hinj.2 _
+    have hreal : (a (ea.symm x) : ℝ) + b (eb.symm y) =
+        a (ea.symm x') + b (eb.symm y') := by simpa [hxa, hxa', hyb, hyb'] using hxy
+    exact_mod_cast hreal
+  have hcodes : bipartiteRelationCode hk a b =
+      bipartiteRelationCode hk aP bP := by
+    rw [boundedPairRepresentative_code hk code hcode]
+    exact hPcode.symm
+  have hP := (bipartiteRelations_iff_of_code_eq hk hcodes p).mp href
+  change (aP (ea.symm x) : ℝ) + bP (eb.symm y) =
+    aP (ea.symm x') + bP (eb.symm y')
+  exact_mod_cast hP
+
+private lemma boundedPairRealizationHom_eval {n k m : ℕ} (hk : 0 < k)
+    (code : Fin (2 * k) → BipartiteRelationIndex k)
+    (hcode : HasBoundedPairCode n k m hk code) (P : BoundedBipartitePair n k m)
+    (hPcode : boundedPairCode hk P = code)
+    (x : Sum (representativeLeftReal n k m hk code)
+      (representativeRightReal n k m hk code)) :
+    bipartiteCoordinateEval _ _ x (boundedPairRealizationHom hk code hcode P hPcode) =
+      (tupleValueAtIndex (boundedPairLeftTuple P) (boundedPairRightTuple P)
+        (realAnchorToIndex (representativeTuples_injective hk code hcode).1
+          (representativeTuples_injective hk code hcode).2 x) : ℝ) := by
+  rcases x with x | y
+  · change (boundedPairLeftTuple P
+      ((tupleRealEquiv _ (representativeTuples_injective hk code hcode).1).symm x) : ℝ) = _
+    rfl
+  · change (boundedPairRightTuple P
+      ((tupleRealEquiv _ (representativeTuples_injective hk code hcode).2).symm y) : ℝ) = _
+    rfl
+
+private lemma boundedPairEncoding_injective (n k m : ℕ) (hk : 0 < k) :
+    Function.Injective (boundedPairEncoding n k m hk) := by
+  classical
+  intro P Q hPQ
+  let code := boundedPairCode hk P
+  have hcodeQ : boundedPairCode hk Q = code := congrArg Prod.fst hPQ |>.symm
+  have hhas : HasBoundedPairCode n k m hk code := ⟨P, rfl⟩
+  have hvalues := congrArg Prod.snd hPQ
+  have hanchorValue (i : Fin (2 * m / k)) :
+      tupleValueAtIndex (boundedPairLeftTuple P) (boundedPairRightTuple P)
+          (boundedPairAnchor n k m hk code i) =
+        tupleValueAtIndex (boundedPairLeftTuple Q) (boundedPairRightTuple Q)
+          (boundedPairAnchor n k m hk code i) := by
+    simpa [boundedPairEncoding, code, hcodeQ] using congrArg (fun f ↦ (f i).1) hvalues
+  let fP := boundedPairRealizationHom hk code hhas P rfl
+  let fQ := boundedPairRealizationHom hk code hhas Q hcodeQ
+  have hf : fP = fQ := by
+    apply bipartiteHom_ext_of_determiningCoordinates
+    intro i
+    let j := Fin.castLE (representativeHomDim_le hk code hhas) i
+    have hj := hanchorValue j
+    rw [boundedPairAnchor_castLE hk code hhas i] at hj
+    rw [boundedPairRealizationHom_eval hk code hhas P rfl,
+      boundedPairRealizationHom_eval hk code hhas Q hcodeQ]
+    exact_mod_cast hj
+  have hleftTuple : boundedPairLeftTuple P = boundedPairLeftTuple Q := by
+    funext i
+    let a := boundedPairRepresentativeLeftTuple n k m hk code
+    let b := boundedPairRepresentativeRightTuple n k m hk code
+    let hinj := representativeTuples_injective hk code hhas
+    let x : representativeLeftReal n k m hk code := tupleRealEquiv a hinj.1 i
+    have hx := congrArg (fun f : bipartiteFreimanHom _ _ ↦ f.1.1 x) hf
+    dsimp [fP, fQ, boundedPairRealizationHom] at hx
+    change (boundedPairLeftTuple P
+      ((tupleRealEquiv a hinj.1).symm (tupleRealEquiv a hinj.1 i)) : ℝ) =
+      boundedPairLeftTuple Q
+        ((tupleRealEquiv a hinj.1).symm (tupleRealEquiv a hinj.1 i)) at hx
+    simp only [Equiv.symm_apply_apply] at hx
+    exact_mod_cast hx
+  have hrightTuple : boundedPairRightTuple P = boundedPairRightTuple Q := by
+    funext i
+    let a := boundedPairRepresentativeLeftTuple n k m hk code
+    let b := boundedPairRepresentativeRightTuple n k m hk code
+    let hinj := representativeTuples_injective hk code hhas
+    let y : representativeRightReal n k m hk code := tupleRealEquiv b hinj.2 i
+    have hy := congrArg (fun f : bipartiteFreimanHom _ _ ↦ f.1.2 y) hf
+    dsimp [fP, fQ, boundedPairRealizationHom] at hy
+    change (boundedPairRightTuple P
+      ((tupleRealEquiv b hinj.2).symm (tupleRealEquiv b hinj.2 i)) : ℝ) =
+      boundedPairRightTuple Q
+        ((tupleRealEquiv b hinj.2).symm (tupleRealEquiv b hinj.2 i)) at hy
+    simp only [Equiv.symm_apply_apply] at hy
+    exact_mod_cast hy
+  apply Subtype.ext
+  apply Prod.ext
+  · apply Finset.coe_injective
+    rw [← range_finsetTuple P.1.1 P.2.2.2.1,
+      ← range_finsetTuple Q.1.1 Q.2.2.2.1]
+    exact congrArg Set.range hleftTuple
+  · apply Finset.coe_injective
+    rw [← range_finsetTuple P.1.2 P.2.2.2.2.1,
+      ← range_finsetTuple Q.1.2 Q.2.2.2.2.1]
+    exact congrArg Set.range hrightTuple
+
+/-- Number of ordered `k`-set pairs in `[n]` with mixed sumset cardinality at most `m`. -/
+theorem ncard_boundedBipartiteSumsetPairs_le (n k m : ℕ) (hk : 0 < k) :
+    (boundedBipartiteSumsetPairs n k m).ncard ≤ k ^ (8 * k) * n ^ (2 * m / k) := by
+  classical
+  have hfinite : (boundedBipartiteSumsetPairs n k m).Finite := by
+    apply ((((interval n).powerset ×ˢ (interval n).powerset) :
+      Finset (Finset ℕ × Finset ℕ))).finite_toSet.subset
+    intro P hP
+    rw [Finset.mem_coe]
+    rw [Finset.mem_product, Finset.mem_powerset, Finset.mem_powerset]
+    exact ⟨hP.1, hP.2.1⟩
+  let : Fintype (BoundedBipartitePair n k m) := hfinite.fintype
+  have hcard := Fintype.card_le_of_injective (boundedPairEncoding n k m hk)
+    (boundedPairEncoding_injective n k m hk)
+  rw [Set.fintypeCard_eq_ncard, Fintype.card_prod, card_bipartiteRelationCodes,
+    Fintype.card_fun, Fintype.card_coe] at hcard
+  simpa [interval] using hcard
+
+/-- Real-valued form of the bipartite pair-counting bound. -/
+theorem ncard_boundedBipartiteSumsetPairs_le_real (n k m : ℕ) (hk : 0 < k) :
+    ((boundedBipartiteSumsetPairs n k m).ncard : ℝ) ≤
+      (k : ℝ) ^ (8 * k) * (n : ℝ) ^ (2 * m / k) := by
+  exact_mod_cast ncard_boundedBipartiteSumsetPairs_le n k m hk
 
 end
 

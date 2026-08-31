@@ -102,7 +102,7 @@ lemma unitInterval_lt_one {δ : unitInterval}
 lemma pairCardThreshold_pos_of_lower_density {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    0 < pairCardThreshold (3 + γ) n δ := by
+    0 < pairCardThreshold (2 + γ) n δ := by
   apply pairCardThreshold_pos_of_density
   · linarith
   · exact unitInterval_pos_of_density_lower hn hδ_lower
@@ -113,8 +113,8 @@ lemma pairCardThreshold_le_density_log_of_lower_density {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval} (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ))
     (hδ_upper : (δ : ℝ) ≤ 1 - c) :
-    (pairCardThreshold (3 + γ) n δ : ℝ) ≤
-      densityCoefficient (3 + γ) c * Real.log (n : ℝ) := by
+    (pairCardThreshold (2 + γ) n δ : ℝ) ≤
+      densityCoefficient (2 + γ) c * Real.log (n : ℝ) := by
   refine pairCardThreshold_le_densityCoefficient_mul_log ?_ hc_pos
     (two_le_nat_of_lowerSizeThreshold_lt hn) (unitInterval_pos_of_density_lower hn hδ_lower)
     hδ_upper

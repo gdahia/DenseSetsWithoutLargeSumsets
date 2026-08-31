@@ -36,7 +36,7 @@ private lemma eleven_twelfths_le_one_sub_ε {γ : ℝ} (hγ_pos : 0 < γ) (hγ_l
 private lemma one_lt_eleven_twelfths_mul_pairCardThreshold {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    (1 : ℝ) < (11 / 12 : ℝ) * pairCardThreshold (3 + γ) n δ := by
+    (1 : ℝ) < (11 / 12 : ℝ) * pairCardThreshold (2 + γ) n δ := by
   apply (by norm_num : (1 : ℝ) < (11 / 12 : ℝ) * 2).trans_le
   apply mul_le_mul_of_nonneg_left
   · exact_mod_cast two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper
@@ -48,7 +48,7 @@ private lemma properGAP_dim_pos_of_large_preimage {γ C : ℝ} {n q : ℕ}
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
     (hA₀P : A₀ ⊆ zmodGAPPreimageContainer n ψ P)
-    (hA₀large : (1 - ε γ) * (pairCardThreshold (3 + γ) n δ : ℝ) ≤ (A₀.card : ℝ)) :
+    (hA₀large : (1 - ε γ) * (pairCardThreshold (2 + γ) n δ : ℝ) ≤ (A₀.card : ℝ)) :
     1 ≤ P.dim := by
   by_contra hdim_not
   exact (not_lt_of_ge
@@ -100,7 +100,7 @@ private lemma first_lower_for_bltLargePreimage {γ C : ℝ} {n q : ℕ}
     (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
     (hAint : A ⊆ interval n) (hBint : B ⊆ interval n)
     (hA''A : A'' ⊆ natCastImage A) (hB''B : B'' ⊆ natCastImage B)
-    (hkdef : k = pairCardThreshold (3 + γ) n δ) (hkpos : 0 < k)
+    (hkdef : k = pairCardThreshold (2 + γ) n δ) (hkpos : 0 < k)
     (hA₀large :
       (1 - ε γ) * (k : ℝ) ≤ ((bltLargePreimage A A'').card : ℝ))
     (hB₀large :
@@ -182,8 +182,8 @@ private lemma mem_bltDimSmallWitnessPairs_of_lower {Q : Finset ℕ} {A' B' : Fin
 private lemma mem_lowerModelGAPs_of_mem_upToDim {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     {hγ_pos : 0 < γ} {C_pos : 0 < C} {hn : lowerSizeThreshold C γ < n}
     {P : ProperGAP (ZMod (zmodModelQ (γ := γ) (C := C) (n := n) hγ_pos C_pos hn))}
-    (hPmem : P ∈ properGAPsZModUpToDim (pairCardThreshold (3 + γ) n δ)
-      ⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊
+    (hPmem : P ∈ properGAPsZModUpToDim (pairCardThreshold (2 + γ) n δ)
+      ⌈changCarrierBound (2 * pairCardThreshold (2 + γ) n δ) (κ C)⌉₊
       (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).pos)
     (hPdim_pos : 1 ≤ P.dim) :
     P ∈ lowerModelGAPs (γ := γ) (C := C) (n := n) δ hγ_pos C_pos hn := by
@@ -211,13 +211,13 @@ lemma pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ C 
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hδ_upper_c : (δ : ℝ) ≤ 1 - c) :
     {S : Finset ℕ |
-      pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
-        (C * pairCardThreshold (3 + γ) n δ) S} ⊆
+      pairSumsetIsSubset n (pairCardThreshold (2 + γ) n δ) 0
+        (C * pairCardThreshold (2 + γ) n δ) S} ⊆
       ⋃ P ∈ lowerModelGAPs (γ := γ) (C := C) (n := n) δ hγ_pos C_pos hn,
         ⋃ p ∈ bltDimSmallWitnessPairs
             (zmodGAPPreimageContainer n
               (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) P)
-            P.dim (pairCardThreshold (3 + γ) n δ) C γ,
+            P.dim (pairCardThreshold (2 + γ) n δ) C γ,
           {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S} := by
   classical
   intro S hS

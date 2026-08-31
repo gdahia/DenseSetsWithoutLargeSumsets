@@ -123,11 +123,11 @@ def lowerSqrtScaleDefault (C γ : ℝ) : ℝ :=
 
 def lowerGapSqrtScaleDefault (C γ c : ℝ) : ℝ :=
   8 * lowerBltConstantDefault C γ *
-    Real.sqrt (densityCoefficient (3 + γ) c) / ε γ
+    Real.sqrt (densityCoefficient (2 + γ) c) / ε γ
 
 def lowerGapSqrtScale (C γ c : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
   8 * lowerBltConstant C γ hC hε *
-    Real.sqrt (densityCoefficient (3 + γ) c) / ε γ
+    Real.sqrt (densityCoefficient (2 + γ) c) / ε γ
 
 lemma lowerGapSqrtScaleDefault_eq (C γ c : ℝ) (hC : 0 < 2 * C)
     (hε : 0 < ε γ) :
@@ -140,7 +140,7 @@ lemma lowerLogScale_pos {γ : ℝ} (hε : 0 < ε γ) :
   positivity
 
 lemma lowerGapSqrtScale_pos {C γ c : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ)
-    (hK : 0 < densityCoefficient (3 + γ) c) :
+    (hK : 0 < densityCoefficient (2 + γ) c) :
     0 < lowerGapSqrtScale C γ c hC hε := by
   rw [lowerGapSqrtScale]
   exact div_pos (mul_pos (mul_pos (by norm_num)
@@ -188,12 +188,12 @@ def lowerSizeThreshold (C γ : ℝ) : ℝ := max (lowerDensityExponent C γ)
 
 def lowerGapThreshold (C γ c : ℝ) : ℝ :=
   max (lowerSizeThreshold C γ) <| max
-    ((2 * densityCoefficient (3 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ)) <|
+    ((2 * densityCoefficient (2 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ)) <|
     Real.exp <| max
       (2 * lowerLogScale γ * Real.log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
+        (max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
       ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
-        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
+        (2 * max 42 (3 * densityCoefficient (2 + γ) c) * lowerConstantDefault C γ *
           lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ))
 
 lemma lowerSizeThreshold_le_lowerGapThreshold (C γ c : ℝ) :

@@ -65,21 +65,26 @@ lemma pairEvent_measure_le_three_ranges
 
 lemma pairEvent_measure_le_three_ranges_of_bounds
     {γ α c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hc_pos : 0 < c)
-    {n : ℕ} (hn_low : lowerGapThreshold (moderateSumsetGapConstant (1 + γ) c) γ c < n)
-    (hn_large : veryLargeSumsetStrictThreshold γ c < n)
+    {n : ℕ} (hn_low : lowerGapThreshold (moderateSumsetGapConstant γ c) γ c < n)
     {δ : unitInterval} (hδ_lower : Real.rpow (n : ℝ) (-α) < (δ : ℝ))
     (hδ_upper : (δ : ℝ) ≤ 1 - c)
-    (hα_lower : α ≤ lowerDensityExponent (moderateSumsetGapConstant (1 + γ) c) γ)
-    (hα_mid : α ≤ moderateSumsetDensityExponent (1 + γ) c)
-    (hα_half : α ≤ 1 / 2)
+    (hα_lower : α ≤ lowerDensityExponent (moderateSumsetGapConstant γ c) γ)
+    (hα_mid : α ≤ moderateSumsetDensityExponent γ c)
     (hn_two : 2 ≤ n)
-    (hk_two : 2 ≤ pairCardThreshold (3 + γ) n δ) :
+    (hk_two : 2 ≤ pairCardThreshold (2 + γ) n δ)
+    (hlarge_bound :
+      (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 *
+          (pairCardThreshold (2 + γ) n δ : ℝ) ^
+            (8 * pairCardThreshold (2 + γ) n δ) /
+          (n : ℝ) ^ (γ * (pairCardThreshold (2 + γ) n δ : ℝ) / 2) ≤
+        (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 /
+          (n : ℝ) ^ (γ * (pairCardThreshold (2 + γ) n δ : ℝ) / 3)) :
     (binomialFinsetSubset (Set.Icc 1 n) δ).real
-        {S | pairEvent n (pairCardThreshold (3 + γ) n δ) S} ≤
-      4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
+        {S | pairEvent n (pairCardThreshold (2 + γ) n δ) S} ≤
+      4 * (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 /
         Real.rpow (n : ℝ) (pairEventDecayExponent γ) := by
-  let k := pairCardThreshold (3 + γ) n δ
-  let C := moderateSumsetGapConstant (1 + γ) c
+  let k := pairCardThreshold (2 + γ) n δ
+  let C := moderateSumsetGapConstant γ c
   have hC_pos : 0 < C := by
     dsimp [C]
     dsimp [moderateSumsetGapConstant]
@@ -87,14 +92,14 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
   have hc_lt : c < 1 := by
     have : 0 < (δ : ℝ) := (Real.rpow_pos_of_pos (by positivity) (-α)).trans hδ_lower
     linarith
-  have hγ_mid_pos : 0 < 1 + γ := by linarith
-  have hγ_mid_le : 1 + γ ≤ 2 := by linarith
+  have hγ_mid_pos : 0 < γ := hγ_pos
+  have hγ_mid_le : γ ≤ 2 := hγ_le.trans (by norm_num)
   have hδ_lower_low : Real.rpow (n : ℝ) (-lowerDensityExponent C γ) < (δ : ℝ) := by
     refine lt_of_le_of_lt ?_ hδ_lower
     apply Real.rpow_le_rpow_of_exponent_le
     · exact_mod_cast (by omega : 1 ≤ n)
     · exact neg_le_neg hα_lower
-  have hδ_lower_mid : Real.rpow (n : ℝ) (-moderateSumsetDensityExponent (1 + γ) c) < (δ : ℝ) := by
+  have hδ_lower_mid : Real.rpow (n : ℝ) (-moderateSumsetDensityExponent γ c) < (δ : ℝ) := by
     refine lt_of_le_of_lt ?_ hδ_lower
     apply Real.rpow_le_rpow_of_exponent_le
     · exact_mod_cast (by omega : 1 ≤ n)
@@ -110,7 +115,7 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
   apply (measureReal_mono hlarge_subset).trans
   refine (pairEvent_measure_le_three_ranges (C := C)
     (L := 2 * (k : ℝ) / Real.rpow (n : ℝ) (ε γ / 2))
-    (M := 2 * (k : ℝ) ^ 2 / Real.rpow (n : ℝ) (((1 + γ) * C) / 2))
+    (M := 2 * (k : ℝ) ^ 2 / Real.rpow (n : ℝ) ((γ * C) / 2))
     (G := (k : ℝ) ^ 2 / Real.rpow (n : ℝ) (γ * (k : ℝ) / 3))
     ?_ ?_ ?_).trans ?_
   · change (binomialFinsetSubset (Set.Icc 1 n) δ).real
@@ -120,22 +125,20 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
         hγ_pos hγ_le hC_pos hc_pos hn_low hδ_lower_low hδ_upper
   · change (binomialFinsetSubset (Set.Icc 1 n) δ).real
         {S : Finset ℕ | moderateSumsetEvent n k C S} ≤ _
-    convert moderate_sumset_probability_le hγ_mid_pos hγ_mid_le hc_pos (by omega)
-      hδ_lower_mid hδ_upper using 1
-    all_goals
-      first
-      | rfl
-      | dsimp [k, C]
-        ring_nf
+    simpa [k, C] using
+      moderate_sumset_probability_le hγ_mid_pos hγ_mid_le hc_pos (by omega)
+        hδ_lower_mid hδ_upper
   · change (binomialFinsetSubset (Set.Icc 1 n) δ).real
         {S : Finset ℕ | veryLargeSumsetEvent n k S} ≤ _
-    simpa [largeSumsetEvent, k] using
-      very_large_sumset_probability_le hγ_pos hγ_le hc_pos hn_large
-        (by
-          refine lt_of_le_of_lt ?_ hδ_lower
-          apply Real.rpow_le_rpow_of_exponent_le
-          · exact_mod_cast (by omega : 1 ≤ n)
-          · exact neg_le_neg hα_half) hδ_upper
+    have hnew := bipartite_very_large_sumset_probability_le hγ_pos (by omega : 1 < n)
+      ((Real.rpow_pos_of_pos (by positivity) (-α)).trans hδ_lower)
+      (lt_of_le_of_lt hδ_upper (by linarith [hc_pos] : 1 - c < 1))
+    have hnew' : (binomialFinsetSubset (Set.Icc 1 n) δ).real
+        {S : Finset ℕ | veryLargeSumsetEvent n k S} ≤
+          (k : ℝ) ^ 2 * (k : ℝ) ^ (8 * k) /
+            (n : ℝ) ^ (γ * (k : ℝ) / 2) := by
+      simpa [largeSumsetEvent, k] using hnew
+    exact hnew'.trans hlarge_bound
   have hn_one : (1 : ℝ) ≤ n := by exact_mod_cast (by omega : 1 ≤ n)
   have hk_two : (2 : ℝ) ≤ k := by exact_mod_cast hk_two
   apply le_trans (b :=
@@ -158,16 +161,17 @@ lemma pairEvent_measure_le_three_ranges_of_bounds
       · apply div_le_div_of_nonneg_left (by positivity)
           (Real.rpow_pos_of_pos (by positivity : 0 < (n : ℝ)) _)
         apply Real.rpow_le_rpow_of_exponent_le hn_one
-        apply le_trans (b := 1 / 32)
-        · dsimp [pairEventDecayExponent]
-          rw [div_le_iff₀ (by positivity : 0 < 8 * (γ + 3))]
-          nlinarith
-        · have hC_one : (1 : ℝ) ≤ C := by
-            dsimp [C, moderateSumsetGapConstant]
-            conv_lhs => rw [← Real.exp_zero]
-            exact Real.exp_le_exp.mpr (div_nonneg (mul_nonneg (by norm_num)
-              (densityCoefficient_pos (by linarith) hc_pos hc_lt).le) (by linarith))
-          nlinarith
+        have hC_one : (1 : ℝ) ≤ C := by
+          dsimp [C, moderateSumsetGapConstant]
+          conv_lhs => rw [← Real.exp_zero]
+          exact Real.exp_le_exp.mpr (div_nonneg (mul_nonneg (by norm_num)
+            (densityCoefficient_pos (by linarith) hc_pos hc_lt).le) (by linarith))
+        dsimp [pairEventDecayExponent]
+        rw [div_le_iff₀ (by positivity : 0 < 8 * (γ + 3))]
+        have hprod : (3 : ℝ) ≤ C * (γ + 3) := by
+          nlinarith [mul_nonneg (sub_nonneg.mpr hC_one) (by linarith : 0 ≤ γ + 3)]
+        have hscale : (1 : ℝ) ≤ 4 * C * (γ + 3) := by nlinarith
+        nlinarith [mul_le_mul_of_nonneg_left hscale hγ_pos.le]
     · apply div_le_div_of_nonneg_left (by positivity)
         (Real.rpow_pos_of_pos (by positivity : 0 < (n : ℝ)) _)
       apply Real.rpow_le_rpow_of_exponent_le hn_one
@@ -183,9 +187,9 @@ lemma eventually_pairEvent_bound_lt {γ α c ε : ℝ}
     ∀ᶠ n : ℕ in (Filter.atTop : Filter ℕ),
       ∀ δ : unitInterval,
         Real.rpow (n : ℝ) (-α) < (δ : ℝ) → (δ : ℝ) ≤ 1 - c →
-          4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
+          4 * (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 /
               Real.rpow (n : ℝ) (pairEventDecayExponent γ) < ε := by
-  let q := densityCoefficient (3 + γ) c
+  let q := densityCoefficient (2 + γ) c
   have hq_pos : 0 < q := by
     dsimp [q, densityCoefficient]
     have hlogc : 0 < Real.log (1 / (1 - c)) := by
@@ -216,16 +220,16 @@ lemma eventually_pairEvent_bound_lt {γ α c ε : ℝ}
   filter_upwards [hsmall, hlog, hn_two] with n hsmall hlog hn_two
   intro δ hδ_lower hδ_upper
   have hn_pos : 0 < (n : ℝ) := by positivity
-  have hk_upper := pairCardThreshold_le_densityCoefficient_mul_log (τ := 3 + γ)
+  have hk_upper := pairCardThreshold_le_densityCoefficient_mul_log (τ := 2 + γ)
     (by linarith) hc_pos hn_two
     ((Real.rpow_pos_of_pos hn_pos (-α)).trans hδ_lower) hδ_upper
-  have hsq : (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 ≤
+  have hsq : (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 ≤
       (q * Real.log (n : ℝ)) ^ 2 := by
-    have : 0 ≤ (pairCardThreshold (3 + γ) n δ : ℝ) := by positivity
-    have hkq : (pairCardThreshold (3 + γ) n δ : ℝ) ≤ q * Real.log (n : ℝ) := by
+    have : 0 ≤ (pairCardThreshold (2 + γ) n δ : ℝ) := by positivity
+    have hkq : (pairCardThreshold (2 + γ) n δ : ℝ) ≤ q * Real.log (n : ℝ) := by
       simpa [q] using hk_upper
     nlinarith [hkq, mul_nonneg hq_pos.le (zero_le_one.trans hlog),
-      sq_nonneg ((pairCardThreshold (3 + γ) n δ : ℝ) - q * Real.log (n : ℝ))]
+      sq_nonneg ((pairCardThreshold (2 + γ) n δ : ℝ) - q * Real.log (n : ℝ))]
   have hden_pos : 0 < Real.rpow (n : ℝ) (pairEventDecayExponent γ) :=
     Real.rpow_pos_of_pos hn_pos _
   apply (div_le_div_of_nonneg_right
@@ -244,7 +248,7 @@ lemma eventually_pairEvent_bound_lt_quarter {γ α c : ℝ}
     ∀ᶠ n : ℕ in (Filter.atTop : Filter ℕ),
       ∀ δ : unitInterval,
         Real.rpow (n : ℝ) (-α) < (δ : ℝ) → (δ : ℝ) ≤ 1 - c →
-          4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
+          4 * (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 /
               Real.rpow (n : ℝ) (pairEventDecayExponent γ) < 1 / 4 := by
   exact eventually_pairEvent_bound_lt hγ_pos hγ_le hc_pos hc_lt (by norm_num)
 
@@ -265,8 +269,8 @@ lemma exists_dense_set_of_pair_probability_lt_quarter
 /-- The exponent used in the density range of Theorem `thm:main`. -/
 def denseSubsetDensityExponent (γ c : ℝ) : ℝ :=
   min (1 / 2)
-    (min (lowerDensityExponent (moderateSumsetGapConstant (1 + γ) c) γ)
-      (moderateSumsetDensityExponent (1 + γ) c))
+    (min (lowerDensityExponent (moderateSumsetGapConstant γ c) γ)
+      (moderateSumsetDensityExponent γ c))
 
 lemma denseSubsetDensityExponent_pos {γ c : ℝ} (hγ_pos : 0 < γ) (hc_pos : 0 < c)
     (hc_lt : c < 1) :
@@ -284,38 +288,41 @@ theorem eventually_pairEvent_probability_le
     {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hc_pos : 0 < c) (hc_lt : c < 1) :
     eventuallyForDensities (denseSubsetDensityExponent γ c) c fun n δ =>
       let ℙ : Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
-      ℙ.real (pairEvent n (pairCardThreshold (3 + γ) n δ)) ≤
-        4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
+      ℙ.real (pairEvent n (pairCardThreshold (2 + γ) n δ)) ≤
+        4 * (pairCardThreshold (2 + γ) n δ : ℝ) ^ 2 /
           Real.rpow (n : ℝ) (pairEventDecayExponent γ) := by
-  let η := 1 + γ
-  let C := moderateSumsetGapConstant η c
+  let C := moderateSumsetGapConstant γ c
   rw [eventuallyForDensities]
   filter_upwards [Filter.eventually_ge_atTop
-      (max 2 (max (Nat.ceil (lowerGapThreshold C γ c)) (veryLargeSumsetStrictThreshold γ c)) + 1)]
+      (max 2 (max (Nat.ceil (lowerGapThreshold C γ c))
+        (bipartiteVeryLargeSumsetStrictThreshold γ c)) + 1)]
         with n hnN
   intro δ hδ_lower hδ_upper
   refine pairEvent_measure_le_three_ranges_of_bounds hγ_pos hγ_le hc_pos
-    ?_ ?_ hδ_lower hδ_upper ?_ ?_ ?_ ?_ ?_
+    ?_ hδ_lower hδ_upper ?_ ?_ ?_ ?_ ?_
   · refine lt_of_le_of_lt (Nat.le_ceil _) ?_
     exact_mod_cast le_trans
       (Nat.add_le_add_right ((le_max_left _ _).trans (le_max_right _ _)) 1) hnN
-  · exact lt_of_lt_of_le
-      (Nat.lt_succ_of_le ((le_max_right _ _).trans (le_max_right _ _))) hnN
-  · dsimp [denseSubsetDensityExponent, C, η]
+  · dsimp [denseSubsetDensityExponent, C]
     exact (min_le_right _ _).trans (min_le_left _ _)
-  · dsimp [denseSubsetDensityExponent, C, η]
+  · dsimp [denseSubsetDensityExponent, C]
     exact (min_le_right _ _).trans (min_le_right _ _)
-  · dsimp [denseSubsetDensityExponent]
-    exact min_le_left _ _
   · omega
   · refine pairCardThreshold_ge_two_of_density_lower
       ?_ ?_ ?_ (by linarith) hδ_lower
     · linarith
     · dsimp [denseSubsetDensityExponent]
       nlinarith [min_le_left (1 / 2 : ℝ)
-        (min (lowerDensityExponent (moderateSumsetGapConstant (1 + γ) c) γ)
-          (moderateSumsetDensityExponent (1 + γ) c))]
+        (min (lowerDensityExponent (moderateSumsetGapConstant γ c) γ)
+          (moderateSumsetDensityExponent γ c))]
     · omega
+  · apply bipartite_very_large_sumset_factor_bound hγ_pos hγ_le hc_pos
+    · exact lt_of_lt_of_le
+        (Nat.lt_succ_of_le ((le_max_right _ _).trans (le_max_right _ _))) hnN
+    · have hn_pos : 0 < (n : ℝ) := by exact_mod_cast (by omega : 0 < n)
+      exact (Real.rpow_pos_of_pos hn_pos
+        (-denseSubsetDensityExponent γ c)).trans hδ_lower
+    · exact hδ_upper
 
 private theorem eventually_exists_dense_subset_without_large_sumsets_uniform
     {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hc_pos : 0 < c) (hc_lt : c < 1) :
@@ -329,8 +336,8 @@ private theorem eventually_exists_dense_subset_without_large_sumsets_uniform
           ¬ ∃ A B : Finset ℕ,
             A ⊆ Finset.Icc 1 n ∧
             B ⊆ Finset.Icc 1 n ∧
-            Nat.ceil ((3 + γ) * Real.log (n : ℝ) / Real.log (1 / δ)) ≤ A.card ∧
-            Nat.ceil ((3 + γ) * Real.log (n : ℝ) / Real.log (1 / δ)) ≤ B.card ∧
+            Nat.ceil ((2 + γ) * Real.log (n : ℝ) / Real.log (1 / δ)) ≤ A.card ∧
+            Nat.ceil ((2 + γ) * Real.log (n : ℝ) / Real.log (1 / δ)) ≤ B.card ∧
             A + B ⊆ S := by
   have hmain := eventually_pairEvent_probability_le hγ_pos hγ_le hc_pos hc_lt
   rw [eventuallyForDensities] at hmain
@@ -341,9 +348,9 @@ private theorem eventually_exists_dense_subset_without_large_sumsets_uniform
       with n hmain hquarter hn_nine
   intro δ hδ_lower hδ_upper
   have hn_pos : 0 < (n : ℝ) := by positivity
-  change existsDenseSetWithoutLargeSumsets n (pairCardThreshold (3 + γ) n δ) δ
+  change existsDenseSetWithoutLargeSumsets n (pairCardThreshold (2 + γ) n δ) δ
   apply exists_dense_set_of_pair_probability_lt_quarter
-    (n := n) (k := pairCardThreshold (3 + γ) n δ)
+    (n := n) (k := pairCardThreshold (2 + γ) n δ)
   · refine le_trans ?_ (mul_lt_mul_of_pos_right hδ_lower hn_pos).le
     refine le_trans (b := Real.rpow (n : ℝ)
       (-denseSubsetDensityExponent γ c + 1)) ?_
@@ -358,8 +365,8 @@ private theorem eventually_exists_dense_subset_without_large_sumsets_uniform
       · exact_mod_cast (by omega : 1 ≤ n)
       · rw [denseSubsetDensityExponent]
         nlinarith [min_le_left (1 / 2 : ℝ)
-          (min (lowerDensityExponent (moderateSumsetGapConstant (1 + γ) c) γ)
-            (moderateSumsetDensityExponent (1 + γ) c))]
+          (min (lowerDensityExponent (moderateSumsetGapConstant γ c) γ)
+            (moderateSumsetDensityExponent γ c))]
   · exact (hmain δ hδ_lower hδ_upper).trans_lt (hquarter δ hδ_lower hδ_upper)
 
 /- Formal statement of the deduction of Theorem `thm:main`. -/
@@ -376,13 +383,46 @@ theorem dense_subset_without_large_sumsets
         ¬ ∃ A B : Finset ℕ,
           A ⊆ Finset.Icc 1 n ∧
           B ⊆ Finset.Icc 1 n ∧
-          Nat.ceil ((3 + γ) * Real.log (n : ℝ) / Real.log (1 / δ n)) ≤ A.card ∧
-          Nat.ceil ((3 + γ) * Real.log (n : ℝ) / Real.log (1 / δ n)) ≤ B.card ∧
+          Nat.ceil ((2 + γ) * Real.log (n : ℝ) / Real.log (1 / δ n)) ≤ A.card ∧
+          Nat.ceil ((2 + γ) * Real.log (n : ℝ) / Real.log (1 / δ n)) ≤ B.card ∧
           A + B ⊆ S := by
   filter_upwards [eventually_exists_dense_subset_without_large_sumsets_uniform
     hγ_pos hγ_le hc_pos hc_lt,
     hδ_lower, hδ_upper] with n hmain hδ_lower hδ_upper
   exact hmain (δ n) hδ_lower hδ_upper
+
+/-- Fixed-density form of the sharp result. Since `ε` is arbitrary, these thresholds have
+leading constant `2 + o(1)`. -/
+theorem fixed_density_dense_subset_without_large_sumsets
+    {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1)
+    {ε : ℝ} (hε_pos : 0 < ε) (hε_le : ε ≤ 1) :
+    ∀ᶠ n : ℕ in (Filter.atTop : Filter ℕ),
+      ∃ S : Finset ℕ,
+        S ⊆ Finset.Icc 1 n ∧
+        (δ : ℝ) * (n : ℝ) ≤ (S.card : ℝ) ∧
+        ¬ ∃ A B : Finset ℕ,
+          A ⊆ Finset.Icc 1 n ∧
+          B ⊆ Finset.Icc 1 n ∧
+          Nat.ceil ((2 + ε) * Real.log (n : ℝ) / Real.log (1 / δ)) ≤ A.card ∧
+          Nat.ceil ((2 + ε) * Real.log (n : ℝ) / Real.log (1 / δ)) ≤ B.card ∧
+          A + B ⊆ S := by
+  let c : ℝ := (1 - (δ : ℝ)) / 2
+  have hc_pos : 0 < c := by dsimp [c]; linarith
+  have hc_lt : c < 1 := by dsimp [c]; linarith [δ.2.1]
+  have hα_pos := denseSubsetDensityExponent_pos hε_pos hc_pos hc_lt
+  have ht : Filter.Tendsto
+      (fun n : ℕ => Real.rpow (n : ℝ) (-denseSubsetDensityExponent ε c))
+      Filter.atTop (nhds 0) :=
+    (tendsto_rpow_neg_atTop hα_pos).comp tendsto_natCast_atTop_atTop
+  have hlower : ∀ᶠ n : ℕ in (Filter.atTop : Filter ℕ),
+      Real.rpow (n : ℝ) (-denseSubsetDensityExponent ε c) < (δ : ℝ) :=
+    ht.eventually_lt_const hδ_pos
+  have hupper : ∀ᶠ _n : ℕ in (Filter.atTop : Filter ℕ), (δ : ℝ) ≤ 1 - c := by
+    exact Filter.Eventually.of_forall fun _ => by
+      dsimp [c]
+      linarith [unitInterval.le_one δ]
+  simpa using dense_subset_without_large_sumsets hε_pos hε_le hc_pos hc_lt
+    (fun _ => δ) hlower hupper
 
 end
 

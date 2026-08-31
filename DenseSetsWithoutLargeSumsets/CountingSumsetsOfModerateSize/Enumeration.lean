@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem
-import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SmallSumsetIsomorphismClasses
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.BipartiteFreimanCounting
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Analysis.SpecialFunctions.Log.Monotone
 
@@ -26,6 +26,23 @@ def pairSumsetsFamily (n k m : ℕ) : Set (Finset ℕ) :=
       ∃ A B : Finset ℕ,
         A ⊆ interval n ∧ B ⊆ interval n ∧
           A.card = k ∧ B.card = k ∧ A + B = Y ∧ Y.card ≤ m}
+
+/-- The bipartite relation-space count, valid throughout the entire sumset range. -/
+theorem pairSumsetsFamily_ncard_le_bipartite (n k m : ℕ) (hk : 0 < k) :
+    (pairSumsetsFamily n k m).ncard ≤ k ^ (8 * k) * n ^ (2 * m / k) := by
+  have hsubset : pairSumsetsFamily n k m ⊆
+      (fun P : Finset ℕ × Finset ℕ ↦ P.1 + P.2) '' boundedBipartiteSumsetPairs n k m := by
+    intro Y hY
+    obtain ⟨_, A, B, hA, hB, hAc, hBc, rfl, hsum⟩ := hY
+    exact ⟨(A, B), ⟨hA, hB, hAc, hBc, hsum⟩, rfl⟩
+  have hfinite : (boundedBipartiteSumsetPairs n k m).Finite := by
+    apply (((interval n).powerset ×ˢ (interval n).powerset :
+      Finset (Finset ℕ × Finset ℕ))).finite_toSet.subset
+    intro P hP
+    rw [Finset.mem_coe, Finset.mem_product, Finset.mem_powerset, Finset.mem_powerset]
+    exact ⟨hP.1, hP.2.1⟩
+  exact (Set.ncard_le_ncard hsubset (hfinite.image _)).trans
+    ((Set.ncard_image_le hfinite).trans (ncard_boundedBipartiteSumsetPairs_le n k m hk))
 
 /-- The fixed auxiliary exponent used in the moderate-sumset range. -/
 def moderateSumsetAuxExponent : ℝ :=
@@ -188,12 +205,6 @@ private lemma mem_boundedFreimanDimSetsFinset {n r t : ℕ} {X : Finset ℕ} :
   rw [boundedFreimanDimSetsFinset, Finset.mem_filter, Finset.mem_powersetCard]
   tauto
 
-private lemma boundedFreimanDimSetsFinset_card (n r t : ℕ) :
-    (boundedFreimanDimSetsFinset n r t).card = (boundedFreimanDimSets n r t).ncard := by
-  rw [← Set.ncard_coe_finset]
-  congr
-  ext X
-  simp [mem_boundedFreimanDimSetsFinset, boundedFreimanDimSets]
 
 private def smallSumsetFreimanDimSetsFinset (n r s t : ℕ) : Finset (Finset ℕ) :=
   (boundedFreimanDimSetsFinset n r t).filter fun X => (X + X).card ≤ s
@@ -212,54 +223,6 @@ private lemma smallSumsetFreimanDimSetsFinset_card (n r s t : ℕ) :
   ext X
   simp [mem_smallSumsetFreimanDimSetsFinset, smallSumsetFreimanDimSets]
 
-private def unionWitnesses (n k r t : ℕ) : Finset (Finset ℕ × Finset ℕ × Finset ℕ) :=
-  (boundedFreimanDimSetsFinset n r t).biUnion fun X =>
-    (X.powersetCard k ×ˢ X.powersetCard k).image fun p => (X, p.1, p.2)
-
-private lemma mem_unionWitnesses {n k r t : ℕ} {w : Finset ℕ × Finset ℕ × Finset ℕ} :
-    w ∈ unionWitnesses n k r t ↔
-      w.1 ⊆ interval n ∧ w.1.card = t ∧ freimanDim w.1 ≤ r ∧
-        w.2.1 ⊆ w.1 ∧ w.2.2 ⊆ w.1 ∧ w.2.1.card = k ∧ w.2.2.card = k := by
-  classical
-  constructor
-  · intro hw
-    rw [unionWitnesses, Finset.mem_biUnion] at hw
-    rcases hw with ⟨X, hX, hwX⟩
-    rw [Finset.mem_image] at hwX
-    rcases hwX with ⟨p, hp, rfl⟩
-    rw [Finset.mem_product] at hp
-    rcases mem_boundedFreimanDimSetsFinset.mp hX with ⟨hXsub, hXcard, hXdim⟩
-    rcases Finset.mem_powersetCard.mp hp.1 with ⟨hAsub, hAcard⟩
-    rcases Finset.mem_powersetCard.mp hp.2 with ⟨hBsub, hBcard⟩
-    exact ⟨hXsub, hXcard, hXdim, hAsub, hBsub, hAcard, hBcard⟩
-  · intro hw
-    rw [unionWitnesses, Finset.mem_biUnion]
-    refine ⟨w.1, mem_boundedFreimanDimSetsFinset.mpr ⟨hw.1, hw.2.1, hw.2.2.1⟩, ?_⟩
-    rw [Finset.mem_image]
-    refine ⟨(w.2.1, w.2.2), ?_, rfl⟩
-    rw [Finset.mem_product]
-    refine ⟨Finset.mem_powersetCard.mpr ⟨hw.2.2.2.1, hw.2.2.2.2.2.1⟩,
-      Finset.mem_powersetCard.mpr ⟨hw.2.2.2.2.1, hw.2.2.2.2.2.2⟩⟩
-
-private lemma unionWitnesses_card_le (n k r t : ℕ) :
-    (unionWitnesses n k r t).card ≤
-      (boundedFreimanDimSets n r t).ncard * Nat.choose t k * Nat.choose t k := by
-  classical
-  apply Finset.card_biUnion_le.trans
-  apply (Finset.sum_le_sum fun X hX => Finset.card_image_le).trans
-  apply le_trans (b := ∑ X ∈ boundedFreimanDimSetsFinset n r t,
-    Nat.choose t k * Nat.choose t k)
-  · apply le_of_eq
-    apply Finset.sum_congr rfl
-    intro X hX
-    rcases mem_boundedFreimanDimSetsFinset.mp hX with ⟨_, hXcard, _⟩
-    simp [Finset.card_product, Finset.card_powersetCard, hXcard]
-  · refine le_trans (b := (boundedFreimanDimSetsFinset n r t).card *
-      (Nat.choose t k * Nat.choose t k)) ?_ ?_
-    · simp [mul_comm, mul_assoc]
-    · rw [boundedFreimanDimSetsFinset_card]
-      ring_nf
-      exact le_rfl
 
 private def smallUnionWitnesses (n k r s t : ℕ) :
     Finset (Finset ℕ × Finset ℕ × Finset ℕ) :=
@@ -314,63 +277,6 @@ private lemma smallUnionWitnesses_card_le (n k r s t : ℕ) :
       ring_nf
       exact le_rfl
 
-private def allUnionWitnesses (n k m : ℕ) : Finset (Finset ℕ × Finset ℕ × Finset ℕ) :=
-  (Finset.Icc k (2 * k)).biUnion fun t => unionWitnesses n k (2 * m / k) t
-
-private lemma pairSumsetsFamily_subset_witnessSums {n k m : ℕ}
-    (hk : 0 < k) (hm : m < k * (k + 1) / 2) :
-    pairSumsetsFamily n k m ⊆
-      ((allUnionWitnesses n k m).image fun w : Finset ℕ × Finset ℕ × Finset ℕ =>
-        w.2.1 + w.2.2 : Finset (Finset ℕ)) := by
-  classical
-  intro Y hY
-  rcases hY with ⟨_hYint, A, B, hAint, hBint, hAcard, hBcard, hYeq, hYcard⟩
-  generalize hXdef : A ∪ B = X
-  have hA_X : A ⊆ X := by rw [← hXdef]; simp
-  have hB_X : B ⊆ X := by rw [← hXdef]; simp
-  rw [Finset.mem_coe, Finset.mem_image]
-  refine ⟨(X, A, B), ?_, by simp [hYeq]⟩
-  rw [allUnionWitnesses, Finset.mem_biUnion]
-  refine ⟨X.card, Finset.mem_Icc.mpr ⟨?_, ?_⟩, ?_⟩
-  · rw [← hAcard]
-    exact Finset.card_le_card hA_X
-  · rw [← hXdef]
-    apply (Finset.card_union_le A B).trans
-    rw [hAcard, hBcard]
-    ring_nf
-    omega
-  rw [mem_unionWitnesses]
-  refine ⟨?_, rfl, ?_, hA_X, hB_X, hAcard, hBcard⟩
-  · intro x hx
-    rw [← hXdef] at hx
-    simp at hx
-    exact hx.elim (fun hxA => hAint hxA) (fun hxB => hBint hxB)
-  · rw [← hXdef]
-    exact freiman_union_dim_le_two_mul_div hk hAcard hBcard
-      (by simpa [hYeq] using hYcard) hm
-
-private lemma pairSumsetsFamily_ncard_le_sum (n k m : ℕ)
-    (hk : 0 < k) (hm : m < k * (k + 1) / 2) :
-    (pairSumsetsFamily n k m).ncard ≤
-      ∑ t ∈ Finset.Icc k (2 * k),
-        (boundedFreimanDimSets n (2 * m / k) t).ncard * Nat.choose t k * Nat.choose t k := by
-  classical
-  generalize himage_def :
-    ((allUnionWitnesses n k m).image fun w : Finset ℕ × Finset ℕ × Finset ℕ =>
-      w.2.1 + w.2.2) = imageW
-  apply le_trans (b := ((imageW : Finset (Finset ℕ)) : Set (Finset ℕ)).ncard)
-  · refine Set.ncard_le_ncard ?_ imageW.finite_toSet
-    rw [← himage_def]
-    simpa using pairSumsetsFamily_subset_witnessSums (n := n) (k := k) (m := m) hk hm
-  apply le_trans (b := imageW.card)
-  · simp
-  apply le_trans (b := (allUnionWitnesses n k m).card)
-  · rw [← himage_def]
-    exact Finset.card_image_le
-  apply le_trans (b :=
-    ∑ t ∈ Finset.Icc k (2 * k), (unionWitnesses n k (2 * m / k) t).card)
-  · exact Finset.card_biUnion_le
-  exact Finset.sum_le_sum fun t ht => unionWitnesses_card_le n k (2 * m / k) t
 
 private def allSmallUnionWitnesses (n k m : ℕ) :
     Finset (Finset ℕ × Finset ℕ × Finset ℕ) :=
@@ -438,23 +344,6 @@ private lemma pairSumsetsFamily_ncard_le_small_sum (n k m : ℕ)
   exact Finset.sum_le_sum fun t ht =>
     smallUnionWitnesses_card_le n k (2 * m / k) (3 * (m * m / k)) t
 
-lemma medium_counting_factor_bound {k : ℕ} (hk : 2 ≤ k) :
-    ((Finset.Icc k (2 * k)).card : ℝ) * ((2 * k : ℕ) : ℝ) ^ (10 * k) ≤
-      (k : ℝ) ^ (24 * k) := by
-  norm_cast
-  apply le_trans (b := (2 * k) * (2 * k) ^ (10 * k))
-  · apply Nat.mul_le_mul_right
-    apply le_trans (b := (Finset.Icc 1 (2 * k)).card)
-    · apply Finset.card_le_card
-      intro t ht
-      rw [Finset.mem_Icc] at ht ⊢
-      omega
-    · simp [Nat.card_Icc]
-  rw [mul_comm, ← pow_succ]
-  apply le_trans (b := (k ^ 2) ^ (10 * k + 1))
-  · exact Nat.pow_le_pow_left (by nlinarith) _
-  rw [← pow_mul]
-  exact Nat.pow_le_pow_right (by omega : 0 < k) (by omega)
 
 private lemma pairSumsetsFamily_empty_of_one_zero (n : ℕ) :
     pairSumsetsFamily n 1 0 = ∅ := by
@@ -647,7 +536,8 @@ private lemma medium_small_exp_card_bound {k : ℕ} {c : ℝ}
   apply Real.exp_le_exp.mpr
   nlinarith
 
-/-- Counting pair sumsets of moderate size, Theorem `stmt:countingPairsOfSets`. -/
+/-- A convenient real-valued corollary of the bipartite count, retaining the former
+moderate-range interface. -/
 theorem pairSumsetsFamily_ncard_le (n k m : ℕ)
     (hm : m < k * (k + 1) / 2) :
     ((pairSumsetsFamily n k m).ncard : ℝ) ≤
@@ -655,66 +545,33 @@ theorem pairSumsetsFamily_ncard_le (n k m : ℕ)
   classical
   by_cases hk_large : 2 ≤ k
   · by_cases hkn : k ≤ n
-    · have hkpos : 0 < k := by omega
-      generalize hrdef : 2 * m / k = r
-      have hsum :
+    · have hk : 0 < k := by omega
+      have hcount :
           ((pairSumsetsFamily n k m).ncard : ℝ) ≤
-            ∑ t ∈ Finset.Icc k (2 * k),
-              (((boundedFreimanDimSets n r t).ncard *
-                  Nat.choose t k * Nat.choose t k : ℕ) : ℝ) := by
-        rw [← hrdef]
-        exact_mod_cast pairSumsetsFamily_ncard_le_sum n k m hkpos hm
-      have hn_pow_le :
-          (n : ℝ) ^ (r + 1) ≤ (n : ℝ) ^ (2 * (m : ℝ) / (k : ℝ) + 1) := by
+            (k : ℝ) ^ (8 * k) * (n : ℝ) ^ (2 * m / k) := by
+        exact_mod_cast pairSumsetsFamily_ncard_le_bipartite n k m hk
+      have hn_pow_le : (n : ℝ) ^ (2 * m / k) ≤
+          (n : ℝ) ^ (2 * (m : ℝ) / (k : ℝ) + 1) := by
         rw [← Real.rpow_natCast]
         apply Real.rpow_le_rpow_of_exponent_le
-        · exact_mod_cast (le_trans (by omega : (1 : ℕ) ≤ 2) (le_trans hk_large hkn))
-        · rw [← hrdef, Nat.cast_add, Nat.cast_one]
-          have hkR_pos : (0 : ℝ) < k := by exact_mod_cast hkpos
-          have hdiv : ((2 * m / k : ℕ) : ℝ) ≤ 2 * (m : ℝ) / k := by
+        · exact_mod_cast (by omega : 1 ≤ n)
+        · have hkR_pos : 0 < (k : ℝ) := by exact_mod_cast hk
+          have hdiv : ((2 * m / k : ℕ) : ℝ) ≤ 2 * (m : ℝ) / (k : ℝ) := by
             rw [le_div_iff₀ hkR_pos]
             exact_mod_cast Nat.div_mul_le_self (2 * m) k
           linarith
-      have hterm :
-          ∀ t ∈ Finset.Icc k (2 * k),
-            (((boundedFreimanDimSets n r t).ncard * Nat.choose t k * Nat.choose t k : ℕ) : ℝ) ≤
-              (n : ℝ) ^ (r + 1) * ((2 * k : ℕ) : ℝ) ^ (10 * k) := by
-        intro t ht
-        have ht_lower : k ≤ t := (Finset.mem_Icc.mp ht).1
-        have ht_upper : t ≤ 2 * k := (Finset.mem_Icc.mp ht).2
-        have hpack :
-            (t : ℝ) ^ (4 * t) * (t : ℝ) ^ k * (t : ℝ) ^ k ≤
-              ((2 * k : ℕ) : ℝ) ^ (10 * k) := by
-          rw [← pow_add, ← pow_add]
-          apply (pow_le_pow_left₀ (b := ((2 * k : ℕ) : ℝ))
-            (by positivity) (by exact_mod_cast ht_upper) _).trans
-          apply pow_le_pow_right₀
-          · exact_mod_cast (by omega : 1 ≤ 2 * k)
-          · omega
-        norm_num only [Nat.cast_mul]
-        apply le_trans (b := ((n : ℝ) ^ (r + 1) * (t : ℝ) ^ (4 * t)) *
-          (t : ℝ) ^ k * (t : ℝ) ^ k)
-        · gcongr
-          · exact card_boundedFreimanDimSets n r t (by omega)
-          · exact_mod_cast Nat.choose_le_pow t k
-          · exact_mod_cast Nat.choose_le_pow t k
-        · simpa only [mul_assoc, Nat.cast_mul, Nat.cast_ofNat] using
-            mul_le_mul_of_nonneg_left hpack (pow_nonneg (Nat.cast_nonneg n) (r + 1))
-      apply hsum.trans
-      apply le_trans (b := ∑ t ∈ Finset.Icc k (2 * k),
-        (n : ℝ) ^ (r + 1) * ((2 * k : ℕ) : ℝ) ^ (10 * k))
-      · apply Finset.sum_le_sum
-        intro t ht
-        exact hterm t ht
-      · simp only [Finset.sum_const, nsmul_eq_mul]
-        simpa only [mul_assoc, mul_left_comm, mul_comm] using
-          mul_le_mul hn_pow_le (medium_counting_factor_bound hk_large)
-            (by positivity) (by positivity)
+      have hk_pow_le : (k : ℝ) ^ (8 * k) ≤ (k : ℝ) ^ (24 * k) := by
+        apply pow_le_pow_right₀
+        · exact_mod_cast (by omega : 1 ≤ k)
+        · omega
+      exact hcount.trans (by
+        nlinarith [mul_le_mul hn_pow_le hk_pow_le (by positivity) (by positivity)])
     · have hempty : pairSumsetsFamily n k m = ∅ := by
         ext Y
         constructor
         · intro hY
-          rcases hY with ⟨_hYint, A, _B, hAint, _hBint, hAcard, _hBcard, _hYeq, _hYcard⟩
+          rcases hY with
+            ⟨_hYint, A, _B, hAint, _hBint, hAcard, _hBcard, _hYeq, _hYcard⟩
           exfalso
           apply hkn
           rw [← hAcard]
