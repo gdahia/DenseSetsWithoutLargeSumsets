@@ -35,6 +35,17 @@ sources:
       - "Imre Z. Ruzsa"
     id: "doi:10.1007/BF01302969"
     type: "journal article"
+  - title: "On a problem of K. Zarankiewicz"
+    authors:
+      - "Tamás Kővári"
+      - "Vera T. Sós"
+      - "Pál Turán"
+    id: "doi:10.4064/cm-3-1-50-57"
+    type: "journal article"
+    journal: "Colloquium Mathematicum"
+    year: 1954
+    volume: 3
+    pages: "50--57"
   - title: "Large sumsets from medium-sized subsets"
     authors:
       - "Béla Bollobás"
@@ -50,8 +61,10 @@ status:
     sumsets", including its probabilistic construction and the estimates for
     small, moderate, and very large sumsets. The project also formalizes the
     additive-combinatorics results from Chang, Green, Ruzsa, and
-    Bollobás--Leader--Tiba described in the README, together with a reduction of
-    the complementary lower bound to Mathlib's Zarankiewicz function.
+    Bollobás--Leader--Tiba described in the README, together with the
+    complementary lower bound: every sufficiently dense subset of [n] does
+    contain a large sumset. The lower bound goes through Mathlib's Zarankiewicz
+    function and the Kővári--Sós--Turán estimate.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms:
@@ -75,6 +88,33 @@ status:
         - "Classical.choice"
         - "Quot.sound"
       literature_dependencies: []
+    - declaration: "DenseSetsWithoutLargeSumsets.pairEvent_of_lt_density"
+      file: "DenseSetsWithoutLargeSumsets/Combinatorics/Additive/SumsetLowerBound.lean"
+      sorry_count: 0
+      axioms:
+        - "propext"
+        - "Classical.choice"
+        - "Quot.sound"
+      literature_dependencies:
+        - "doi:10.4064/cm-3-1-50-57"
+    - declaration: "DenseSetsWithoutLargeSumsets.eventually_pairEvent_of_rpow_le_card"
+      file: "DenseSetsWithoutLargeSumsets/Combinatorics/Additive/SumsetLowerBound.lean"
+      sorry_count: 0
+      axioms:
+        - "propext"
+        - "Classical.choice"
+        - "Quot.sound"
+      literature_dependencies:
+        - "doi:10.4064/cm-3-1-50-57"
+    - declaration: "SimpleGraph.zarankiewicz_le"
+      file: "DenseSetsWithoutLargeSumsets/Combinatorics/SimpleGraph/KovariSosTuran.lean"
+      sorry_count: 0
+      axioms:
+        - "propext"
+        - "Classical.choice"
+        - "Quot.sound"
+      literature_dependencies:
+        - "doi:10.4064/cm-3-1-50-57"
 
 automation:
   methods:
@@ -164,6 +204,29 @@ alignment:
       lean: "DenseSetsWithoutLargeSumsets.card_add_lower_bound_of_affineDim"
       module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumOfSetsInSeveralDimensions"
       status: "proved"
+    - source: "On a problem of K. Zarankiewicz, Kővári--Sós--Turán theorem"
+      lean: "SimpleGraph.zarankiewicz_le"
+      module: "DenseSetsWithoutLargeSumsets.Combinatorics.SimpleGraph.KovariSosTuran"
+      status: "proved"
+      note: >-
+        Not proved here. The file is a verbatim copy, by Mitchell Horner, of the
+        open Mathlib pull request leanprover-community/mathlib4#25841 at commit
+        8f4ec0b3adc694d08665af3e3126487338a43434, with only the module-system
+        declarations removed. It is vendored because the pull request has not
+        been merged into the Mathlib revision this project pins, and should be
+        replaced by the Mathlib import once it lands.
+    - source: "Dense sets without large sumsets, lower bound direction"
+      lean: "DenseSetsWithoutLargeSumsets.pairEvent_of_lt_density"
+      module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumsetLowerBound"
+      status: "proved"
+      note: >-
+        The complement of Theorem 1.1. For every window 0 < m <= n, a set of
+        density delta contains a sumset A + B of size k once
+        (k-1)^(1/k) (1+m/n) m^(-1/k) + k/n < delta. The reduction represents
+        each s in S minus {1} in all m ways as (i+s)-i, then applies
+        Kővári--Sós--Turán to the resulting Zarankiewicz problem. Taking
+        m=floor(n/k) gives k=(1-o(1)) log n/log(1/delta), matching the
+        construction up to its leading factor of 3.
     - source: "Large sumsets from medium-sized subsets, Theorem 2"
       lean: "DenseSetsWithoutLargeSumsets.exists_medium_sized_subsets_with_large_sumset_subsets"
       module: "DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets"
@@ -177,4 +240,8 @@ alignment:
 acknowledgements: >-
   Built on Mathlib and the APAP project; APAP supplies additive-combinatorics
   and discrete-Fourier-analysis infrastructure used in the proof of the weak
-  version of Chang's theorem.
+  version of Chang's theorem. The Kővári--Sós--Turán bound in
+  DenseSetsWithoutLargeSumsets/Combinatorics/SimpleGraph/KovariSosTuran.lean was
+  written by Mitchell Horner for Mathlib pull request
+  leanprover-community/mathlib4#25841 and is reproduced here unchanged, under
+  Mathlib's Apache 2.0 license, while that pull request is open.

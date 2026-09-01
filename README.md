@@ -13,6 +13,15 @@ The only dependencies are Mathlib and the [`APAP` project](https://yaeldillies.g
 where the latter is used for additive combinatorics / discrete Fourier analysis machinery
 in Chang's theorem.
 
+One file, `DenseSetsWithoutLargeSumsets/Combinatorics/SimpleGraph/KovariSosTuran.lean`, is not
+original to this project: it is a verbatim copy of the Kővári–Sós–Turán theorem written by
+**Mitchell Horner** for the open Mathlib pull request
+[#25841](https://github.com/leanprover-community/mathlib4/pull/25841), reproduced here under
+Mathlib's Apache 2.0 license because that pull request has not been merged into the Mathlib
+revision this project pins. The only edits are the removal of the `module` / `public import`
+declarations. Once the pull request lands, the file should be deleted in favour of importing
+`Mathlib.Combinatorics.SimpleGraph.Extremal.KovariSosTuran`.
+
 ## Other formalized results
 
 The repository also develops a substantial amount of reusable additive combinatorics, including:
@@ -32,10 +41,14 @@ The repository also develops a substantial amount of reusable additive combinato
   [*Large sumsets from medium-sized subsets*](https://arxiv.org/abs/2206.09366).
 - Supporting results about generalized arithmetic progressions, finite probability spaces,
   binomial random finite sets, and concentration estimates needed for the main argument.
-- A reduction of the complementary *lower* bound — every sufficiently dense $S \subseteq [n]$
-  does contain a sumset $A + B$ with $\min\{|A|, |B|\} \ge k$ — to Mathlib's Zarankiewicz
-  function, obtained by encoding $[n]$ in base $\lfloor\sqrt{n}\rfloor + 1$ as a bipartite
-  relation (`DenseSetsWithoutLargeSumsets.exists_pairEvent_of_zarankiewicz_lt`).
+- The complementary *lower* bound (`DenseSetsWithoutLargeSumsets.pairEvent_of_lt_density`).
+  For any $m\le n$, representing every $s\in S\setminus\{1\}$ in the $m$ ways
+  $s=(i+s)-i$ gives a bipartite relation with at least $m(|S|-1)$ edges. The
+  Kővári–Sós–Turán estimate yields the sharp sufficient density
+  $$(k-1)^{1/k}(1+m/n)m^{-1/k}+k/n<\delta.$$
+  Taking $m=\lfloor n/k\rfloor$ gives
+  $k=(1-o(1))\log n/\log(1/\delta)$, matching the construction's leading constant up to a
+  factor of $3$.
 
 ## Build
 

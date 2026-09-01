@@ -4,4 +4,5 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumsetFromZarankiewicz
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumsetLowerBound
 import DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets
