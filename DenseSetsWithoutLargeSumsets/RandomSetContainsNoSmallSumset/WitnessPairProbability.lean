@@ -3,15 +3,14 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.NumberTheory.Bertrand
+module
+
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
+public import DenseSetsWithoutLargeSumsets.Probability
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 Probability bounds for individual BLT witness pairs.
@@ -20,6 +19,8 @@ Bounds the probability that a fixed BLT witness pair has its sumset contained in
 set, and packages the union bound over a finite family of pairs
 (`bltDimSmallWitnessPairs_probability_sum_le`, `dim_fingerprint_sum_le_gap_dim_sum`).
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

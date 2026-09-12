@@ -3,15 +3,16 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairProbability
+module
+
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.Constants
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimensionSumsetBounds
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.NumberTheory.Bertrand
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 Doubling of the union of two sets with a small mixed sumset.
@@ -21,6 +22,8 @@ Plünnecke--Ruzsa consequences of `#(A + B) ≤ C * k` for `k`-sets `A, B`: the 
 (`card_union_add_union_le_κ_mul`, `card_large_subset_union_add_union_le_κ_mul_card`), plus the
 asymmetric lower bound on `#(A + B)` coming from a Freiman-dimension lower bound on `A ∪ B`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

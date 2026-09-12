@@ -3,7 +3,10 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Analysis.Convex.Gauge
+module
+
+public import Mathlib.Analysis.Convex.Gauge
+public import Mathlib.MeasureTheory.Group.FundamentalDomain
 import Mathlib.MeasureTheory.Group.GeometryOfNumbers
 
 /-! # Successive minima of a lattice with respect to a symmetric convex body
@@ -47,6 +50,8 @@ body is a convex body again, and `exists_pos_forall_norm_apply_lt` together with
 subgroup. `Chang.BoxLatticePoints` transports the count to a subgroup of `ℤ ^ d` and a box, which
 is the form the properization consumes.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

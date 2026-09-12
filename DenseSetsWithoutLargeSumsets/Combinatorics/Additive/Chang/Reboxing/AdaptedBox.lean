@@ -3,7 +3,10 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GeometryOfNumbers
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GeometryOfNumbers
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
 
 /-! # Adapted lattice boxes and their GAPs
 
@@ -13,6 +16,8 @@ lattice points. This module packages such data as a proper centered GAP with an 
 formula. Quantitative product estimates belong to the shape-specific construction of the adapted
 box rather than to this neutral packaging layer.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

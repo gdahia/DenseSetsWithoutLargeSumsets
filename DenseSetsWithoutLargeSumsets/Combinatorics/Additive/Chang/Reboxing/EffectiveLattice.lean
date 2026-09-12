@@ -3,7 +3,9 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Model
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Model
 
 /-! # Effective lattice coordinates for box reboxing
 
@@ -11,6 +13,8 @@ This file transports a finite set `D ⊆ ℤ^d` to the saturated lattice in its 
 is the effective dimension of `D`. The coordinate and reconstruction maps are reusable in the
 specialized projection and slice reboxing arguments.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

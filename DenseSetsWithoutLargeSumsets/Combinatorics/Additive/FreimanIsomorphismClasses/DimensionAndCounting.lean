@@ -3,7 +3,13 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanIsomorphismClasses.RelationAndExtensionCodes
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanIsomorphismClasses.RelationAndExtensionCodes
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+public import DenseSetsWithoutLargeSumsets.Common
+public import Mathlib.Data.Fintype.Perm
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Freiman dimension and bounded-dimension classes
@@ -11,6 +17,8 @@ import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanIsomorphismCla
 This submodule develops relation models, passes from labeled tuples to finite-set classes, and
 counts bounded-dimension realizations.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
@@ -21,7 +29,7 @@ noncomputable section
 /-! ### Freiman dimension and determining coordinates -/
 
 /-- The coefficient vector of `aᵢ + aⱼ = aₖ + aₗ`. -/
-private def relationVector {t : ℕ} (p : RelationIndex t) : Fin t →₀ ℚ :=
+def relationVector {t : ℕ} (p : RelationIndex t) : Fin t →₀ ℚ :=
   Finsupp.single p.1 1 + Finsupp.single p.2.1 1 -
     Finsupp.single p.2.2.1 1 - Finsupp.single p.2.2.2 1
 
@@ -31,10 +39,10 @@ def relationHolds {t : ℕ} (a : Fin t → ℕ) (p : RelationIndex t) : Prop :=
 private def tupleEval {t : ℕ} (a : Fin t → ℕ) : (Fin t →₀ ℚ) →ₗ[ℚ] ℚ :=
   Finsupp.linearCombination ℚ fun i ↦ (a i : ℚ)
 
-private def coefficientSum (t : ℕ) : (Fin t →₀ ℚ) →ₗ[ℚ] ℚ :=
+def coefficientSum (t : ℕ) : (Fin t →₀ ℚ) →ₗ[ℚ] ℚ :=
   Finsupp.linearCombination ℚ fun _ ↦ 1
 
-private def zeroSumSpace (t : ℕ) : Submodule ℚ (Fin t →₀ ℚ) :=
+def zeroSumSpace (t : ℕ) : Submodule ℚ (Fin t →₀ ℚ) :=
   LinearMap.ker (coefficientSum t)
 
 private lemma tupleEval_relationVector {t : ℕ} (a : Fin t → ℕ) (p : RelationIndex t) :
@@ -61,7 +69,7 @@ private lemma coefficientSum_relationVector {t : ℕ} (p : RelationIndex t) :
   ring
 
 /-- The rational span of the additive relations satisfied by an enumerated set. -/
-private def relationSpace {t : ℕ} (a : Fin t → ℕ) : Submodule ℚ (Fin t →₀ ℚ) :=
+def relationSpace {t : ℕ} (a : Fin t → ℕ) : Submodule ℚ (Fin t →₀ ℚ) :=
   Submodule.span ℚ (relationVector '' {p | relationHolds a p})
 
 private lemma relationSpace_le_zeroSumSpace {t : ℕ} (a : Fin t → ℕ) :
@@ -70,7 +78,7 @@ private lemma relationSpace_le_zeroSumSpace {t : ℕ} (a : Fin t → ℕ) :
   rintro _ ⟨p, -, rfl⟩
   exact coefficientSum_relationVector p
 
-private def relationSpaceInZeroSum {t : ℕ} (a : Fin t → ℕ) :
+def relationSpaceInZeroSum {t : ℕ} (a : Fin t → ℕ) :
     Submodule ℚ (zeroSumSpace t) :=
   (relationSpace a).comap (zeroSumSpace t).subtype
 
@@ -505,12 +513,12 @@ private lemma freimanRelationEquivalent_tupleRange {s t : ℕ} {a b : Fin t → 
     freimanRelationHolds_comp_perm]
   exact hrelations (permuteFreimanRelation ea.symm p)
 
-private def finsetFreimanRelationCodes {s t : ℕ} (ht : 0 < t)
+def finsetFreimanRelationCodes {s t : ℕ} (ht : 0 < t)
     (X : SizedNatFinset t) : Finset (Fin t → FreimanRelationIndex s t) :=
   Finset.univ.image fun e : Equiv.Perm (Fin t) ↦
     freimanRelationCode (s := s) ht (permutedFinsetTuple X e)
 
-private lemma finsetFreimanRelationCodes_nonempty {s t : ℕ} (ht : 0 < t)
+lemma finsetFreimanRelationCodes_nonempty {s t : ℕ} (ht : 0 < t)
     (X : SizedNatFinset t) : (finsetFreimanRelationCodes (s := s) ht X).Nonempty := by
   refine ⟨freimanRelationCode (s := s) ht
     (permutedFinsetTuple X (Equiv.refl (Fin t))), ?_⟩

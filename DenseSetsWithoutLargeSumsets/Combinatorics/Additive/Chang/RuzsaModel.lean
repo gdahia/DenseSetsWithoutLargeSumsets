@@ -3,13 +3,17 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import Mathlib.Combinatorics.Additive.FreimanHom
+public import Mathlib.Data.Real.Basic
+public import Mathlib.Algebra.Group.Pointwise.Finset.Basic
+public import Mathlib.Data.ZMod.Basic
 import Mathlib.Algebra.Field.ZMod
-import Mathlib.Combinatorics.Additive.FreimanHom
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.Combinatorics.Pigeonhole
 import Mathlib.Data.Rat.Cast.Lemmas
 import Mathlib.Data.Rat.Cast.Order
-import Mathlib.Data.Real.Basic
 
 /-! # Stage M of Chang's theorem: the Ruzsa model
 
@@ -39,6 +43,8 @@ there are only `|s • X - s • X| ≤ m` elements to avoid and each of them ru
 * `exists_ruzsa_model_of_doubling`: the same statement with the Plünnecke–Ruzsa bound
   `m ≤ κ ^ (2 * s) * |X|` for the modulus, which is the form Stage F consumes.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

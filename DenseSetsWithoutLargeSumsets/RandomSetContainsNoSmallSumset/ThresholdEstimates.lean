@@ -3,15 +3,14 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.SumsetGrowth
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.NumberTheory.Bertrand
+module
+
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.Constants
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimensionSumsetBounds
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 Analytic estimates relating the size thresholds to logarithms of `n`.
@@ -21,6 +20,8 @@ or `lowerGapThreshold` into log-scale bounds (e.g. `fifteen_lt_log_of_lowerAnaly
 `density_coeff_log_lt_exp_neg_mul_q`, `lowerGapSqrtScale_log_bound`) that the later counting
 arguments consume.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

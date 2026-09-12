@@ -3,11 +3,13 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Tactic.SetNotationForOrder
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.Data.Nat.Choose.Cast
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+public import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumOfSetsInSeveralDimensions
+import Mathlib.Data.Nat.Choose.Cast
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Sumset bounds from Freiman dimension
@@ -15,6 +17,8 @@ import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumOfSetsInSeveralDim
 This file transports geometric sumset bounds through rational Freiman models and derives lower
 bounds for the sumset of two sets from the Freiman dimension of their union.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

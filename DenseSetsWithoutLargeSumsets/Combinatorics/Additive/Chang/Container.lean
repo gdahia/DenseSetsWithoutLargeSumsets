@@ -3,13 +3,20 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Analysis.Complex.ExponentialBounds
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Packing
+public import APAP.Prereqs.Chang
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.BohrProgression
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Fourier
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.FreimanRigidity
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Packing
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.RuzsaModel
+import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
+import Mathlib.Combinatorics.Additive.RuzsaCovering
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-! # The coarse cyclic container in Chang's theorem
 
@@ -37,6 +44,8 @@ that `X` has to exceed for the model group to be large enough to carry a Bohr pr
 The model group holds no container: only bounded-length additive relations cross the modelling
 isomorphism, namely the progression `Q` and, through it, the quadruple relations of Stage T.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

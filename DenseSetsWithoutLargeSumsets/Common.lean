@@ -3,14 +3,15 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Tactic.SetNotationForOrder
-import Mathlib.Topology.UnitInterval
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
+module
+
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 /-!
 Common definitions
 -/
+
+@[expose] public section
 
 open scoped BigOperators Pointwise
 

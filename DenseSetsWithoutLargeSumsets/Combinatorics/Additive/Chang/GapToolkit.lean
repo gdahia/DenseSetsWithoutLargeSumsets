@@ -3,11 +3,16 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Algebra.Module.Defs
-import Mathlib.Combinatorics.Additive.FreimanHom
-import Mathlib.Data.Pi.Interval
-import Mathlib.Data.Int.Interval
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
+module
+
+public import Mathlib.Combinatorics.Additive.FreimanHom
+public import Mathlib.Data.Pi.Interval
+public import Mathlib.Data.Int.Interval
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
+public import Mathlib.Data.Int.ConditionallyCompleteOrder
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Data.Rat.Floor
 
 /-! # Generalized arithmetic progressions (proper and non-proper)
 
@@ -28,6 +33,8 @@ The main pieces are:
 All results are stated in a single ambient `noncomputable section` because the coordinate map is
 defined via choice.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

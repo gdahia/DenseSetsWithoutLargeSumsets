@@ -3,15 +3,26 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem
-import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SmallSumsetIsomorphismClasses
-import Mathlib.Analysis.Complex.ExponentialBounds
-import Mathlib.Analysis.SpecialFunctions.Log.Monotone
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SmallSumsetIsomorphismClasses.CoreAndCovers
+import APAP.Prereqs.Chang
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimensionSumsetBounds
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SmallSumsetIsomorphismClasses.ClassCountBounds
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.MeasureTheory.Covering.Besicovitch
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 Bounds for counting sumsets of moderate size.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

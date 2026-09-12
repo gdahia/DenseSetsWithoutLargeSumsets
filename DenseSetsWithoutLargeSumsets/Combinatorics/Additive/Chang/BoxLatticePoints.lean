@@ -3,8 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.ConvexGeometry
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GeometryOfNumbers
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.ConvexGeometry
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GeometryOfNumbers
+public import Mathlib.Analysis.InnerProductSpace.Basic
+import Mathlib.Analysis.RCLike.Lemmas
 
 /-! # The lattice point count for a box of integer points
 
@@ -31,6 +35,8 @@ The transport is along the coordinatewise inclusion `intCastHom : ℤ ^ d → �
 
 The result is `ncard_latticeBoxPoints_le`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

@@ -3,9 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ArithmeticRemoval.Basic
+public import Mathlib.Algebra.Group.Pointwise.Finset.Scalar
 import Mathlib.Algebra.Group.Action.Pointwise.Finset
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ArithmeticRemoval.Basic
 
 /-!
 # Cleaning up a pair of sets almost all of whose sums are popular
@@ -23,6 +26,8 @@ the two ways of passing to large subsets `X₀ ⊆ X` and `Y₀ ⊆ Y` whose who
   on `#(X + Y)`. It only gives `#(X₀ + Y₀) ≤ 2 * #P ^ 3 / (#X * #Y)`, but it is elementary:
   every `z ∈ X₀ + Y₀` has many representations as `p₁ + p₂ - p₃` with `p₁, p₂, p₃ ∈ P`.
 -/
+
+@[expose] public section
 
 open Finset
 

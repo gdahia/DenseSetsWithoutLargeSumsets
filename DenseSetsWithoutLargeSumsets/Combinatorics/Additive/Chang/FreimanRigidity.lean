@@ -3,8 +3,11 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Algebra.Group.Pointwise.Finset.Basic
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
+module
+
+public import Mathlib.Algebra.Group.Pointwise.Finset.Basic
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
+import Mathlib.Data.Rat.Floor
 
 /-! # Stage T of Chang's theorem: transport across a Freiman isomorphism
 
@@ -27,6 +30,8 @@ The isomorphism budget is `8`: a relation `z₁ + z₂ = z₃ + z₄` between el
 what turns it into the corresponding relation between the transported elements. Nothing of
 unbounded additive length crosses the isomorphism.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

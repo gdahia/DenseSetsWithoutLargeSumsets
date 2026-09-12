@@ -3,16 +3,19 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.Combinatorics.Additive.RuzsaCovering
-import Mathlib.Algebra.BigOperators.Fin
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization.AlgebraAndGAPBasics
+import Mathlib.Algebra.Group.Action.Pointwise.Finset
+import Mathlib.Tactic.Positivity.Finset
 
 /-! # Chang's batch packing argument
 
 This file contains the combinatorial packing part of Chang's proof. It is independent of the
 Fourier construction of the initial progression.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

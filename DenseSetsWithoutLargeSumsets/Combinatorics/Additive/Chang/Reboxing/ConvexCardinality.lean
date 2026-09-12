@@ -3,8 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Data.ZMod.Basic
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.EffectiveLattice
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.ConvexProgression
+public import Mathlib.Analysis.Convex.Basic
+public import Mathlib.Data.ZMod.Defs
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-! # Cardinality control for dilates of convex lattice sets
 
@@ -15,6 +19,8 @@ dilate has cardinality at most `(2 * n + 1) ^ s * E.card`.
 The proof reduces coordinates modulo `2 * n + 1`. Two points in the same residue class have a
 normalized difference which is again an integer point of the original body.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

@@ -3,11 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+public import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Algebra.Order.Group.PiLex
-import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
-import Mathlib.LinearAlgebra.AffineSpace.Pointwise
-import Mathlib.Tactic.SetNotationForOrder
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Sum of sets in several dimensions
@@ -15,6 +16,8 @@ import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
 This file proves the sharp lower bound from Imre Ruzsa's *Sum of sets in several
 dimensions*.  The nonemptiness assumption is the positive-cardinality assumption in the paper.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

@@ -3,12 +3,17 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Algebra.Group.Pointwise.Finset.Basic
-import Mathlib.Algebra.Order.Field.Basic
+module
+
+public import Mathlib.Algebra.Group.Pointwise.Finset.Basic
+public import Mathlib.Data.Real.Basic
 import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Real.Basic
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Positivity
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The penalised minimality step
@@ -20,6 +25,8 @@ subsets can only decrease the capped sumset term by less than the penalty incurr
 recorded in `DenseSetsWithoutLargeSumsets.exists_potential_minimiser`, which is the only interface
 to the potential used later.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

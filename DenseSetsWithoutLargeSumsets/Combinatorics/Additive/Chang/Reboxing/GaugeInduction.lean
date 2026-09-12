@@ -3,7 +3,10 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.GaugeBox
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.GaugeBox
+import Mathlib.Analysis.Normed.Module.FiniteDimension
 
 /-! # Shortest-direction induction for adapted lattice boxes
 
@@ -21,6 +24,8 @@ the resulting integral steps and widths as a proper GAP, and `EffectiveLattice` 
 saturated coordinates used by the slice wrapper. The applications are the concrete projected-box
 and sliced-box theorems in `Chang.Properization` and `Chang.Transport`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

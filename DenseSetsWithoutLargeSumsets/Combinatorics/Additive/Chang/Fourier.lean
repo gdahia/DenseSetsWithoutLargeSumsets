@@ -3,9 +3,16 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import APAP.Prereqs.Bohr.Basic
-import APAP.Prereqs.Chang
-import APAP.Prereqs.Energy
+module
+
+import APAP.Mathlib.Analysis.Normed.Ring.Basic
+import APAP.Prereqs.Convolution.Discrete.Basic
+import AddCombi.Mathlib.Algebra.BigOperators.Ring.Finset
+import AddCombi.Mathlib.Algebra.GroupWithZero.Indicator
+import Mathlib.Algebra.Order.Chebyshev
+
+public import APAP.Prereqs.Chang
+public import AddCombi.Mathlib.Algebra.Notation.Indicator
 import APAP.Prereqs.LpNorm.Discrete.Basic
 import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
@@ -21,6 +28,8 @@ Chang's dissociated-spectrum bound, and chord-width Bohr sets. Chang-specific st
 this boundary should be phrased for `Finset (ZMod q)` and should absorb normalization changes here
 rather than propagate APAP's analytic conventions through the geometric development.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
@@ -98,7 +107,7 @@ lemma fourthEnergy_lower_bound {q : ℕ} [NeZero q] {κ : ℝ} (X : Finset (ZMod
 
 /-! ## Large spectrum -/
 
-private def changIndicatorComplex {G : Type*} (X : Finset G) : G → ℂ :=
+def changIndicatorComplex {G : Type*} (X : Finset G) : G → ℂ :=
   𝟭_[(X : Set G)]
 
 private def changFourfoldCorrelation

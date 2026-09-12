@@ -3,9 +3,13 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Analysis.Complex.ExponentialBounds
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Container
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Transport
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Container
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Transport
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-! # Chang's theorem
 
@@ -25,6 +29,8 @@ Freiman--Bilu theorem, and that is the bound the downstream argument consumes: i
 `freimanDim X` by `2 ⌈κ⌉ - 1`. The coarse container's own dimension, `changContainerExponent κ`,
 appears here only as the argument of the quartic properization and transport costs.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

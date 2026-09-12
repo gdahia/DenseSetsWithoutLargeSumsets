@@ -3,13 +3,14 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Data.Real.Basic
+module
+
+public import Mathlib.Data.Real.Basic
+public import Mathlib.LinearAlgebra.AffineSpace.Combination
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.Combinatorics.Additive.FreimanHom
 import Mathlib.Data.Nat.Choose.Cast
-import Mathlib.LinearAlgebra.AffineSpace.Combination
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
-import Mathlib.LinearAlgebra.Dimension.Finrank
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.Combinatorics.Additive.FreimanHom
 
 /-!
 # A self-sumset bound for the Freiman dimension
@@ -17,6 +18,8 @@ import Mathlib.Combinatorics.Additive.FreimanHom
 This file derives the Freiman-dimension bound used in the small-sumset argument from the summed
 lower bound for a union of two finite sets.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

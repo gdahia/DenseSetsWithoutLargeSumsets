@@ -3,13 +3,20 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SmallSumsetIsomorphismClasses.CoreAndCovers
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SmallSumsetIsomorphismClasses.CoreAndCovers
+import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.SpecialFunctions.Log.Monotone
+import Mathlib.Analysis.SpecialFunctions.Stirling
 
 /-!
 # Bounds for small-sumset Freiman classes
 
 This submodule proves the analytic class-count estimates and the final realization bound.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

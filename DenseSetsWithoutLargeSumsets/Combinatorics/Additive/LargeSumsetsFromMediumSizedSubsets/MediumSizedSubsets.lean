@@ -3,10 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Analysis.Real.Sqrt
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Constants
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Constants
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Sampling
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Cleanup
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Potential
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.Sampling
 
 /-!
 # Large sumsets from medium-sized subsets
@@ -36,6 +38,8 @@ least `bltAlpha K ε * min #X #Y` representations, would be few and would still 
 pair, so one of the two cleanup lemmas of `DenseSetsWithoutLargeSumsets.Cleanup` would produce a
 pair of strictly smaller potential.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

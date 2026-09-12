@@ -3,12 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Analysis.Complex.ExponentialBounds
-import Mathlib.Analysis.SpecialFunctions.Log.Monotone
-import Mathlib.Analysis.SpecialFunctions.Stirling
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanIsomorphismClasses
-import DenseSetsWithoutLargeSumsets.Common
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanIsomorphismClasses.DimensionAndCounting
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.MeasureTheory.Covering.Besicovitch
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isomorphism classes with small self-sumsets
@@ -17,6 +17,8 @@ This file formalizes Section 4 of Green's paper. It contains the numerical sampl
 the small-core proposition, the extension and restricted-sumset lemmas, and the final count of
 Freiman-isomorphism classes with small restricted sumsets.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

@@ -3,16 +3,18 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Data.Finset.Sort
-import Mathlib.Data.Fintype.EquivFin
-import Mathlib.Data.Fintype.Perm
-import Mathlib.Combinatorics.Additive.CauchyDavenport
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Common
+module
+
+public import Mathlib.Data.Finset.Sort
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.Group.End
+public import Mathlib.Algebra.Group.Pointwise.Finset.Basic
+public import Mathlib.Data.Fintype.Option
+public import Mathlib.Data.Fintype.Sum
+public import Mathlib.Data.Real.Basic
+public import Mathlib.Logic.Equiv.Fin.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 
 /-!
 # Freiman-isomorphism classes
@@ -26,6 +28,8 @@ needed by Section 4 are developed alongside the relation encodings they use.
 
 The source of version 2 is available at <https://arxiv.org/e-print/math/0304183>.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
@@ -156,7 +160,7 @@ private lemma freimanRelationCodes_nonempty {s t : ℕ} (ht : 0 < t)
   use code
   simp [freimanRelationCodes, hcode]
 
-noncomputable def freimanRelationCode {s t : ℕ} (ht : 0 < t)
+@[no_expose] noncomputable def freimanRelationCode {s t : ℕ} (ht : 0 < t)
     (a : Fin t → ℕ) : Fin t → FreimanRelationIndex s t :=
   (freimanRelationCodes (s := s) a).min'
     (freimanRelationCodes_nonempty (s := s) ht a)
@@ -963,9 +967,9 @@ theorem exists_core_decomposition (A : Finset ℕ) {t m : ℕ} (hA : A.card = t)
 
 /-! ### Extension relation codes -/
 
-private abbrev ExtensionSlot (d : ℕ) := Unit ⊕ Fin d
+abbrev ExtensionSlot (d : ℕ) := Unit ⊕ Fin d
 
-private abbrev ExtensionShape (d : ℕ) :=
+abbrev ExtensionShape (d : ℕ) :=
   (Fin 2 → ExtensionSlot d) × (Fin 2 → ExtensionSlot d)
 
 private def extensionSlot {l d : ℕ} (i : Fin (l + d)) : ExtensionSlot d :=
@@ -1032,7 +1036,7 @@ private noncomputable def extensionWitnesses {l d : ℕ} (a : Fin (l + d) → �
   exact Finset.univ.filter fun witness ↦
     freimanRelationHolds a (extensionRelation shape witness)
 
-noncomputable def extensionCode {l d : ℕ} (a : Fin (l + d) → ℕ) :
+@[no_expose] noncomputable def extensionCode {l d : ℕ} (a : Fin (l + d) → ℕ) :
     ExtensionShape d → Option (FreimanRelationIndex 2 l) :=
   fun shape ↦ if h : (extensionWitnesses a shape).Nonempty then
     some ((extensionWitnesses a shape).min' h) else none
@@ -1300,7 +1304,7 @@ private lemma chosenRestrictedRepresentation_mem (A : Finset ℕ) {x : ℕ}
     chosenRestrictedRepresentation A hx ∈ restrictedRepresentationPairs A x :=
   Classical.choose_spec (mem_restrictedSumset_iff_representationPairs_nonempty.mp hx)
 
-noncomputable def restrictedSumRepresentation {l u : ℕ}
+@[no_expose] noncomputable def restrictedSumRepresentation {l u : ℕ}
     (A B : Finset ℕ) (hA : A.card = l) (hB : B.card = u)
     (hBA : B ⊆ restrictedSumset A) : Fin u → Fin l × Fin l :=
   fun i ↦
@@ -1354,7 +1358,7 @@ lemma injective_of_four_relations_iff {u : ℕ} {a b : Fin u → ℕ}
     nsmul_eq_mul] at hpA
   exact ha (by omega)
 
-private def pairSumRange {l u : ℕ} (b : Fin l → ℕ)
+def pairSumRange {l u : ℕ} (b : Fin l → ℕ)
     (representation : Fin u → Fin l × Fin l) : Finset ℕ :=
   Finset.univ.image (pairSumTuple b representation)
 

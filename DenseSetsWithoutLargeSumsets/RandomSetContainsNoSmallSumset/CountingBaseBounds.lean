@@ -3,15 +3,16 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.NumberTheory.Bertrand
-import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.LargeSubsetsGAP
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
+module
+
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 Bookkeeping constants for counting proper GAPs and BLT pairs.
@@ -22,6 +23,8 @@ fingerprint count are measured against, culminating in the two log bounds
 (`lower_counting_base_log_le_epsilon_log_div_eight`,
 `lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight`) feeding the exponent estimate.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

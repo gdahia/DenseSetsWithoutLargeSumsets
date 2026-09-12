@@ -3,15 +3,21 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Analysis.Convex.Basic
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+module
+
+public import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Algebra.Order.Archimedean.Real.Basic
+import Mathlib.Data.Finset.Attr
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 
 /-! # Symmetric convex progressions
 
 This module contains the elementary interface for finite sets of lattice points in symmetric convex
 bodies, used to describe the concrete box projections and slices constructed by its callers.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

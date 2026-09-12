@@ -3,7 +3,11 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization.AlgebraAndGAPBasics
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization.AlgebraAndGAPBasics
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.LinearAlgebra.LinearIndependent.BaseChange
 
 /-!
 # Short relations and iterated properization
@@ -11,6 +15,8 @@ import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization.A
 This submodule develops the successive-minimum argument, saturated quotient reduction, and the
 iteration producing a two-proper generalized arithmetic progression.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

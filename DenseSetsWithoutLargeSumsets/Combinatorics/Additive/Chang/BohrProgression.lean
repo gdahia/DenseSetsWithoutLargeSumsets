@@ -3,9 +3,13 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Analysis.Real.Pi.Bounds
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization.AlgebraAndGAPBasics
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Fourier
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization
+import Mathlib.Analysis.Real.Pi.Bounds
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-! # A large progression inside a chord neighborhood
 
@@ -41,6 +45,8 @@ whatever `q` is, and no nonzero modular scalar has to be cancelled. Room is expl
 every reduction modulo `q` performed here goes through `eq_zero_of_dvd_of_two_mul_abs_le`, which
 consumes the bound placing the relevant lattice vector inside half the box.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

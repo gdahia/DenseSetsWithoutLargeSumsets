@@ -3,8 +3,10 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ArithmeticRemoval.TripartiteGraph
-import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ArithmeticRemoval.TripartiteGraph
+public import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 
 /-!
 # The arithmetic removal lemma in a set of small doubling
@@ -31,6 +33,8 @@ of which at most `3 / 4 * #X` could have been hit.
 The small doubling hypothesis enters only through the comparison of `#W` with `#X`: it is what
 makes a triangle count of order `#X ^ 3` small compared to the cube of the number of vertices.
 -/
+
+@[expose] public section
 
 open Finset SimpleGraph SimpleGraph.TripartiteFromTriangles Sum3
 open scoped Pointwise

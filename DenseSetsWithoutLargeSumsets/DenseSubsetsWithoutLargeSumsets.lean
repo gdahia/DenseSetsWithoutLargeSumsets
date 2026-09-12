@@ -3,11 +3,18 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
+public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Probability
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.Constants
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem
-import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize
-import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
-import DenseSetsWithoutLargeSumsets.Probability
-import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Covering.Besicovitch
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 The construction of dense subsets without large sumsets.
@@ -15,6 +22,8 @@ The construction of dense subsets without large sumsets.
 The three preceding files estimate disjoint ranges of `#(A+B)`.  This file contains
 the bookkeeping which combines them into the final probability estimate.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
@@ -24,13 +33,13 @@ open scoped Pointwise
 
 noncomputable section
 
-private def smallSumsetEvent (n k : ℕ) (C : ℝ) : Set (Finset ℕ) :=
+def smallSumsetEvent (n k : ℕ) (C : ℝ) : Set (Finset ℕ) :=
   {S | pairSumsetIsSubset n k 0 (C * k) S}
 
-private def mediumSumsetEvent (n k : ℕ) (C : ℝ) : Set (Finset ℕ) :=
+def mediumSumsetEvent (n k : ℕ) (C : ℝ) : Set (Finset ℕ) :=
   {S | moderateSumsetEvent n k C S}
 
-private def largeSumsetEvent (n k : ℕ) : Set (Finset ℕ) :=
+def largeSumsetEvent (n k : ℕ) : Set (Finset ℕ) :=
   {S | veryLargeSumsetEvent n k S}
 
 lemma pairEvent_subset_three_ranges {n k : ℕ} {C : ℝ} :

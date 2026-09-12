@@ -3,13 +3,28 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Enumeration
+module
+
+public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Enumeration
+public import DenseSetsWithoutLargeSumsets.Probability
+import APAP.Prereqs.Chang
+import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
+import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.SpecialFunctions.Log.Monotone
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.MeasureTheory.Covering.Besicovitch
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Probability bounds for moderate sumsets
 
 This submodule turns the enumeration bounds into the moderate-sumset probability estimate.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
@@ -484,7 +499,7 @@ private lemma medium_large_slice_bound {γ gap : ℝ} (hγ_pos : 0 < γ)
     | dsimp [q]
       ring_nf
 
-private def moderateSumsetCardScale (γ c : ℝ) : ℝ :=
+def moderateSumsetCardScale (γ c : ℝ) : ℝ :=
   max (smallSumsetClassCountThreshold : ℝ)
     (max
       ((max (2 * moderateSumsetGapConstant γ c) ((4 : ℝ) / γ)) ^ ((2 : ℝ) ^ (8 : ℕ)))

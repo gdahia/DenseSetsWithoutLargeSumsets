@@ -3,12 +3,16 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Probability
+module
+
+public import DenseSetsWithoutLargeSumsets.Probability
 import Mathlib.Combinatorics.Additive.RuzsaCovering
 
 /-!
 Bounds effective for very large sumsets.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
@@ -16,7 +20,7 @@ open scoped Pointwise
 
 noncomputable section
 
-private def integerInterval (n : ℕ) : Finset ℤ :=
+def integerInterval (n : ℕ) : Finset ℤ :=
   natCastImage (interval n)
 
 private lemma integerInterval_card (n : ℕ) : (integerInterval n).card = n := by
@@ -405,7 +409,7 @@ private lemma pairCardThreshold_log_le_gamma_log {γ c : ℝ} (hγ_pos : 0 < γ)
     mul_le_mul_of_nonneg_left hlog_le (by norm_num)
   exact hmul18.trans (veryLargeSumset_log_log_bound hγ_pos hγ_le hc_pos hc_lt hn)
 
-private def veryLargeSumsetPairSlice (n k m : ℕ) : Finset (Finset ℕ × Finset ℕ) :=
+def veryLargeSumsetPairSlice (n k m : ℕ) : Finset (Finset ℕ × Finset ℕ) :=
   ((interval n).powersetCard k ×ˢ (interval n).powersetCard k).filter fun p =>
     (p.1 + p.2).card = m
 

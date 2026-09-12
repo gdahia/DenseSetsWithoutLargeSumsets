@@ -3,15 +3,16 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.CountingBaseBounds
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.NumberTheory.Bertrand
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 The exponent bound on a single dimension-`d` summand.
@@ -20,6 +21,8 @@ Combines the counting bounds on proper GAPs and BLT fingerprints with the probab
 `δ ^ (dim * k)` into the single estimate `lower_gap_dim_summand_le`, bounding each term of the
 sum over dimensions by `n ^ (-(ε γ / 2))`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

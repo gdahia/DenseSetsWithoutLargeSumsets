@@ -3,15 +3,20 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import DenseSetsWithoutLargeSumsets.Probability
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.CountingBaseBounds
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.EventSubset
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.NumberTheory.Bertrand
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ExponentBounds
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.LargeSubsetsGAP
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairProbability
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 The probability estimate for a pair with a small sumset.
@@ -20,6 +25,8 @@ Assembles the event-subset reduction, the union bound over witness pairs, and th
 bound into `small_sumset_pair_probability_le`, the probability estimate consumed by the rest of
 the development.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

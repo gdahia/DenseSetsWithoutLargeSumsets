@@ -3,8 +3,11 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Lattice
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Lattice
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
 
 /-! # The full-rank Freiman model of a 2-proper GAP's subset
 
@@ -15,6 +18,8 @@ coordinates, and the rational cast, is a Freiman 2-isomorphism from `X` onto a f
 subset of `ℚ^r`, where `r` is the dimension of the real span of the translated coordinate set.
 Consequently `r ≤ freimanDim X`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

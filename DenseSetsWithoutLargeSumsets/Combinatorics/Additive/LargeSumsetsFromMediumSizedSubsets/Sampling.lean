@@ -3,15 +3,20 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Algebra.BigOperators.Expect
+module
+
+
+public import Mathlib.Algebra.BigOperators.Expect
+public import Mathlib.Data.Real.Basic
 import Mathlib.Algebra.BigOperators.Field
-import Mathlib.Algebra.Group.Pointwise.Finset.Basic
-import Mathlib.Algebra.Order.Field.Basic
-import Mathlib.Data.Fintype.Pi
-import Mathlib.Data.Real.Basic
+import Mathlib.Data.Rat.Cast.Order
 import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # Sampling with replacement from two sets
@@ -29,6 +34,8 @@ their number `Z` exceeds neither `𝔼 Z + (𝔼 Z) ^ 2`; the pointwise inequali
 `1 ≤ 2 * Z / t - (Z / t) ^ 2`, valid when `Z` is positive, then bounds the probability that `Z` is
 positive from below by `𝔼 Z / (1 + 𝔼 Z)`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

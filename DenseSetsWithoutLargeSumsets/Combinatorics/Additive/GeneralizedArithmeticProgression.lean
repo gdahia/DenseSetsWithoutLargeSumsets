@@ -3,20 +3,26 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Data.Fintype.Pi
+public import Mathlib.Data.Real.Basic
+public import Mathlib.Data.ZMod.Defs
+import Mathlib.Algebra.Order.Archimedean.Real.Basic
+import Mathlib.Algebra.Order.BigOperators.GroupWithZero.Finset
 import Mathlib.Data.Int.ConditionallyCompleteOrder
 import Mathlib.Data.Set.Card
-import Mathlib.Order.Filter.Defs
-import Mathlib.Algebra.Order.Archimedean.Real.Basic
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Algebra.Order.BigOperators.GroupWithZero.Finset
 
 /-!
 GAPs
 -/
 
+@[expose] public section
+
 namespace DenseSetsWithoutLargeSumsets
 
-open Filter Nat
+open Nat
 open scoped Pointwise
 
 noncomputable section
@@ -95,7 +101,7 @@ private lemma encodeGapAsParams_injective {q d s : ℕ} :
   exact ⟨rfl, by rw [pcarrier_eq, qcarrier_eq, horigin, hstep_d, hlength_d],
     horigin, heq_of_eq hstep_d, heq_of_eq hlength_d⟩
 
-private lemma properGAPsZModOfDimSet_finite {q : ℕ} (d s : ℕ) (hq : 0 < q) :
+lemma properGAPsZModOfDimSet_finite {q : ℕ} (d s : ℕ) (hq : 0 < q) :
     (properGAPsZModOfDimSet q d s).Finite := by
   have : NeZero q := ⟨Nat.ne_of_gt hq⟩
   have : Finite (gapEncodingParams q d s) := by

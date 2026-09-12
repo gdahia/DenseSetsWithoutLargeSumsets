@@ -3,14 +3,18 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
+module
+
+public import Mathlib.Data.Int.Interval
+public import Mathlib.Data.Pi.Interval
+public import Mathlib.GroupTheory.Index
+public import Mathlib.Algebra.Order.Archimedean.Real.Basic
+public import Mathlib.Data.Int.ConditionallyCompleteOrder
+public import Mathlib.LinearAlgebra.LinearIndependent.Defs
+import Mathlib.Algebra.Order.BigOperators.GroupWithZero.Finset
 import Mathlib.Combinatorics.Pigeonhole
-import Mathlib.Data.Int.Interval
-import Mathlib.Data.Pi.Interval
-import Mathlib.GroupTheory.Index
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
-import Mathlib.LinearAlgebra.LinearIndependent.Basic
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
 
 /-! # Geometry of numbers for the relation lattice of a progression
 
@@ -45,6 +49,8 @@ argument in the sense of this file — it projects along a shortest lattice vect
 a box under such a projection is not a box — which is why it is proved in a real normed space, in
 `Chang.ConvexGeometry`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

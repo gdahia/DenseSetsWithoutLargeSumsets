@@ -3,7 +3,9 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Combinatorics.SimpleGraph.Triangle.Tripartite
+module
+
+public import Mathlib.Combinatorics.SimpleGraph.Triangle.Tripartite
 
 /-!
 # The tripartite graph attached to the equation `a + b = c`
@@ -26,6 +28,8 @@ sitting in a sum type, so all triangles are transversal and each edge knows whic
 joins. This is why the ordinary, uncoloured triangle removal lemma suffices, with no need for a
 directed or coloured variant.
 -/
+
+@[expose] public section
 
 open Finset SimpleGraph SimpleGraph.TripartiteFromTriangles Sum3
 

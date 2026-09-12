@@ -3,12 +3,16 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Common
-import Mathlib.Probability.Distributions.SetBernoulli
-import Mathlib.Probability.Distributions.Binomial
+module
+
+import Mathlib.Topology.Algebra.Polynomial
+import Mathlib.Order.Interval.Set.Nat
+
+public import DenseSetsWithoutLargeSumsets.Common
+public import Mathlib.Probability.Distributions.SetBernoulli
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
-import Mathlib.Analysis.MeanInequalities
+import Mathlib.Probability.Distributions.Binomial
 import Mathlib.RingTheory.Polynomial.Bernstein
 
 /-!
@@ -18,6 +22,8 @@ The mean-at-least-three binomial lower-tail estimate used by the dense-set argum
 this file. Keeping the finite calculation here separates it from the construction of the Bernoulli
 random finset.
 -/
+
+@[expose] public section
 
 open scoped BigOperators ENNReal
 

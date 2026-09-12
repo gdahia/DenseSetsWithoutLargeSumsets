@@ -3,10 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Data.Pi.Interval
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Model
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Model
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Properization.ShortRelationsAndIteration
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.EffectiveLattice
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.GaugeInduction
 
 /-! # The coordinate-and-lattice transport of Appendix A
 
@@ -21,6 +23,8 @@ points, and pushes the progression back into the ambient group.
 Reboxing is supplied by the proved box-slice specialization under `Chang.Reboxing`, after the
 effective-coordinate construction in this module identifies the full-rank lattice slice.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

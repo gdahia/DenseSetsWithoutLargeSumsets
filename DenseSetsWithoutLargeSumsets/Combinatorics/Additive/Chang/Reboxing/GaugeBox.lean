@@ -3,10 +3,12 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.ConvexGeometry
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GeometryOfNumbers
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.BoxLatticePoints
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.AdaptedBox
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.BoxLatticePoints
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.AdaptedBox
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.ConvexProgression
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Lattice
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.ConvexCardinality
 
 /-! # Gauge bounds for lattice coefficient boxes
@@ -16,6 +18,8 @@ invariant is most naturally stated on the endpoints: if `mᵢ bᵢ` has controll
 step, then the entire centered coefficient box has controlled gauge, with only a factor equal to
 the number of steps.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

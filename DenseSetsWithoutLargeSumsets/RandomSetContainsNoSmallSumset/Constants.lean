@@ -3,14 +3,15 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
+module
+
+public import DenseSetsWithoutLargeSumsets.Common
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import Mathlib.NumberTheory.Bertrand
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
 
 /-!
 The constants of the random-set-avoids-small-sumsets argument.
@@ -20,6 +21,8 @@ For a doubling parameter `C` and error `γ` this file collects the model embeddi
 and sqrt scales they feed into, and the two size thresholds (`lowerSizeThreshold`,
 `lowerGapThreshold`) above which the rest of the argument applies.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

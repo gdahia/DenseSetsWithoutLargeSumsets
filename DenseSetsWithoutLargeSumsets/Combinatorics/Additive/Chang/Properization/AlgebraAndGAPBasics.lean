@@ -3,17 +3,13 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.Analysis.SpecialFunctions.Exp
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.FreeModule.PID
-import Mathlib.LinearAlgebra.LinearIndependent.BaseChange
+module
+
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Lattice
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.GaugeBox
+public import Mathlib.LinearAlgebra.TensorProduct.Pi
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reboxing.GaugeInduction
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.BoxLatticePoints
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GapToolkit
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.GeometryOfNumbers
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Lattice
+import Mathlib.LinearAlgebra.LinearIndependent.BaseChange
 
 /-! # Properization of generalized arithmetic progressions
 
@@ -42,6 +38,8 @@ The cubic cost of each step telescopes into the quartic exponent in the final th
 The reboxing step is the proved shortest-direction projection construction under
 `Chang.Reboxing`; no external geometric input is used.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 

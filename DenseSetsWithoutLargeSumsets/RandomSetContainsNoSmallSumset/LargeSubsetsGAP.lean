@@ -3,15 +3,17 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimension
-import DenseSetsWithoutLargeSumsets.Probability
-import DenseSetsWithoutLargeSumsets.Common
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.GeneralizedArithmeticProgression
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.LargeSumsetsFromMediumSizedSubsets.MediumSizedSubsets
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.Chang.Reduction
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.NumberTheory.Bertrand
+module
+
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
+public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
+import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimensionSumsetBounds
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.SumsetGrowth
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 Existence of a proper GAP containing two large subsets.
@@ -21,6 +23,8 @@ Chang's theorem in the `ZMod q` model) a proper GAP of bounded dimension and car
 preimage contains `A₀` and `B₀` (`largeSubsets_exists_zmodGAPPreimageContainer`), and the
 matching Freiman-dimension lower bound on the mixed sumset of `A₀` and `B₀`.
 -/
+
+@[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
