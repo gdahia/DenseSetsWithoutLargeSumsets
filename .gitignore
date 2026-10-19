@@ -1,4 +1,1 @@
-/.lake/
-/.lean/
-*.olean
-*.ilean
+/.lake

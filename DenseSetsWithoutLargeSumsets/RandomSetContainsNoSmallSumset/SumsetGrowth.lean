@@ -6,183 +6,108 @@ Authors: Gabriel Dahia
 module
 
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.Constants
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimensionSumsetBounds
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
+import SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.Combinatorics.Matroid.Init
-import Mathlib.NumberTheory.ArithmeticFunction.Misc
-import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Data.Nat.Choose.Cast
 
 /-!
-Doubling of the union of two sets with a small mixed sumset.
+# Sumsets of two sets with a small sumset
 
-Plünnecke--Ruzsa consequences of `#(A + B) ≤ C * k` for `k`-sets `A, B`: the self-sumset of
-`A ∪ B` doubles by at most `κ C`, and this doubling bound survives passing to large subsets
-(`card_union_add_union_le_κ_mul`, `card_large_subset_union_add_union_le_κ_mul_card`), plus the
-asymmetric lower bound on `#(A + B)` coming from a Freiman-dimension lower bound on `A ∪ B`.
+Let `A` and `B` be sets of size `k` in an abelian group with `|A + B| ≤ C * k`. By the
+Plünnecke–Ruzsa inequality, `|A + A|` and `|B + B|` are at most `C ^ 2 * k`. So `A ∪ B`, and every
+`A₀ ∪ B₀` with `A₀ ⊆ A`, `B₀ ⊆ B` and `|A₀ ∪ B₀| ≥ k / 2`, has doubling at most
+`κ C = 6 * C ^ 2`. We also bound `|A + B|` from below in terms of `freimanDim (A ∪ B)`.
+
+## Main statements
+
+* `card_union_add_union_le_κ_mul`: `|(A ∪ B) + (A ∪ B)| ≤ κ C * k`.
+* `card_large_subset_union_add_union_le_κ_mul_card`:
+  `|(A₀ ∪ B₀) + (A₀ ∪ B₀)| ≤ κ C * |A₀ ∪ B₀|`.
+* `asym_large_subsets_sum_lower`: if `freimanDim (A ∪ B) = r` with `1 ≤ r ≤ ε * k` and
+  `|A| ≥ |B| ≥ (1 - ε) * k`, then `|A + B| ≥ (1 - 2 * ε) * r * k`.
 -/
 
 @[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
-open Nat hiding div_pos
+open Finset SumOfSetsInSeveralDimensions
 open scoped Pointwise
 
 noncomputable section
 
 private lemma card_add_self_le_sq_mul {G : Type*} [DecidableEq G] [AddCommGroup G]
-    {A B : Finset G} {k : ℕ} {C : ℝ} (hk : k ≠ 0)
-    (_hAcard : A.card = k) (hBcard : B.card = k) (hAB : (A + B).card ≤ C * k) :
-    (A + A).card ≤ C ^ 2 * k := by
-  have hkpos : 0 < k := Nat.pos_of_ne_zero hk
-  have hratio : ((A + B).card : ℝ) / k ≤ C := by
-    refine (div_le_iff₀ ?_).mpr hAB
-    exact_mod_cast hkpos
-  have hratio_nonneg : 0 ≤ ((A + B).card : ℝ) / k := by positivity
-  apply le_trans
-    (b := (((A + B).card : ℝ) / k) ^ 2 * k)
-  · rw [← two_nsmul A]
-    have hplu :
-        ((2 • A).card : ℚ≥0) ≤ (((A + B).card : ℚ≥0) / k) ^ 2 * k := by
-      rw [← hBcard, add_comm]
-      apply Finset.pluennecke_ruzsa_inequality_nsmul_add
-      rw [← Finset.card_pos, hBcard]
-      exact hkpos
-    simpa using (NNRat.cast_le (K := ℝ)).mpr hplu
-  · apply mul_le_mul_of_nonneg_right
-    · nlinarith [mul_nonneg (sub_nonneg.mpr hratio)
-        (add_nonneg (hratio_nonneg.trans hratio) hratio_nonneg)]
-    · positivity
+    {A B : Finset G} {k : ℕ} {C : ℝ} (hAcard : #A = k) (hBcard : #B = k)
+    (hAB : #(A + B) ≤ C * k) :
+    #(A + A) ≤ C ^ 2 * k := by
+  obtain rfl | hk := eq_or_ne k 0
+  · simp [card_eq_zero.1 hAcard]
+  have h := pluennecke_ruzsa_inequality_nsmul_add (card_pos.1 (hBcard ▸ hk.bot_lt)) A 2
+  rw [add_comm, hBcard, two_nsmul] at h
+  refine le_trans (b := (#(A + B) / k : ℝ) ^ 2 * k) ?_ ?_
+  · simpa using (NNRat.cast_le (K := ℝ)).2 h
+  · gcongr
+    exact (div_le_iff₀ (mod_cast hk.bot_lt)).2 hAB
 
-/--
-Pluennecke-Ruzsa input for the small-sumset argument: two `k`-sets with small mixed sumset
-have a union whose self-sumset has cardinality at most `κ C * k`.
--/
+private lemma card_union_add_union_le_three_mul {G : Type*} [DecidableEq G] [AddCommGroup G]
+    {A B : Finset G} {k : ℕ} {C : ℝ} (hAcard : #A = k) (hBcard : #B = k)
+    (hAB : #(A + B) ≤ C * k) (hC : 1 ≤ C) :
+    #((A ∪ B) + (A ∪ B)) ≤ 3 * C ^ 2 * k := by
+  have h : (#((A + A) ∪ ((A + B) ∪ (B + B))) : ℝ) ≤ #(A + A) + (#(A + B) + #(B + B)) :=
+    mod_cast (card_union_le _ _).trans (Nat.add_le_add_left (card_union_le _ _) _)
+  rw [union_add, add_union, add_union, add_comm B A, union_assoc, union_left_idem]
+  linarith [card_add_self_le_sq_mul hAcard hBcard hAB,
+    card_add_self_le_sq_mul hBcard hAcard (add_comm A B ▸ hAB),
+    mul_le_mul_of_nonneg_right (le_self_pow₀ hC two_ne_zero) (Nat.cast_nonneg (α := ℝ) k)]
+
+/-- If `|A| = |B| = k` and `|A + B| ≤ C * k`, then `|(A ∪ B) + (A ∪ B)| ≤ κ C * k`. -/
 lemma card_union_add_union_le_κ_mul {G : Type*} [DecidableEq G] [AddCommGroup G]
     {A B : Finset G} {k : ℕ} {C : ℝ}
-    (hAcard : A.card = k) (hBcard : B.card = k) (hAB : (A + B).card ≤ C * k) :
-    ((A ∪ B) + (A ∪ B)).card ≤ κ C * k := by
-  by_cases hk : k = 0
-  · rw [hk] at hAcard hBcard ⊢
-    rw [Finset.card_eq_zero] at hAcard hBcard
-    simp [hAcard, hBcard]
-  · rw [Finset.union_add, Finset.add_union, Finset.add_union, add_comm B A]
-    simp only [Finset.union_assoc, Finset.union_left_idem]
-    apply le_trans (b := ((A + A).card : ℝ) + (A + B).card + (B + B).card)
-    · norm_cast
-      simpa only [Finset.union_assoc] using
-        (Finset.card_union_le ((A + A) ∪ (A + B)) (B + B)).trans
-          (Nat.add_le_add_right (Finset.card_union_le (A + A) (A + B)) (B + B).card)
-    have hkpos : 0 < k := Nat.pos_of_ne_zero hk
-    have hk_le_sum : k ≤ (A + B).card := by
-      rw [← hAcard]
-      apply Finset.card_le_card_add_right
-      apply Finset.card_pos.mp
-      rw [hBcard]
-      exact hkpos
-    have hCone : (1 : ℝ) ≤ C := by
-      nlinarith [(by exact_mod_cast hkpos : (0 : ℝ) < k),
-        (by exact_mod_cast hk_le_sum : (k : ℝ) ≤ (A + B).card), hAB]
-    have hBB : ((B + B).card : ℝ) ≤ C ^ 2 * k := by
-      exact_mod_cast card_add_self_le_sq_mul (A := B) (B := A) hk hBcard hAcard
-        (by simpa [add_comm] using hAB)
-    rw [κ]
-    nlinarith [hCone, card_add_self_le_sq_mul (A := A) (B := B) hk hAcard hBcard hAB,
-      hBB, hAB]
+    (hAcard : #A = k) (hBcard : #B = k) (hAB : #(A + B) ≤ C * k) :
+    #((A ∪ B) + (A ∪ B)) ≤ κ C * k := by
+  obtain rfl | hk := eq_or_ne k 0
+  · simp [card_eq_zero.1 hAcard, card_eq_zero.1 hBcard]
+  have hkAB := card_le_card_add_right (s := A) (card_pos.1 (hBcard ▸ hk.bot_lt))
+  rw [hAcard, ← Nat.cast_le (α := ℝ)] at hkAB
+  have hC : 1 ≤ C := le_of_mul_le_mul_right (by linarith) (Nat.cast_pos.2 hk.bot_lt)
+  rw [κ]
+  linarith [card_union_add_union_le_three_mul hAcard hBcard hAB hC,
+    mul_nonneg (sq_nonneg C) (Nat.cast_nonneg (α := ℝ) k)]
 
+/-- If `|A| = |B| = k`, `|A + B| ≤ C * k` with `C ≥ 1`, and `A₀ ⊆ A`, `B₀ ⊆ B` satisfy
+`|A₀ ∪ B₀| ≥ k / 2`, then `|(A₀ ∪ B₀) + (A₀ ∪ B₀)| ≤ κ C * |A₀ ∪ B₀|`. -/
 lemma card_large_subset_union_add_union_le_κ_mul_card
     {G : Type*} [DecidableEq G] [AddCommGroup G]
     {A B A₀ B₀ : Finset G} {k : ℕ} {C : ℝ}
     (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B)
-    (hAcard : A.card = k) (hBcard : B.card = k)
-    (hAB : (A + B).card ≤ C * k)
-    (hXlower : (k : ℝ) / 2 ≤ ((A₀ ∪ B₀).card : ℝ))
+    (hAcard : #A = k) (hBcard : #B = k)
+    (hAB : #(A + B) ≤ C * k)
+    (hXlower : (k : ℝ) / 2 ≤ (#(A₀ ∪ B₀) : ℝ))
     (hC_one : 1 ≤ C) :
-    (((A₀ ∪ B₀) + (A₀ ∪ B₀)).card : ℝ) ≤
-      κ C * ((A₀ ∪ B₀).card : ℝ) := by
-  by_cases hk : k = 0
-  · rw [hk] at hAcard hBcard
-    simp [
-      Finset.card_eq_zero.mp
-        (Nat.eq_zero_of_le_zero (by simpa [hAcard] using Finset.card_le_card hA₀A)),
-      Finset.card_eq_zero.mp
-        (Nat.eq_zero_of_le_zero (by simpa [hBcard] using Finset.card_le_card hB₀B))]
-  · refine le_trans
-      (b := ((A + A).card : ℝ) + (A + B).card + (B + B).card) ?_ ?_
-    · exact_mod_cast ((Finset.card_le_card (by
-        intro x hx
-        rw [Finset.mem_add] at hx
-        rcases hx with ⟨a, ha, b, hb, rfl⟩
-        rw [Finset.mem_union] at ha hb
-        rcases ha with ha | ha <;> rcases hb with hb | hb
-        · simp [Finset.add_mem_add (hA₀A ha) (hA₀A hb)]
-        · simp [Finset.add_mem_add (hA₀A ha) (hB₀B hb)]
-        · simp [(by
-            simpa [add_comm] using
-              (Finset.add_mem_add (hA₀A hb) (hB₀B ha) : b + a ∈ A + B) :
-            a + b ∈ A + B)]
-        · simp [Finset.add_mem_add (hB₀B ha) (hB₀B hb)])).trans
-          ((Finset.card_union_le ((A + A) ∪ (A + B)) (B + B)).trans
-            (Nat.add_le_add_right (Finset.card_union_le (A + A) (A + B)) (B + B).card)))
-    · refine le_trans (b := C ^ 2 * k + C * k + C ^ 2 * k) ?_ ?_
-      · nlinarith [card_add_self_le_sq_mul hk hAcard hBcard hAB,
-          hAB, card_add_self_le_sq_mul hk hBcard hAcard
-            (by simpa [add_comm] using hAB)]
-      · refine le_trans (b := 3 * C ^ 2 * k) ?_ ?_
-        · nlinarith [sq_nonneg C, hC_one]
-        · refine (by nlinarith [sq_nonneg C] :
-            3 * C ^ 2 * k ≤ 6 * C ^ 2 * ((A₀ ∪ B₀).card : ℝ)).trans_eq ?_
-          rw [κ]
+    (#((A₀ ∪ B₀) + (A₀ ∪ B₀)) : ℝ) ≤ κ C * (#(A₀ ∪ B₀) : ℝ) := by
+  have hsub : #((A₀ ∪ B₀) + (A₀ ∪ B₀)) ≤ #((A ∪ B) + (A ∪ B)) :=
+    card_le_card (add_subset_add (union_subset_union hA₀A hB₀B) (union_subset_union hA₀A hB₀B))
+  rw [κ]
+  linarith [card_union_add_union_le_three_mul hAcard hBcard hAB hC_one,
+    (Nat.cast_le (α := ℝ)).2 hsub, mul_le_mul_of_nonneg_left hXlower (sq_nonneg C)]
 
-private lemma choose_succ_two_le_sq (r : ℕ) :
-    Nat.choose (r + 1) 2 ≤ r * r := by
-  rw [Nat.choose_two_right]
-  apply Nat.div_le_of_le_mul
-  rw [Nat.add_sub_cancel]
-  nlinarith
-
-private lemma choose_succ_two_le_add_pred_mul {r a b : ℕ}
-    (hr : 1 ≤ r) (hrb : r ≤ b) (hba : b ≤ a) :
-    Nat.choose (r + 1) 2 ≤ a + (r - 1) * b := by
-  apply (choose_succ_two_le_sq r).trans
-  apply (Nat.mul_le_mul_left r hrb).trans
-  rw [← Nat.sub_add_cancel hr]
-  rw [Nat.add_mul, one_mul]
-  rw [add_comm ((r - 1) * b) b]
-  exact Nat.add_le_add_right hba ((r - 1) * b)
-
+/-- Let `A` and `B` be nonempty with `|B| ≤ |A|` and `freimanDim (A ∪ B) = r ≥ 1`. If
+`r ≤ ε * k` and `|A|, |B| ≥ (1 - ε) * k`, then `|A + B| ≥ (1 - 2 * ε) * r * k`. -/
 lemma asym_large_subsets_sum_lower
     {G : Type*} [DecidableEq G] [AddCommMonoid G]
     {A B : Finset G} {r k : ℕ} {ε : ℝ}
-    (hr : 1 ≤ r) (hA : A.Nonempty) (hB : B.Nonempty)
-    (hBA : B.card ≤ A.card) (hdim : freimanDim (A ∪ B) = r)
-    (_hε_nonneg : 0 ≤ ε) (hε_le_half : ε ≤ 1 / 2)
+    (hr : 1 ≤ r) (hB : B.Nonempty) (hBA : #B ≤ #A) (hdim : freimanDim (A ∪ B) = r)
     (hr_le_εk : (r : ℝ) ≤ ε * (k : ℝ))
-    (hA_large : (1 - ε) * (k : ℝ) ≤ (A.card : ℝ))
-    (hB_large : (1 - ε) * (k : ℝ) ≤ (B.card : ℝ)) :
-    (1 - 2 * ε) * (r : ℝ) * (k : ℝ) ≤ ((A + B).card : ℝ) := by
-  apply (by
-    rw [Nat.cast_sub hr]
-    norm_num
-    nlinarith [hA_large, hB_large,
-      (by exact_mod_cast hr : (1 : ℝ) ≤ (r : ℝ)),
-      (by
-        nlinarith [
-          (by exact_mod_cast choose_succ_two_le_sq r :
-            (Nat.choose (r + 1) 2 : ℝ) ≤ (r : ℝ) * (r : ℝ)),
-          mul_le_mul_of_nonneg_left hr_le_εk (by positivity : 0 ≤ (r : ℝ))] :
-        (Nat.choose (r + 1) 2 : ℝ) ≤ ε * (r : ℝ) * (k : ℝ))] :
-    (1 - 2 * ε) * (r : ℝ) * (k : ℝ) ≤
-      (A.card : ℝ) + ((r - 1 : ℕ) : ℝ) * (B.card : ℝ) -
-        (Nat.choose (r + 1) 2 : ℝ)).trans
-  rw [← Nat.cast_mul, ← Nat.cast_add]
-  rw [← Nat.cast_sub (choose_succ_two_le_add_pred_mul hr
-    (by
-      exact_mod_cast (by nlinarith : (r : ℝ) ≤ (B.card : ℝ)) : r ≤ B.card)
-    hBA)]
-  exact_mod_cast card_add_lower_bound_of_freimanDim_union (G := G) r A B hr hA hB hBA hdim
+    (hA_large : (1 - ε) * (k : ℝ) ≤ (#A : ℝ))
+    (hB_large : (1 - ε) * (k : ℝ) ≤ (#B : ℝ)) :
+    (1 - 2 * ε) * (r : ℝ) * (k : ℝ) ≤ (#(A + B) : ℝ) := by
+  have hr₁ : (1 : ℝ) ≤ r := mod_cast hr
+  have h := card_add_mul_card_sub_choose_le_card_add_of_freimanDim_union hr hB hBA hdim
+  rw [tsub_le_iff_right, ← Nat.cast_le (α := ℝ)] at h
+  push_cast [Nat.cast_sub hr, Nat.cast_choose_two] at h
+  linarith [mul_le_mul_of_nonneg_left hB_large (sub_nonneg.2 hr₁),
+    mul_le_mul_of_nonneg_left hr_le_εk (zero_le_one.trans hr₁),
+    mul_nonneg (zero_le_one.trans hr₁) (sub_nonneg.2 hr₁)]
 
 end
 

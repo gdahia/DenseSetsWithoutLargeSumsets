@@ -7,28 +7,34 @@ module
 
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
-import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.FreimanDimensionSumsetBounds
+import SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.SumsetGrowth
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
-import Mathlib.Combinatorics.Matroid.Init
-import Mathlib.NumberTheory.ArithmeticFunction.Misc
-import Mathlib.Tactic.NormNum.Prime
 
 /-!
-Existence of a proper GAP containing two large subsets.
+# A progression that contains two large subsets
 
-Given a pair `A, B` with small sumset and large subsets `A₀ ⊆ A`, `B₀ ⊆ B`, produces (via
-Chang's theorem in the `ZMod q` model) a proper GAP of bounded dimension and carrier size whose
-preimage contains `A₀` and `B₀` (`largeSubsets_exists_zmodGAPPreimageContainer`), and the
-matching Freiman-dimension lower bound on the mixed sumset of `A₀` and `B₀`.
+Let `A, B ⊆ [n]` have size `k = pairCardThreshold (3 + γ) n δ` and satisfy `|A + B| ≤ C * k`. Let
+`A₀ ⊆ A` and `B₀ ⊆ B` have size at least `(1 - ε γ) * k`, and let `X` be the image of `A₀ ∪ B₀`
+in `ZMod q`. Then `|X + X| ≤ κ C * |X|`. By Chang's theorem, `X` is contained in a proper
+generalized arithmetic progression of dimension at most `freimanDim X` with at most
+`changCarrierBound (2 * k) (κ C)` points. Also `freimanDim X ≤ 2 * ⌈κ C⌉₊ - 1`, and Ruzsa's bound
+for sumsets in several dimensions gives `|A₀ + B₀| ≥ (1 - 2 * ε γ) * freimanDim X * k`.
+
+## Main statements
+
+* `largeSubsets_exists_zmodGAPPreimageContainer`: there is a proper progression `P` of dimension
+  at most `freimanDim X` with at most `changCarrierBound (2 * k) (κ C)` points whose preimage in
+  `[n]` contains `A₀` and `B₀`.
+* `large_subsets_first_term_lower_by_dim`: if `D ≤ freimanDim X`, then
+  `(1 - 3 * ε γ) * D * k ≤ (1 - ε γ) * |A₀ + B₀|`.
 -/
 
 @[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
-open Nat hiding div_pos
+open Finset ChangFreimanRuzsa LargeSumsetsFromSubsets SumOfSetsInSeveralDimensions
 open scoped Pointwise
 
 noncomputable section
@@ -38,248 +44,123 @@ lemma one_le_sumset_card_coefficient_of_threshold_pair_sumset
     [IsRightCancelAdd G] {γ C : ℝ} {n : ℕ} {δ : unitInterval} {A B : Finset G}
     (hγ_pos : 0 < γ) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
-    (hAcard : A.card = pairCardThreshold (3 + γ) n δ)
-    (hBcard : B.card = pairCardThreshold (3 + γ) n δ)
-    (hAB : (A + B).card ≤ C * pairCardThreshold (3 + γ) n δ) :
-    1 ≤ C := by
-  exact one_le_sumset_card_coefficient_of_small_pair_sumset
+    (hAcard : #A = pairCardThreshold (3 + γ) n δ)
+    (hBcard : #B = pairCardThreshold (3 + γ) n δ)
+    (hAB : #(A + B) ≤ C * pairCardThreshold (3 + γ) n δ) :
+    1 ≤ C :=
+  one_le_sumset_card_coefficient_of_small_pair_sumset
     (pairCardThreshold_pos_of_lower_density hγ_pos hn hδ_lower hδ_upper) hAcard hBcard hAB
 
-private lemma freiman_image_card_eq_of_subset {q n : ℕ} {ψ : ℕ → ZMod q}
-    {S : Finset ℕ}
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hS : S ⊆ interval n) :
-    (S.image ψ).card = S.card := by
-  rw [Finset.card_image_of_injOn (hψ.bijOn.injOn.mono (by
-    intro x hx
-    exact hS hx))]
+private lemma card_image_eq_of_subset_interval {q n : ℕ} {ψ : ℕ → ZMod q} {S : Finset ℕ}
+    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ) (hS : S ⊆ interval n) :
+    #(S.image ψ) = #S :=
+  card_image_of_injOn (hψ.bijOn.injOn.mono (coe_subset.2 hS))
 
-private lemma half_threshold_le_image_union_card {γ : ℝ} {q n k : ℕ}
-    {ψ : ℕ → ZMod q} {A A₀ B₀ : Finset ℕ}
-    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hA₀A : A₀ ⊆ A)
-    (hA₀large : (1 - ε γ) * (k : ℝ) ≤ (A₀.card : ℝ)) :
-    (k : ℝ) / 2 ≤ ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) := by
-  apply (by
-    nlinarith [half_le_one_sub_ε hγ_pos hγ_le, hA₀large,
-      (by positivity : 0 ≤ (k : ℝ))] :
-    (k : ℝ) / 2 ≤ (A₀.card : ℝ)).trans
-  exact_mod_cast (by
-    rw [← freiman_image_card_eq_of_subset hψ (hA₀A.trans hAint)]
-    exact Finset.card_le_card Finset.subset_union_left :
-    A₀.card ≤ (A₀.image ψ ∪ B₀.image ψ).card)
+private lemma half_le_card_image_union {γ : ℝ} {q n k : ℕ} {ψ : ℕ → ZMod q}
+    {A₀ B₀ : Finset ℕ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
+    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ) (hA₀int : A₀ ⊆ interval n)
+    (hA₀large : (1 - ε γ) * k ≤ #A₀) :
+    (k : ℝ) / 2 ≤ #(A₀.image ψ ∪ B₀.image ψ) := by
+  have h : #(A₀.image ψ) ≤ #(A₀.image ψ ∪ B₀.image ψ) := card_le_card subset_union_left
+  rw [card_image_eq_of_subset_interval hψ hA₀int, ← Nat.cast_le (α := ℝ)] at h
+  linarith [mul_le_mul_of_nonneg_right (half_le_one_sub_ε hγ_pos hγ_le)
+    (Nat.cast_nonneg (α := ℝ) k)]
 
-private lemma image_union_card_le_two_mul_threshold {q n k : ℕ}
-    {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ}
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hBint : B ⊆ interval n)
-    (hAcard : A.card = k) (hBcard : B.card = k)
-    (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
-    (A₀.image ψ ∪ B₀.image ψ).card ≤ 2 * k := by
-  apply (Finset.card_union_le (A₀.image ψ) (B₀.image ψ)).trans
-  rw [freiman_image_card_eq_of_subset hψ (hA₀A.trans hAint),
-    freiman_image_card_eq_of_subset hψ (hB₀B.trans hBint)]
-  apply (Nat.add_le_add (Finset.card_le_card hA₀A) (Finset.card_le_card hB₀B)).trans
-  rw [hAcard, hBcard]
-  omega
+private lemma card_image_union_le_two_mul {q k : ℕ} {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ}
+    (hAcard : #A = k) (hBcard : #B = k) (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
+    #(A₀.image ψ ∪ B₀.image ψ) ≤ 2 * k := by
+  grind [card_union_le (A₀.image ψ) (B₀.image ψ), card_image_le (s := A₀) (f := ψ),
+    card_image_le (s := B₀) (f := ψ), card_le_card hA₀A, card_le_card hB₀B]
 
-private lemma image_union_card_le_density_coeff_log {γ C c : ℝ} {n q : ℕ}
-    {δ : unitInterval} {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ}
-    (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hn : lowerSizeThreshold C γ < n)
-    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ))
-    (hδ_upper : (δ : ℝ) ≤ 1 - c)
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hBint : B ⊆ interval n)
-    (hAcard : A.card = pairCardThreshold (3 + γ) n δ)
-    (hBcard : B.card = pairCardThreshold (3 + γ) n δ)
-    (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
-    ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) ≤
-      2 * densityCoefficient (3 + γ) c * Real.log (n : ℝ) := by
-  apply (by
-    exact_mod_cast image_union_card_le_two_mul_threshold hψ hAint hBint hAcard hBcard hA₀A
-      hB₀B :
-    ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) ≤
-      ((2 * pairCardThreshold (3 + γ) n δ : ℕ) : ℝ)).trans
-  rw [Nat.cast_mul]
-  norm_num only [Nat.cast_ofNat]
-  convert mul_le_mul_of_nonneg_left
-    (pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower hδ_upper)
-    (by norm_num : (0 : ℝ) ≤ 2) using 1
-  all_goals ring
-
-private lemma image_union_card_lt_exp_neg_mul_q {γ C c : ℝ} {n q : ℕ}
-    {δ : unitInterval} {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ}
-    (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hc_lt : c < 1)
+private lemma exp_mul_card_image_union_le {γ C c : ℝ} {n q : ℕ} {δ : unitInterval}
+    {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ} (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hc_lt : c < 1)
     (hn : lowerGapThreshold C γ c < n) (hq_lower : 2 * n ≤ q)
-    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ))
-    (hδ_upper : (δ : ℝ) ≤ 1 - c)
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hBint : B ⊆ interval n)
-    (hAcard : A.card = pairCardThreshold (3 + γ) n δ)
-    (hBcard : B.card = pairCardThreshold (3 + γ) n δ)
+    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) ≤ 1 - c)
+    (hAcard : #A = pairCardThreshold (3 + γ) n δ) (hBcard : #B = pairCardThreshold (3 + γ) n δ)
     (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
-    ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) < Real.exp (-(changExponent C)) * q := by
-  exact (image_union_card_le_density_coeff_log hγ_pos hc_pos
-    ((lowerSizeThreshold_le_lowerGapThreshold C γ c).trans_lt hn) hδ_lower hδ_upper hψ hAint
-    hBint hAcard hBcard hA₀A hB₀B).trans_lt
-    (density_coeff_log_lt_exp_neg_mul_q hγ_pos hc_pos hc_lt hn hq_lower)
+    Real.exp (changFreimanDimExponent (κ C)) * #(A₀.image ψ ∪ B₀.image ψ) ≤ q := by
+  have hX : (#(A₀.image ψ ∪ B₀.image ψ) : ℝ) ≤ 2 * pairCardThreshold (3 + γ) n δ :=
+    mod_cast card_image_union_le_two_mul hAcard hBcard hA₀A hB₀B
+  have hq := density_coeff_log_lt_exp_neg_mul_q hγ_pos hc_pos hc_lt hn hq_lower
+  rw [changExponent, Real.exp_neg, ← div_eq_inv_mul, lt_div_iff₀' (Real.exp_pos _)] at hq
+  refine (mul_le_mul_of_nonneg_left ?_ (Real.exp_nonneg _)).trans hq.le
+  linarith [pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos
+    ((lowerSizeThreshold_le_lowerGapThreshold C γ c).trans_lt hn) hδ_lower hδ_upper]
 
-private lemma image_union_card_lt_chang_exp_mul_q {γ C c : ℝ} {n q : ℕ}
-    {δ : unitInterval} {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ}
-    (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hc_lt : c < 1)
-    (hn : lowerGapThreshold C γ c < n) (hq_lower : 2 * n ≤ q)
-    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ))
-    (hδ_upper : (δ : ℝ) ≤ 1 - c)
+private lemma card_image_union_add_le_κ_mul {γ C : ℝ} {n q k : ℕ} {ψ : ℕ → ZMod q}
+    {A B A₀ B₀ : Finset ℕ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
     (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hBint : B ⊆ interval n)
-    (hAcard : A.card = pairCardThreshold (3 + γ) n δ)
-    (hBcard : B.card = pairCardThreshold (3 + γ) n δ)
-    (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
-    ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) <
-      Real.exp (-changTheoremExponent (κ C)) * q := by
-  simpa [changExponent, neg_mul, mul_assoc] using
-    image_union_card_lt_exp_neg_mul_q hγ_pos hc_pos hc_lt hn hq_lower hδ_lower hδ_upper hψ
-      hAint hBint hAcard hBcard hA₀A hB₀B
+    (hAint : A ⊆ interval n) (hBint : B ⊆ interval n) (hAcard : #A = k) (hBcard : #B = k)
+    (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) (hA₀large : (1 - ε γ) * k ≤ #A₀) (hAB : #(A + B) ≤ C * k) :
+    (#((A₀.image ψ ∪ B₀.image ψ) + (A₀.image ψ ∪ B₀.image ψ)) : ℝ) ≤
+      κ C * #(A₀.image ψ ∪ B₀.image ψ) := by
+  refine card_large_subset_union_add_union_le_κ_mul_card (image_subset_image hA₀A)
+    (image_subset_image hB₀B) ((card_image_eq_of_subset_interval hψ hAint).trans hAcard)
+    ((card_image_eq_of_subset_interval hψ hBint).trans hBcard) ?_
+    (half_le_card_image_union hγ_pos hγ_le hψ (hA₀A.trans hAint) hA₀large) hC_one
+  rwa [freiman_image_sum_card hψ hAint hBint]
 
-private lemma image_union_add_union_le_κ_mul_card {γ C : ℝ} {n q k : ℕ}
-    {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ}
-    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hBint : B ⊆ interval n)
-    (hAcard : A.card = k) (hBcard : B.card = k)
-    (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B)
-    (hA₀large : (1 - ε γ) * (k : ℝ) ≤ (A₀.card : ℝ))
-    (hAB : (A + B).card ≤ C * k) :
-    (((A₀.image ψ ∪ B₀.image ψ) + (A₀.image ψ ∪ B₀.image ψ)).card : ℝ) ≤
-      κ C * ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) := by
-  apply card_large_subset_union_add_union_le_κ_mul_card
-  · exact Finset.image_mono ψ hA₀A
-  · exact Finset.image_mono ψ hB₀B
-  · rw [freiman_image_card_eq_of_subset hψ hAint, hAcard]
-  · rw [freiman_image_card_eq_of_subset hψ hBint, hBcard]
-  · rw [freiman_image_sum_card hψ hAint hBint]
-    exact hAB
-  · exact half_threshold_le_image_union_card hγ_pos hγ_le hψ hAint hA₀A hA₀large
-  · exact hC_one
-
-private lemma chang_threshold_lt_image_union_card {γ C : ℝ} {n q : ℕ}
-    {δ : unitInterval} {ψ : ℕ → ZMod q} {A A₀ B₀ : Finset ℕ}
-    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
+private lemma exp_lt_card_image_union {γ C : ℝ} {n q : ℕ} {δ : unitInterval} {ψ : ℕ → ZMod q}
+    {A₀ B₀ : Finset ℕ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
+    (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hA₀A : A₀ ⊆ A)
-    (hA₀large : (1 - ε γ) * (pairCardThreshold (3 + γ) n δ : ℝ) ≤ (A₀.card : ℝ)) :
-    Real.exp (changContainerExponent (κ C)) <
-      ((A₀.image ψ ∪ B₀.image ψ).card : ℝ) := by
-  nlinarith [two_mul_chang_size_threshold_lt_pairCardThreshold hγ_pos hC_one
+    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ) (hA₀int : A₀ ⊆ interval n)
+    (hA₀large : (1 - ε γ) * pairCardThreshold (3 + γ) n δ ≤ #A₀) :
+    Real.exp (changContainerExponent (κ C)) < #(A₀.image ψ ∪ B₀.image ψ) := by
+  linarith [two_mul_chang_size_threshold_lt_pairCardThreshold hγ_pos hC_one
     (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper,
-    half_threshold_le_image_union_card (B₀ := B₀) hγ_pos hγ_le hψ hAint hA₀A hA₀large]
+    half_le_card_image_union (B₀ := B₀) hγ_pos hγ_le hψ hA₀int hA₀large]
 
-private lemma image_union_freimanDim_le_two_ceil_κ_sub_one {γ C : ℝ}
-    {n q k : ℕ} {ψ : ℕ → ZMod q} {A B A₀ B₀ : Finset ℕ}
-    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
-    (hq : Nat.Prime q) (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hAint : A ⊆ interval n) (hBint : B ⊆ interval n)
-    (hAcard : A.card = k) (hBcard : B.card = k)
-    (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B)
-    (hA₀large : (1 - ε γ) * (k : ℝ) ≤ (A₀.card : ℝ))
-    (hAB : (A + B).card ≤ C * k) :
-    freimanDim (A₀.image ψ ∪ B₀.image ψ) ≤ 2 * ⌈κ C⌉₊ - 1 := by
-  apply freimanDim_le_two_mul_sub_one_of_card_add_le (A₀.image ψ ∪ B₀.image ψ) hq
-  exact_mod_cast
-    ((image_union_add_union_le_κ_mul_card hγ_pos hγ_le hC_one hψ hAint hBint
-      hAcard hBcard hA₀A hB₀B hA₀large hAB).trans
-      (mul_le_mul_of_nonneg_right (Nat.le_ceil (κ C)) (by positivity)) :
-    (((A₀.image ψ ∪ B₀.image ψ) + (A₀.image ψ ∪ B₀.image ψ)).card : ℝ) ≤
-      (⌈κ C⌉₊ : ℝ) * ((A₀.image ψ ∪ B₀.image ψ).card : ℝ))
+private lemma freimanDim_le_two_mul_ceil_sub_one {q : ℕ} {K : ℝ} {X : Finset (ZMod q)}
+    (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ K * #X) : freimanDim X ≤ 2 * ⌈K⌉₊ - 1 := by
+  refine Nat.le_sub_one_of_lt ((Nat.cast_lt (α := ℝ)).1 ?_)
+  push_cast
+  linarith [freimanDim_le_two_mul_sub_one_of_card_add_le hX hXX, Nat.le_ceil K]
 
-private lemma chang_carrier_card_le_ceil_of_card_le {C : ℝ} {q k : ℕ}
-    {X : Finset (ZMod q)} {P : ProperGAP (ZMod q)}
-    (hXcard : X.card ≤ 2 * k)
-    (hPcard : (P.carrier.card : ℝ) ≤ changCarrierBound X.card (κ C)) :
-    P.carrier.card ≤ ⌈changCarrierBound (2 * k) (κ C)⌉₊ := by
-  exact_mod_cast ((hPcard.trans
-    ((by
-      unfold changCarrierBound
-      gcongr) :
-      changCarrierBound X.card (κ C) ≤ changCarrierBound (2 * k) (κ C))).trans
-    (Nat.le_ceil (changCarrierBound (2 * k) (κ C))))
+private lemma card_carrier_le_ceil_changCarrierBound {C : ℝ} {q k : ℕ} {X : Finset (ZMod q)}
+    {P : GAP (ZMod q)} (hXcard : #X ≤ 2 * k)
+    (hPcard : (#P.carrier : ℝ) ≤ changCarrierBound #X (κ C)) :
+    #P.carrier ≤ ⌈changCarrierBound (2 * k) (κ C)⌉₊ := by
+  refine (Nat.cast_le (α := ℝ)).1 ((hPcard.trans ?_).trans (Nat.le_ceil _))
+  unfold changCarrierBound
+  gcongr
 
-private lemma large_subset_nonempty_of_card_lower {γ : ℝ} {S : Finset ℕ} {k : ℕ}
-    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hkpos : 0 < k)
-    (hSlarge : (1 - ε γ) * (k : ℝ) ≤ (S.card : ℝ)) :
+private lemma nonempty_of_one_sub_ε_mul_le_card {γ : ℝ} {S : Finset ℕ} {k : ℕ}
+    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hk : 0 < k) (hS : (1 - ε γ) * k ≤ #S) :
     S.Nonempty := by
-  apply Finset.card_pos.mp
-  exact_mod_cast (by
-    nlinarith [half_le_one_sub_ε hγ_pos hγ_le,
-      (by exact_mod_cast hkpos : (0 : ℝ) < k), hSlarge] :
-    (0 : ℝ) < S.card)
+  rw [← card_pos, ← Nat.cast_pos (α := ℝ)]
+  exact (mul_pos (by linarith [half_le_one_sub_ε hγ_pos hγ_le]) (Nat.cast_pos.2 hk)).trans_le hS
 
-private lemma freiman_image_nonempty_of_card_lower {γ : ℝ} {q n : ℕ}
-    {ψ : ℕ → ZMod q} {S : Finset ℕ} {k : ℕ}
-    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
-    (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
-    (hS : S ⊆ interval n) (hkpos : 0 < k)
-    (hSlarge : (1 - ε γ) * (k : ℝ) ≤ (S.card : ℝ)) :
-    (S.image ψ).Nonempty := by
-  apply Finset.card_pos.mp
-  rw [freiman_image_card_eq_of_subset hψ hS]
-  exact Finset.card_pos.mpr (large_subset_nonempty_of_card_lower hγ_pos hγ_le hkpos hSlarge)
-
-private lemma freimanDim_image_union_le_ε_mul_threshold {γ C : ℝ} {n q : ℕ}
-    {δ : unitInterval} {ψ : ℕ → ZMod q} {A₀ B₀ : Finset ℕ} {k : ℕ}
-    (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn_one : 1 < n)
-    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
-    (hkdef : k = pairCardThreshold (3 + γ) n δ)
-    (hdim_bound : freimanDim (A₀.image ψ ∪ B₀.image ψ) ≤ 2 * ⌈κ C⌉₊ - 1) :
-    (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) ≤ ε γ * (k : ℝ) := by
-  rw [hkdef]
-  apply (by exact_mod_cast hdim_bound :
-    (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) ≤
-      ((2 * ⌈κ C⌉₊ - 1 : ℕ) : ℝ)).trans
-  exact two_mul_ceil_κ_sub_one_le_ε_mul_pairCardThreshold hγ_pos hγ_le hC_one hn_one
-    hδ_lower hδ_upper
-
-private lemma large_subsets_image_sum_lower {γ C : ℝ} {n q : ℕ}
+private lemma one_sub_two_mul_ε_mul_freimanDim_mul_le_card_add {γ C : ℝ} {n q : ℕ}
     {δ : unitInterval} {ψ : ℕ → ZMod q} {A₀ B₀ : Finset ℕ} {k : ℕ}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
     (hA₀int : A₀ ⊆ interval n) (hB₀int : B₀ ⊆ interval n)
     (hkdef : k = pairCardThreshold (3 + γ) n δ) (hkpos : 0 < k)
-    (hA₀large : (1 - ε γ) * (k : ℝ) ≤ (A₀.card : ℝ))
-    (hB₀large : (1 - ε γ) * (k : ℝ) ≤ (B₀.card : ℝ))
+    (hA₀large : (1 - ε γ) * k ≤ #A₀) (hB₀large : (1 - ε γ) * k ≤ #B₀)
     (hdim_bound : freimanDim (A₀.image ψ ∪ B₀.image ψ) ≤ 2 * ⌈κ C⌉₊ - 1) :
-    (1 - 2 * ε γ) * (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) * (k : ℝ) ≤
-      ((A₀.image ψ + B₀.image ψ).card : ℝ) := by
-  by_cases hr0 : freimanDim (A₀.image ψ ∪ B₀.image ψ) = 0
-  · simp [hr0]
-  · by_cases hBA : (B₀.image ψ).card ≤ (A₀.image ψ).card
-    · exact asym_large_subsets_sum_lower (G := ZMod q) (A := A₀.image ψ)
-        (B := B₀.image ψ) (r := freimanDim (A₀.image ψ ∪ B₀.image ψ))
-        (k := k) (ε := ε γ) (Nat.succ_le_of_lt (Nat.pos_of_ne_zero hr0))
-        (freiman_image_nonempty_of_card_lower hγ_pos hγ_le hψ hA₀int hkpos hA₀large)
-        (freiman_image_nonempty_of_card_lower hγ_pos hγ_le hψ hB₀int hkpos hB₀large)
-        hBA rfl (ε_pos hγ_pos).le (le_of_lt (ε_lt_one_half hγ_pos hγ_le))
-        (freimanDim_image_union_le_ε_mul_threshold hγ_pos hγ_le hC_one hn_one
-          hδ_lower hδ_upper hkdef hdim_bound)
-        (by simpa [freiman_image_card_eq_of_subset hψ hA₀int] using hA₀large)
-        (by simpa [freiman_image_card_eq_of_subset hψ hB₀int] using hB₀large)
-    · simpa [add_comm] using
-        asym_large_subsets_sum_lower (G := ZMod q) (A := B₀.image ψ)
-          (B := A₀.image ψ) (r := freimanDim (A₀.image ψ ∪ B₀.image ψ))
-          (k := k) (ε := ε γ) (Nat.succ_le_of_lt (Nat.pos_of_ne_zero hr0))
-          (freiman_image_nonempty_of_card_lower hγ_pos hγ_le hψ hB₀int hkpos hB₀large)
-          (freiman_image_nonempty_of_card_lower hγ_pos hγ_le hψ hA₀int hkpos hA₀large)
-          (le_of_not_ge hBA) (by simp [Finset.union_comm])
-          (ε_pos hγ_pos).le (le_of_lt (ε_lt_one_half hγ_pos hγ_le))
-          (freimanDim_image_union_le_ε_mul_threshold hγ_pos hγ_le hC_one hn_one
-            hδ_lower hδ_upper hkdef hdim_bound)
-          (by simpa [freiman_image_card_eq_of_subset hψ hB₀int] using hB₀large)
-          (by simpa [freiman_image_card_eq_of_subset hψ hA₀int] using hA₀large)
+    (1 - 2 * ε γ) * freimanDim (A₀.image ψ ∪ B₀.image ψ) * k ≤ #(A₀.image ψ + B₀.image ψ) := by
+  subst hkdef
+  obtain hr | hr := Nat.eq_zero_or_pos (freimanDim (A₀.image ψ ∪ B₀.image ψ))
+  · simp [hr]
+  have hA := (nonempty_of_one_sub_ε_mul_le_card hγ_pos hγ_le hkpos hA₀large).image ψ
+  have hB := (nonempty_of_one_sub_ε_mul_le_card hγ_pos hγ_le hkpos hB₀large).image ψ
+  have hdim := ((Nat.cast_le (α := ℝ)).2 hdim_bound).trans
+    (two_mul_ceil_κ_sub_one_le_ε_mul_pairCardThreshold hγ_pos hC_one hn_one hδ_lower hδ_upper)
+  rw [← card_image_eq_of_subset_interval hψ hA₀int] at hA₀large
+  rw [← card_image_eq_of_subset_interval hψ hB₀int] at hB₀large
+  obtain hBA | hAB := le_total #(B₀.image ψ) #(A₀.image ψ)
+  · exact asym_large_subsets_sum_lower hr hB hBA rfl hdim hA₀large hB₀large
+  · rw [add_comm (A₀.image ψ)]
+    exact asym_large_subsets_sum_lower hr hA hAB (by rw [union_comm]) hdim hB₀large hA₀large
 
-lemma largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
+/-- Let `A, B ⊆ [n]` have size `k = pairCardThreshold (3 + γ) n δ` and satisfy `|A + B| ≤ C * k`,
+and let `A₀ ⊆ A`, `B₀ ⊆ B` have size at least `(1 - ε γ) * k`. Let `X` be the image of `A₀ ∪ B₀`
+in `ZMod q`. Then there is a proper progression `P` of dimension at most
+`min k (freimanDim X)` with at most `changCarrierBound (2 * k) (κ C)` points whose preimage in
+`[n]` contains `A₀` and `B₀`. Moreover `freimanDim X ≤ 2 * ⌈κ C⌉₊ - 1`. -/
+theorem largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (C_pos : 0 < C)
     (hc_pos : 0 < c) (hc_lt : c < 1) (hn : lowerSizeThreshold C γ < n)
@@ -287,89 +168,60 @@ lemma largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hδ_upper_c : (δ : ℝ) ≤ 1 - c) :
     ∀ {A B A₀ B₀ : Finset ℕ}, A ⊆ interval n → B ⊆ interval n →
-      A.card = pairCardThreshold (3 + γ) n δ → B.card = pairCardThreshold (3 + γ) n δ →
+      #A = pairCardThreshold (3 + γ) n δ → #B = pairCardThreshold (3 + γ) n δ →
       A₀ ⊆ A → B₀ ⊆ B →
-      (1 - ε γ) * (pairCardThreshold (3 + γ) n δ : ℝ) ≤ (A₀.card : ℝ) →
-      (1 - ε γ) * (pairCardThreshold (3 + γ) n δ : ℝ) ≤ (B₀.card : ℝ) →
-      (A + B).card ≤ C * pairCardThreshold (3 + γ) n δ →
+      (1 - ε γ) * (pairCardThreshold (3 + γ) n δ : ℝ) ≤ (#A₀ : ℝ) →
+      (1 - ε γ) * (pairCardThreshold (3 + γ) n δ : ℝ) ≤ (#B₀ : ℝ) →
+      #(A + B) ≤ C * pairCardThreshold (3 + γ) n δ →
       ∃ P ∈ properGAPsZModUpToDim (pairCardThreshold (3 + γ) n δ)
           ⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊
-          (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).pos,
-        A₀ ⊆ zmodGAPPreimageContainer n
-            (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) P ∧
-          B₀ ⊆ zmodGAPPreimageContainer n
-              (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) P ∧
+          (zmodModelQ_prime hγ_pos C_pos hn).pos,
+        A₀ ⊆ zmodGAPPreimageContainer n (zmodModelEmbedding hγ_pos C_pos hn) P ∧
+          B₀ ⊆ zmodGAPPreimageContainer n (zmodModelEmbedding hγ_pos C_pos hn) P ∧
             P.dim ≤ freimanDim
-                (A₀.image (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) ∪
-                  B₀.image (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)) ∧
+                (A₀.image (zmodModelEmbedding hγ_pos C_pos hn) ∪
+                  B₀.image (zmodModelEmbedding hγ_pos C_pos hn)) ∧
               freimanDim
-                  (A₀.image (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) ∪
-                    B₀.image (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn))
+                  (A₀.image (zmodModelEmbedding hγ_pos C_pos hn) ∪
+                    B₀.image (zmodModelEmbedding hγ_pos C_pos hn))
                 ≤ 2 * ⌈κ C⌉₊ - 1 := by
-  intro A B A₀ B₀ hAint hBint hAcard hBcard hA₀A hB₀B hA₀large hB₀large hAB
-  obtain ⟨P, hXP, hPdim, hPcard⟩ :=
-    exists_properGAP_of_small_sumset
-      (A₀.image (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) ∪
-        B₀.image (zmodModelEmbedding (γ := γ) (C := C) (n := n) hγ_pos C_pos hn))
-      (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-      (two_le_κ_of_one_le
-        (one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
-          hAcard hBcard hAB))
-      (image_union_add_union_le_κ_mul_card hγ_pos hγ_le
-        (one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
-          hAcard hBcard hAB)
-        (zmodModelEmbedding_iso (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-        hAint hBint hAcard hBcard hA₀A hB₀B hA₀large hAB)
-      (chang_threshold_lt_image_union_card (B₀ := B₀) hγ_pos hγ_le
-        (one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
-          hAcard hBcard hAB)
-        hn hδ_lower hδ_upper
-        (zmodModelEmbedding_iso (γ := γ) (C := C) (n := n) hγ_pos C_pos hn) hAint hA₀A
-        hA₀large)
-      (image_union_card_lt_chang_exp_mul_q hγ_pos hc_pos hc_lt hn_gap
-        (zmodModelQ_lower (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-        hδ_lower hδ_upper_c
-        (zmodModelEmbedding_iso (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-        hAint hBint hAcard hBcard hA₀A hB₀B)
-  refine ⟨P, ?_, ?_, ?_, hPdim, ?_⟩
-  · apply (mem_properGAPsZModUpToDim
-      (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).pos).2
-    constructor
-    · exact (hPdim.trans
-        (image_union_freimanDim_le_two_ceil_κ_sub_one hγ_pos hγ_le
-          (one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
-            hAcard hBcard hAB)
-          (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-          (zmodModelEmbedding_iso (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-          hAint hBint hAcard hBcard hA₀A hB₀B hA₀large hAB)).trans
-        (two_mul_ceil_κ_sub_one_le_pairCardThreshold hγ_pos
-          (one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
-            hAcard hBcard hAB)
-          (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper)
-    · apply chang_carrier_card_le_ceil_of_card_le
-      · exact image_union_card_le_two_mul_threshold
-          (zmodModelEmbedding_iso (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-          hAint hBint hAcard hBcard hA₀A hB₀B
-      · exact hPcard
+  intro A B A₀ B₀ hAint hBint hAcard hBcard hA₀A hB₀B hA₀large _ hAB
+  have hC := one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
+    hAcard hBcard hAB
+  have hq := zmodModelQ_prime hγ_pos C_pos hn
+  have hψ := zmodModelEmbedding_iso hγ_pos C_pos hn
+  have hXX := card_image_union_add_le_κ_mul hγ_pos hγ_le hC hψ hAint hBint hAcard hBcard hA₀A
+    hB₀B hA₀large hAB
+  have hXlower := exp_lt_card_image_union (B₀ := B₀) hγ_pos hγ_le hC hn hδ_lower hδ_upper hψ
+    (hA₀A.trans hAint) hA₀large
+  have hXupper := exp_mul_card_image_union_le (ψ := zmodModelEmbedding hγ_pos C_pos hn) hγ_pos
+    hc_pos hc_lt hn_gap (zmodModelQ_lower hγ_pos C_pos hn) hδ_lower hδ_upper_c hAcard hBcard
+    hA₀A hB₀B
+  obtain ⟨P, hP, hXP, -, hPdim, hPcard⟩ :=
+    exists_twoProperGAP_zmod_dim_le_freimanDim _ hq (two_le_κ_of_one_le hC) hXX hXlower hXupper
+  have hdim := freimanDim_le_two_mul_ceil_sub_one
+    (card_pos.1 (mod_cast (Real.exp_pos _).trans hXlower)) hXX
+  refine ⟨P, (mem_properGAPsZModUpToDim hq.pos).2 ⟨P.twoProper_proper hP, ?_, ?_⟩,
+    ?_, ?_, hPdim, hdim⟩
+  · exact (hPdim.trans hdim).trans (two_mul_ceil_κ_sub_one_le_pairCardThreshold hγ_pos hC
+      (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper)
+  · exact card_carrier_le_ceil_changCarrierBound
+      (card_image_union_le_two_mul hAcard hBcard hA₀A hB₀B) hPcard
   · intro a ha
-    rw [zmodGAPPreimageContainer, Finset.mem_filter]
-    constructor
-    · exact hA₀A.trans hAint ha
-    apply hXP
-    exact Finset.mem_union.mpr (Or.inl (Finset.mem_image.2 ⟨a, ha, rfl⟩))
+    exact mem_filter.2 ⟨hA₀A.trans hAint ha, hXP (mem_union_left _ (mem_image_of_mem _ ha))⟩
   · intro b hb
-    rw [zmodGAPPreimageContainer, Finset.mem_filter]
-    constructor
-    · exact hB₀B.trans hBint hb
-    apply hXP
-    exact Finset.mem_union.mpr (Or.inr (Finset.mem_image.2 ⟨b, hb, rfl⟩))
-  · exact image_union_freimanDim_le_two_ceil_κ_sub_one hγ_pos hγ_le
-      (one_le_sumset_card_coefficient_of_threshold_pair_sumset hγ_pos hn hδ_lower hδ_upper
-        hAcard hBcard hAB)
-      (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-      (zmodModelEmbedding_iso (γ := γ) (C := C) (n := n) hγ_pos C_pos hn)
-      hAint hBint hAcard hBcard hA₀A hB₀B hA₀large hAB
+    exact mem_filter.2 ⟨hB₀B.trans hBint hb, hXP (mem_union_right _ (mem_image_of_mem _ hb))⟩
 
+private lemma one_sub_three_mul_mul_mul_le {e D r k N : ℝ} (he : e ≤ 1 / 3) (hD : D ≤ r)
+    (hr : 0 ≤ r) (hk : 0 ≤ k) (h : (1 - 2 * e) * r * k ≤ N) :
+    (1 - 3 * e) * D * k ≤ (1 - e) * N := by
+  nlinarith [mul_le_mul_of_nonneg_left h (by linarith : 0 ≤ 1 - e),
+    mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hD (by linarith : 0 ≤ 1 - 3 * e)) hk,
+    mul_nonneg (mul_nonneg (sq_nonneg e) hr) hk]
+
+/-- Let `A₀, B₀ ⊆ [n]` have size at least `(1 - ε γ) * k`, where
+`k = pairCardThreshold (3 + γ) n δ`, and let `X` be the image of `A₀ ∪ B₀` in `ZMod q`. If
+`D ≤ freimanDim X ≤ 2 * ⌈κ C⌉₊ - 1`, then `(1 - 3 * ε γ) * D * k ≤ (1 - ε γ) * |A₀ + B₀|`. -/
 lemma large_subsets_first_term_lower_by_dim {γ C : ℝ} {n q : ℕ}
     {δ : unitInterval} {ψ : ℕ → ZMod q} {A₀ B₀ : Finset ℕ} {D k : ℕ}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn_one : 1 < n)
@@ -377,32 +229,17 @@ lemma large_subsets_first_term_lower_by_dim {γ C : ℝ} {n q : ℕ}
     (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ)
     (hA₀int : A₀ ⊆ interval n) (hB₀int : B₀ ⊆ interval n)
     (hkdef : k = pairCardThreshold (3 + γ) n δ) (hkpos : 0 < k)
-    (hA₀large : (1 - ε γ) * (k : ℝ) ≤ (A₀.card : ℝ))
-    (hB₀large : (1 - ε γ) * (k : ℝ) ≤ (B₀.card : ℝ))
+    (hA₀large : (1 - ε γ) * (k : ℝ) ≤ (#A₀ : ℝ))
+    (hB₀large : (1 - ε γ) * (k : ℝ) ≤ (#B₀ : ℝ))
     (hDdim : D ≤ freimanDim (A₀.image ψ ∪ B₀.image ψ))
     (hdim_bound : freimanDim (A₀.image ψ ∪ B₀.image ψ) ≤ 2 * ⌈κ C⌉₊ - 1) :
     (1 - 3 * ε γ) * (D : ℝ) * (k : ℝ) ≤
-      (1 - ε γ) * ((natCastImage A₀ + natCastImage B₀).card : ℝ) := by
-  apply le_trans (b :=
-      (1 - ε γ) *
-        ((1 - 2 * ε γ) * (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) * (k : ℝ)))
-  · refine le_trans (b :=
-        (1 - 3 * ε γ) * (freimanDim (A₀.image ψ ∪ B₀.image ψ) : ℝ) * (k : ℝ)) ?_ ?_
-    · gcongr
-      · exact (one_sub_three_mul_ε_pos hγ_pos hγ_le).le
-    · ring_nf
-      nlinarith [mul_nonneg (sq_nonneg (ε γ))
-        (mul_nonneg
-          (Nat.cast_nonneg (freimanDim (A₀.image ψ ∪ B₀.image ψ)) :
-            (0 : ℝ) ≤ freimanDim (A₀.image ψ ∪ B₀.image ψ))
-          (Nat.cast_nonneg k : (0 : ℝ) ≤ k))]
-  apply (mul_le_mul_of_nonneg_left
-    (large_subsets_image_sum_lower hγ_pos hγ_le hC_one hn_one hδ_lower hδ_upper hψ
-      hA₀int hB₀int hkdef hkpos hA₀large hB₀large hdim_bound)
-    (by
-      exact (by norm_num : (0 : ℝ) ≤ 1 / 2).trans (half_le_one_sub_ε hγ_pos hγ_le))).trans_eq
-  rw [freiman_image_sum_card hψ hA₀int hB₀int, natCastImage_sum_card A₀ B₀]
-
+      (1 - ε γ) * (#(natCastImage A₀ + natCastImage B₀) : ℝ) := by
+  have h := one_sub_two_mul_ε_mul_freimanDim_mul_le_card_add hγ_pos hγ_le hC_one hn_one hδ_lower
+    hδ_upper hψ hA₀int hB₀int hkdef hkpos hA₀large hB₀large hdim_bound
+  rw [freiman_image_sum_card hψ hA₀int hB₀int, ← natCastImage_sum_card] at h
+  exact one_sub_three_mul_mul_mul_le (by linarith [ε_le_one_twelfth hγ_pos hγ_le])
+    (mod_cast hDdim) (Nat.cast_nonneg _) (Nat.cast_nonneg _) h
 
 end
 

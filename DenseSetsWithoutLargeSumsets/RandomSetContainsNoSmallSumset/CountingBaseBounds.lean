@@ -8,135 +8,125 @@ module
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
-import Mathlib.Combinatorics.Matroid.Init
-import Mathlib.NumberTheory.ArithmeticFunction.Misc
-import Mathlib.Tactic.NormNum.Prime
 
 /-!
-Bookkeeping constants for counting proper GAPs and BLT pairs.
+# The base of the counting bounds
 
-Introduces `lowerModelGAPs` and `bltLargePreimage`, and bounds the common base
-`3 * lowerConstant C γ * pairCardThreshold (3 + γ) n δ` that both the GAP count and the BLT
-fingerprint count are measured against, culminating in the two log bounds
-(`lower_counting_base_log_le_epsilon_log_div_eight`,
-`lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight`) feeding the exponent estimate.
+Let `k = pairCardThreshold (3 + γ) n δ`, let `L = lowerConstant C γ` and let
+`β = lowerBltConstant C γ`. The number of proper progressions and the number of pairs of small
+subsets of a progression are both bounded by powers of `3 * L * k`. This file bounds the
+quantities of the counting argument by `3 * L * k`, and bounds `log (3 * L * k)` in terms of
+`log n`.
+
+## Main definitions
+
+* `lowerModelGAPs`: the proper progressions in `ZMod q` of dimension between `1` and `k` with at
+  most `⌈changCarrierBound (2 * k) (κ C)⌉₊` points.
+* `bltLargePreimage`: the elements of `A` whose cast to `ℤ` lies in `T`.
+
+## Main statements
+
+* `lower_counting_base_log_le_epsilon_log_div_eight`: `log (3 * L * k) ≤ ε γ * log n / 8`.
+* `lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight`:
+  `β * √k * log (3 * L * k) ≤ ε γ * log n / 8`.
 -/
 
 @[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
-open Nat hiding div_pos
-open scoped Pointwise
+open Finset Real ChangFreimanRuzsa
 
 noncomputable section
 
+/-- The proper progressions in `ZMod q` of dimension between `1` and
+`k = pairCardThreshold (3 + γ) n δ` with at most `⌈changCarrierBound (2 * k) (κ C)⌉₊` points,
+where `q = zmodModelQ`. -/
 abbrev lowerModelGAPs {γ C : ℝ} {n : ℕ} (δ : unitInterval)
     (hγ_pos : 0 < γ) (C_pos : 0 < C) (hn : lowerSizeThreshold C γ < n) :
-    Finset (ProperGAP (ZMod (zmodModelQ (γ := γ) (C := C) (n := n) hγ_pos C_pos hn))) := by
+    Finset (GAP (ZMod (zmodModelQ (γ := γ) (C := C) (n := n) hγ_pos C_pos hn))) := by
   classical
-  exact (Finset.Icc 1 (pairCardThreshold (3 + γ) n δ)).biUnion fun d =>
+  exact (Finset.Icc 1 (pairCardThreshold (3 + γ) n δ)).biUnion fun d ↦
     properGAPsZModOfDim d
         ⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊
         (zmodModelQ_prime (γ := γ) (C := C) (n := n) hγ_pos C_pos hn).pos
 
+/-- The elements of `A` whose cast to `ℤ` lies in `T`. -/
 abbrev bltLargePreimage (A : Finset ℕ) (T : Finset ℤ) : Finset ℕ :=
-  A.filter fun a => (a : ℤ) ∈ T
+  A.filter fun a ↦ (a : ℤ) ∈ T
 
-lemma bltLargePreimage_subset (A : Finset ℕ) (T : Finset ℤ) :
-    bltLargePreimage A T ⊆ A := by
-  intro a ha
-  rw [bltLargePreimage, Finset.mem_filter] at ha
-  exact ha.1
+lemma bltLargePreimage_subset (A : Finset ℕ) (T : Finset ℤ) : bltLargePreimage A T ⊆ A :=
+  filter_subset _ _
 
 lemma natCastImage_bltLargePreimage_eq_of_subset {A : Finset ℕ} {T : Finset ℤ}
     (hT : T ⊆ natCastImage A) :
-    natCastImage (bltLargePreimage A T) = T := by
-  unfold bltLargePreimage
-  exact natCastImage_filter_mem_eq_of_subset hT
+    natCastImage (bltLargePreimage A T) = T :=
+  natCastImage_filter_mem_eq_of_subset hT
 
-private lemma bltLargePreimage_card_eq_of_subset {A : Finset ℕ} {T : Finset ℤ}
-    (hT : T ⊆ natCastImage A) :
-    (bltLargePreimage A T).card = T.card := by
-  rw [← natCastImage_card (bltLargePreimage A T), natCastImage_bltLargePreimage_eq_of_subset hT]
+lemma bltLargePreimage_large_of_blt {γ : ℝ} {A : Finset ℕ} {T : Finset ℤ} {k : ℕ}
+    (hAcard : #A = k) (hT : T ⊆ natCastImage A)
+    (hTlarge : (1 - ε γ) * (#(natCastImage A) : ℝ) ≤ (#T : ℝ)) :
+    (1 - ε γ) * (k : ℝ) ≤ (#(bltLargePreimage A T) : ℝ) := by
+  rwa [← natCastImage_card (bltLargePreimage A T), natCastImage_bltLargePreimage_eq_of_subset hT,
+    ← hAcard, ← natCastImage_card A]
 
-lemma bltLargePreimage_large_of_blt {γ : ℝ} {A : Finset ℕ} {T : Finset ℤ}
-    {k : ℕ}
-    (hAcard : A.card = k) (hT : T ⊆ natCastImage A)
-    (hTlarge : (1 - ε γ) * ((natCastImage A).card : ℝ) ≤ (T.card : ℝ)) :
-    (1 - ε γ) * (k : ℝ) ≤ ((bltLargePreimage A T).card : ℝ) := by
-  simpa [natCastImage_card A, hAcard, bltLargePreimage_card_eq_of_subset hT] using hTlarge
-
-lemma natCastImage_nonempty_of_card_eq {A : Finset ℕ} {k : ℕ}
-    (hAcard : A.card = k) (hk : 0 < k) :
-    (natCastImage A).Nonempty := by
-  apply Finset.card_pos.mp
-  rw [natCastImage_card, hAcard]
-  exact hk
-
-private lemma two_le_two_mul_ceil_κ_sub_one {C : ℝ} (hC_one : 1 ≤ C) :
-    2 ≤ 2 * ⌈κ C⌉₊ - 1 := by
-  exact (by norm_num : 2 ≤ 2 * 6 - 1).trans
-    (Nat.sub_le_sub_right
-      (Nat.mul_le_mul_left 2 (by
-        exact_mod_cast (κ_ge_six_of_one_le hC_one).trans (Nat.le_ceil (κ C))))
-      1)
+lemma natCastImage_nonempty_of_card_eq {A : Finset ℕ} {k : ℕ} (hAcard : #A = k) (hk : 0 < k) :
+    (natCastImage A).Nonempty :=
+  card_pos.1 (by rwa [natCastImage_card, hAcard])
 
 lemma two_le_pairCardThreshold_of_one_le {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
     2 ≤ pairCardThreshold (3 + γ) n δ := by
-  exact (two_le_two_mul_ceil_κ_sub_one hC_one).trans
-    (two_mul_ceil_κ_sub_one_le_pairCardThreshold hγ_pos hC_one
-      (one_lt_nat_of_lowerSizeThreshold_lt hn)
-      hδ_lower hδ_upper)
+  have hκ : 6 ≤ ⌈κ C⌉₊ := mod_cast (κ_ge_six_of_one_le hC_one).trans (Nat.le_ceil _)
+  have h := two_mul_ceil_κ_sub_one_le_pairCardThreshold hγ_pos hC_one
+    (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper
+  grind
 
-private lemma four_le_pairCardThreshold_of_one_le {γ C : ℝ} {n : ℕ} {δ : unitInterval}
+private lemma four_le_pairCardThreshold {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    4 ≤ pairCardThreshold (3 + γ) n δ := by
-  apply le_of_lt
-  exact_mod_cast (by
-    nlinarith [fourteen_mul_sq_lt_ε_mul_pairCardThreshold hγ_pos hγ_le hC_one
+    (4 : ℝ) ≤ pairCardThreshold (3 + γ) n δ := by
+  linarith [fourteen_mul_sq_lt_ε_mul_pairCardThreshold hγ_pos hC_one
       (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper,
-      ε_le_one_twelfth hγ_pos hγ_le,
-      sq_nonneg (C - 1)] :
-      (4 : ℝ) < pairCardThreshold (3 + γ) n δ)
+    mul_le_mul_of_nonneg_right (ε_le_one_twelfth hγ_pos hγ_le)
+      (Nat.cast_nonneg (pairCardThreshold (3 + γ) n δ)),
+    one_le_pow₀ hC_one (n := 2)]
 
-private lemma two_le_blt_sqrt_pairCardThreshold {γ C : ℝ} {n : ℕ} {δ : unitInterval}
+private lemma two_le_lowerBltConstant_mul_sqrt {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    2 ≤ lowerBltConstant C γ hC_two hε *
-        Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  nlinarith [one_le_lowerBltConstant hC_two hε,
-    Real.le_sqrt_of_sq_le (x := (2 : ℝ))
-      (y := (pairCardThreshold (3 + γ) n δ : ℝ)) (by
-      convert (by
-        exact_mod_cast four_le_pairCardThreshold_of_one_le hγ_pos hγ_le hC_one hn hδ_lower
-          hδ_upper :
-          (4 : ℝ) ≤ pairCardThreshold (3 + γ) n δ) using 1
-      norm_num)]
+    2 ≤ lowerBltConstant C γ hC_two hε * √(pairCardThreshold (3 + γ) n δ : ℝ) := by
+  have h : 2 ≤ √(pairCardThreshold (3 + γ) n δ : ℝ) := le_sqrt_of_sq_le
+    (by linarith [four_le_pairCardThreshold hγ_pos hγ_le hC_one hn hδ_lower hδ_upper])
+  nlinarith [one_le_lowerBltConstant hC_two hε]
 
-lemma lower_blt_ceiling_succ_le_two_mul {γ C : ℝ} {n : ℕ}
-    {δ : unitInterval}
+lemma lower_blt_ceiling_succ_le_two_mul {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    ((⌈lowerBltConstant C γ hC_two hε *
-          Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ)⌉₊ + 1 : ℕ) : ℝ) ≤
-      2 * lowerBltConstant C γ hC_two hε *
-        Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  rw [Nat.cast_add, Nat.cast_one]
-  nlinarith [Nat.ceil_lt_add_one
-    (a := lowerBltConstant C γ hC_two hε *
-      Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ)) (mul_nonneg
-    ((zero_le_one' ℝ).trans (one_le_lowerBltConstant hC_two hε))
-    (Real.sqrt_nonneg (pairCardThreshold (3 + γ) n δ : ℝ))),
-    two_le_blt_sqrt_pairCardThreshold hγ_pos hγ_le hC_one hn hδ_lower hδ_upper hC_two
-      hε]
+    ((⌈lowerBltConstant C γ hC_two hε * √(pairCardThreshold (3 + γ) n δ : ℝ)⌉₊ + 1 : ℕ) : ℝ) ≤
+      2 * lowerBltConstant C γ hC_two hε * √(pairCardThreshold (3 + γ) n δ : ℝ) := by
+  have h := two_le_lowerBltConstant_mul_sqrt hγ_pos hγ_le hC_one hn hδ_lower hδ_upper hC_two hε
+  push_cast
+  linarith [Nat.ceil_lt_add_one (zero_le_two.trans h)]
+
+private lemma changCarrierBound_two_mul_le {γ C : ℝ} (k : ℕ) (hC_two : 0 < 2 * C)
+    (hε : 0 < ε γ) :
+    changCarrierBound (2 * k) (κ C) ≤ 2 * (lowerConstant C γ hC_two hε * k) := by
+  rw [changCarrierBound, Nat.cast_mul, Nat.cast_two, mul_left_comm]
+  gcongr
+  exact le_max_left _ _
+
+private lemma two_le_lowerConstant_mul_pairCardThreshold {γ C : ℝ} {n : ℕ} {δ : unitInterval}
+    (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
+    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
+    (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
+    2 ≤ lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
+  have hk : (2 : ℝ) ≤ pairCardThreshold (3 + γ) n δ :=
+    mod_cast two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper
+  nlinarith [one_le_lowerConstant hC_two hε]
 
 lemma changCarrierBound_ceil_succ_le_three_mul_lowerConstant {γ C : ℝ} {n : ℕ}
     {δ : unitInterval}
@@ -145,46 +135,17 @@ lemma changCarrierBound_ceil_succ_le_three_mul_lowerConstant {γ C : ℝ} {n : �
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
     ((⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊ + 1 : ℕ) : ℝ) ≤
       3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  simp [changCarrierBound]
-  nlinarith [Nat.ceil_lt_add_one
-    (a := Real.exp (changTheoremExponent (κ C)) *
-      (2 * (pairCardThreshold (3 + γ) n δ : ℝ)))
-    (mul_nonneg (Real.exp_pos _).le (by positivity :
-      0 ≤ 2 * (pairCardThreshold (3 + γ) n δ : ℝ))),
-    le_max_left (Real.exp (changTheoremExponent (κ C)))
-      (4 * lowerBltConstant C γ hC_two hε),
-    mul_le_mul_of_nonneg_right
-      (le_max_left (Real.exp (changTheoremExponent (κ C)))
-        (4 * lowerBltConstant C γ hC_two hε))
-      (by positivity : 0 ≤ 2 * (pairCardThreshold (3 + γ) n δ : ℝ)),
-    (by
-      rw [lowerConstant_eq C γ hC_two hε]
-      exact (mul_le_mul_of_nonneg_right
-        (le_max_left (Real.exp (changTheoremExponent (κ C)))
-          (4 * lowerBltConstant C γ hC_two hε))
-        (by positivity : 0 ≤ 2 * (pairCardThreshold (3 + γ) n δ : ℝ))).trans_eq (by ring) :
-      Real.exp (changTheoremExponent (κ C)) *
-          (2 * (pairCardThreshold (3 + γ) n δ : ℝ)) ≤
-        2 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)),
-    one_le_lowerConstant hC_two hε,
-    (by
-      exact_mod_cast two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper :
-        (2 : ℝ) ≤ pairCardThreshold (3 + γ) n δ),
-    (by
-      rw [← one_mul (2 : ℝ)]
-      exact mul_le_mul (one_le_lowerConstant hC_two hε)
-        (by
-          exact_mod_cast two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower
-            hδ_upper :
-            (2 : ℝ) ≤ pairCardThreshold (3 + γ) n δ)
-        (by norm_num) ((zero_le_one' ℝ).trans (one_le_lowerConstant hC_two hε)) :
-      (2 : ℝ) ≤ lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)),
-    two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper]
+  have h : 0 ≤ changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C) :=
+    mul_nonneg (exp_pos _).le (Nat.cast_nonneg _)
+  push_cast
+  linarith [Nat.ceil_lt_add_one h,
+    changCarrierBound_two_mul_le (pairCardThreshold (3 + γ) n δ) hC_two hε,
+    two_le_lowerConstant_mul_pairCardThreshold hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε]
 
-lemma lower_exponent_coefficient {γ : ℝ} (hγ_pos : 0 < γ) (_hγ_le : γ ≤ 1) :
+lemma lower_exponent_coefficient {γ : ℝ} (hγ_pos : 0 < γ) :
     2 * (1 + ε γ) ≤ (1 - 3 * ε γ) * (3 + γ) := by
   unfold ε
-  field_simp [(by positivity : 0 < 4 * (γ + 2)).ne']
+  field_simp
   nlinarith
 
 lemma one_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInterval}
@@ -192,49 +153,15 @@ lemma one_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
     1 ≤ 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  apply (by norm_num : (1 : ℝ) ≤ 3 * 2).trans
-  nlinarith [(by
-    rw [← one_mul (2 : ℝ)]
-    exact mul_le_mul (one_le_lowerConstant hC_two hε)
-      (by
-        exact_mod_cast two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper :
-        (2 : ℝ) ≤ pairCardThreshold (3 + γ) n δ)
-      (by norm_num) ((zero_le_one' ℝ).trans (one_le_lowerConstant hC_two hε)) :
-    (2 : ℝ) ≤ lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ))]
-
-private lemma four_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInterval}
-    (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
-    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
-    (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    4 ≤ 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  apply (by norm_num : (4 : ℝ) ≤ 3 * 2).trans
-  nlinarith [(by
-    rw [← one_mul (2 : ℝ)]
-    exact mul_le_mul (one_le_lowerConstant hC_two hε)
-      (by
-        exact_mod_cast two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper :
-        (2 : ℝ) ≤ pairCardThreshold (3 + γ) n δ)
-      (by norm_num) ((zero_le_one' ℝ).trans (one_le_lowerConstant hC_two hε)) :
-    (2 : ℝ) ≤ lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ))]
+  linarith [two_le_lowerConstant_mul_pairCardThreshold hγ_pos hC_one hn hδ_lower hδ_upper hC_two
+    hε]
 
 lemma lower_counting_base_pos {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    0 < 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  exact zero_lt_one.trans_le
-    (one_le_lower_counting_base hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε)
-
-lemma lower_chang_carrier_ceil_pos {γ C : ℝ} {n : ℕ} {δ : unitInterval}
-    (hγ_pos : 0 < γ) (_hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
-    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    0 < ⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊ := by
-  rw [Nat.ceil_pos]
-  rw [changCarrierBound]
-  apply mul_pos
-  · exact Real.exp_pos _
-  · exact_mod_cast Nat.mul_pos (by norm_num : 0 < 2)
-      (pairCardThreshold_pos_of_lower_density hγ_pos hn hδ_lower hδ_upper)
+    0 < 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) :=
+  zero_lt_one.trans_le (one_le_lower_counting_base hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε)
 
 lemma changCarrierBound_ceil_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
@@ -242,88 +169,69 @@ lemma changCarrierBound_ceil_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ :
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
     (⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊ : ℝ) ≤
       3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  exact (by exact_mod_cast
-      Nat.le_succ ⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊ :
-      (⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊ : ℝ) ≤
-        (⌈changCarrierBound (2 * pairCardThreshold (3 + γ) n δ) (κ C)⌉₊ + 1 : ℕ)).trans
-    (changCarrierBound_ceil_succ_le_three_mul_lowerConstant hγ_pos hC_one hn hδ_lower hδ_upper
-      hC_two hε)
+  have h := changCarrierBound_ceil_succ_le_three_mul_lowerConstant hγ_pos hC_one hn hδ_lower
+    hδ_upper hC_two hε
+  push_cast at h
+  linarith
 
 lemma blt_ceiling_succ_le_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    ((⌈lowerBltConstant C γ hC_two hε *
-          Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ)⌉₊ + 1 : ℕ) : ℝ) ≤
+    ((⌈lowerBltConstant C γ hC_two hε * √(pairCardThreshold (3 + γ) n δ : ℝ)⌉₊ + 1 : ℕ) : ℝ) ≤
       3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) := by
-  apply (lower_blt_ceiling_succ_le_two_mul hγ_pos hγ_le hC_one hn hδ_lower hδ_upper
-    hC_two hε).trans
-  nlinarith [
-    (mul_le_mul (lowerBltConstant_le_lowerConstant hC_two hε)
-      (by
-        rw [Real.sqrt_le_left (by positivity :
-          0 ≤ (pairCardThreshold (3 + γ) n δ : ℝ))]
-        have hk_one : (1 : ℝ) ≤ pairCardThreshold (3 + γ) n δ := by
-          exact_mod_cast ((by norm_num : 1 ≤ 2).trans
-            (two_le_pairCardThreshold_of_one_le hγ_pos hC_one hn hδ_lower hδ_upper))
-        nlinarith)
-      (Real.sqrt_nonneg (pairCardThreshold (3 + γ) n δ : ℝ))
-      ((zero_le_one' ℝ).trans (one_le_lowerConstant hC_two hε)) :
-      lowerBltConstant C γ hC_two hε *
-          Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ) ≤
-        lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)),
-    lowerConstant_pos C γ hC_two hε,
-    pairCardThreshold_pos_of_lower_density hγ_pos hn hδ_lower hδ_upper]
+  have hk := four_le_pairCardThreshold hγ_pos hγ_le hC_one hn hδ_lower hδ_upper
+  have hL := (lowerConstant_pos C γ hC_two hε).le
+  have hs : √(pairCardThreshold (3 + γ) n δ : ℝ) ≤ pairCardThreshold (3 + γ) n δ :=
+    sqrt_le_self_iff.2 (Or.inr (by linarith))
+  refine (lower_blt_ceiling_succ_le_two_mul hγ_pos hγ_le hC_one hn hδ_lower hδ_upper hC_two
+    hε).trans ?_
+  linarith [mul_le_mul (lowerBltConstant_le_lowerConstant hC_two hε) hs (sqrt_nonneg _) hL,
+    mul_nonneg hL (zero_le_four.trans hk)]
 
 lemma zmodModelQ_le_n_mul_lower_counting_base {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hγ_pos : 0 < γ) (C_pos : 0 < C) (hC_one : 1 ≤ C) (hn : lowerSizeThreshold C γ < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    (zmodModelQ (γ := γ) (C := C) (n := n) hγ_pos C_pos hn : ℝ) ≤
-      (n : ℝ) * (3 * lowerConstant C γ hC_two hε *
-        (pairCardThreshold (3 + γ) n δ : ℝ)) := by
-  apply (by
-      exact_mod_cast zmodModelQ_upper (γ := γ) (C := C) (n := n) hγ_pos C_pos hn :
-        (zmodModelQ (γ := γ) (C := C) (n := n) hγ_pos C_pos hn : ℝ) ≤
-          4 * (n : ℝ)).trans
-  rw [mul_comm (4 : ℝ) (n : ℝ)]
-  exact mul_le_mul_of_nonneg_left
-    (four_le_lower_counting_base hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε)
-    (le_of_lt (old_model_threshold_nat_pos hn))
+    (zmodModelQ hγ_pos C_pos hn : ℝ) ≤
+      (n : ℝ) * (3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)) := by
+  have hq : (zmodModelQ hγ_pos C_pos hn : ℝ) ≤ 4 * n := mod_cast zmodModelQ_upper hγ_pos C_pos hn
+  nlinarith [old_model_threshold_nat_pos hn,
+    two_le_lowerConstant_mul_pairCardThreshold hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε]
 
-lemma lower_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
+private lemma lower_counting_base_le {γ C c : ℝ} {n : ℕ} {δ : unitInterval}
+    (hγ_pos : 0 < γ) (hc_pos : 0 < c) (hn : lowerSizeThreshold C γ < n)
+    (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper_c : (δ : ℝ) ≤ 1 - c)
+    (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
+    3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) ≤
+      max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC_two hε * log n := by
+  have hL := (lowerConstant_pos C γ hC_two hε).le
+  have hlog : 0 ≤ log (n : ℝ) := by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn]
+  linarith [mul_le_mul_of_nonneg_left
+      (pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower hδ_upper_c)
+      (mul_nonneg zero_le_three hL),
+    mul_le_mul_of_nonneg_right (le_max_right 42 (3 * densityCoefficient (3 + γ) c))
+      (mul_nonneg hL hlog)]
+
+/-- The logarithm of the base `3 * L * k` is at most `ε γ * log n / 8`. -/
+theorem lower_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval}
-    (hγ_pos : 0 < γ) (_hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
-    (hc_pos : 0 < c) (hc_lt : c < 1) (hn : lowerSizeThreshold C γ < n)
+    (hγ_pos : 0 < γ) (hC_one : 1 ≤ C)
+    (hc_pos : 0 < c) (hn : lowerSizeThreshold C γ < n)
     (hn_gap : lowerGapThreshold C γ c < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hδ_upper_c : (δ : ℝ) ≤ 1 - c)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    Real.log (3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)) ≤
-      ε γ * Real.log (n : ℝ) / 8 := by
-  refine (Real.log_le_log
-    (x := 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ))
-    (y := max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC_two hε *
-      Real.log (n : ℝ))
-    (lower_counting_base_pos hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε) ?_).trans ?_
-  · have hk := pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower
-      hδ_upper_c
-    have hlog_nonneg : 0 ≤ Real.log (n : ℝ) := by
-      linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn]
-    nlinarith [mul_le_mul_of_nonneg_left hk
-        (mul_nonneg (by norm_num : (0 : ℝ) ≤ 3) (lowerConstant_pos C γ hC_two hε).le),
-      mul_le_mul_of_nonneg_right (le_max_right (42 : ℝ)
-        (3 * densityCoefficient (3 + γ) c))
-        (mul_nonneg (lowerConstant_pos C γ hC_two hε).le hlog_nonneg)]
-  · have hT₁ := lowerLogScale_log_bound_of_gap (C := C) (γ := γ) (c := c) (n := n)
-      hC_two hε hn_gap
-    rw [lowerLogScale] at hT₁
-    rw [div_mul_eq_mul_div] at hT₁
-    rw [div_le_iff₀ hε] at hT₁
-    rw [le_div_iff₀ (by norm_num : (0 : ℝ) < 8)]
-    nlinarith
+    log (3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)) ≤
+      ε γ * log (n : ℝ) / 8 := by
+  have h := lowerLogScale_log_bound_of_gap (c := c) hC_two hε hn_gap
+  rw [lowerLogScale, div_mul_eq_mul_div, div_le_iff₀ hε] at h
+  linarith [log_le_log (lower_counting_base_pos hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε)
+    (lower_counting_base_le hγ_pos hc_pos hn hδ_lower hδ_upper_c hC_two hε)]
 
-lemma lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
+/-- With `β = lowerBltConstant C γ`, the product `β * √k * log (3 * L * k)` is at most
+`ε γ * log n / 8`. -/
+theorem lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
     (hc_pos : 0 < c) (hc_lt : c < 1) (hn : lowerSizeThreshold C γ < n)
@@ -331,57 +239,25 @@ lemma lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n 
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hδ_upper_c : (δ : ℝ) ≤ 1 - c)
     (hC_two : 0 < 2 * C) (hε : 0 < ε γ) :
-    lowerBltConstant C γ hC_two hε *
-        Real.sqrt (pairCardThreshold (3 + γ) n δ : ℝ) *
-        Real.log (3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)) ≤
-      ε γ * Real.log (n : ℝ) / 8 := by
-  refine (mul_le_mul_of_nonneg_left
-      (Real.log_le_log
-        (x := 3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ))
-        (y := max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC_two hε *
-          Real.log (n : ℝ))
-        (lower_counting_base_pos hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε) ?_) ?_).trans ?_
-  · have hk := pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower
-      hδ_upper_c
-    have hlog_nonneg : 0 ≤ Real.log (n : ℝ) := by
-      linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn]
-    nlinarith [mul_le_mul_of_nonneg_left hk
-        (mul_nonneg (by norm_num : (0 : ℝ) ≤ 3) (lowerConstant_pos C γ hC_two hε).le),
-      mul_le_mul_of_nonneg_right (le_max_right (42 : ℝ)
-        (3 * densityCoefficient (3 + γ) c))
-        (mul_nonneg (lowerConstant_pos C γ hC_two hε).le hlog_nonneg)]
-  · exact mul_nonneg ((zero_le_one' ℝ).trans (one_le_lowerBltConstant hC_two hε))
-      (Real.sqrt_nonneg (pairCardThreshold (3 + γ) n δ : ℝ))
-  · refine (mul_le_mul_of_nonneg_right
-      (mul_le_mul_of_nonneg_left
-        (Real.sqrt_le_sqrt
-          (pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower
-            hδ_upper_c))
-        ((zero_le_one' ℝ).trans (one_le_lowerBltConstant hC_two hε))) ?_).trans ?_
-    · apply Real.log_nonneg
-      have hbase : (1 : ℝ) ≤ lowerConstant C γ hC_two hε * Real.log (n : ℝ) := by
-        rw [← one_mul (1 : ℝ)]
-        exact mul_le_mul (one_le_lowerConstant hC_two hε)
-          ((by norm_num : (1 : ℝ) < 15).le.trans
-            (le_of_lt (fifteen_lt_log_of_lowerAnalyticThreshold hn)))
-          (by norm_num) ((zero_le_one' ℝ).trans (one_le_lowerConstant hC_two hε))
-      apply hbase.trans
-      simpa [mul_assoc] using mul_le_mul_of_nonneg_right
-        ((by norm_num : (1 : ℝ) ≤ 42).trans
-          (le_max_left (42 : ℝ) (3 * densityCoefficient (3 + γ) c)))
-        (zero_le_one.trans hbase)
-    · rw [Real.sqrt_mul
-        (zero_lt_one.trans (one_lt_densityCoefficient hγ_pos hc_pos hc_lt)).le]
-      have hT₂ := lowerGapSqrtScale_log_bound hγ_pos hγ_le hC_two hε hc_pos hc_lt hn_gap
-      rw [lowerGapSqrtScale, div_mul_eq_mul_div] at hT₂
-      rw [div_le_iff₀ hε] at hT₂
-      have := mul_le_mul_of_nonneg_right hT₂ (Real.sqrt_nonneg (Real.log (n : ℝ)))
-      have hsquare : Real.sqrt (Real.log (n : ℝ)) * Real.sqrt (Real.log (n : ℝ)) =
-          Real.log (n : ℝ) := by
-        rw [← pow_two, Real.sq_sqrt (le_of_lt ((by norm_num : (0 : ℝ) < 15).trans
-          (fifteen_lt_log_of_lowerAnalyticThreshold hn)))]
-      nlinarith [this, hsquare]
-
+    lowerBltConstant C γ hC_two hε * √(pairCardThreshold (3 + γ) n δ : ℝ) *
+        log (3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)) ≤
+      ε γ * log (n : ℝ) / 8 := by
+  have hlogn : 0 ≤ log (n : ℝ) := by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn]
+  have hβ : 0 ≤ lowerBltConstant C γ hC_two hε := zero_le_one.trans (one_le_lowerBltConstant _ _)
+  have hk := sqrt_le_sqrt
+    (pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower hδ_upper_c)
+  rw [sqrt_mul (zero_le_one.trans (one_lt_densityCoefficient hγ_pos hc_pos hc_lt).le)] at hk
+  have h₁ := mul_le_mul (mul_le_mul_of_nonneg_left hk hβ)
+    (log_le_log (lower_counting_base_pos hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε)
+      (lower_counting_base_le hγ_pos hc_pos hn hδ_lower hδ_upper_c hC_two hε))
+    (log_nonneg (one_le_lower_counting_base hγ_pos hC_one hn hδ_lower hδ_upper hC_two hε))
+    (by positivity)
+  have h₂ := mul_le_mul_of_nonneg_right
+    (lowerGapSqrtScale_log_bound hγ_pos hγ_le hC_two hε hc_pos hc_lt hn_gap)
+    (sqrt_nonneg (log n))
+  rw [mul_self_sqrt hlogn, lowerGapSqrtScale, div_mul_eq_mul_div, div_mul_eq_mul_div,
+    div_le_iff₀ hε] at h₂
+  linarith
 
 end
 

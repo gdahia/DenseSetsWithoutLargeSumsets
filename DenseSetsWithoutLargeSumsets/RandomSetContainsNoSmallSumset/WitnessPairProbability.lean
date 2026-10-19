@@ -7,156 +7,107 @@ module
 
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
 public import DenseSetsWithoutLargeSumsets.Probability
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
-import Mathlib.Combinatorics.Matroid.Init
-import Mathlib.NumberTheory.ArithmeticFunction.Misc
-import Mathlib.Tactic.NormNum.Prime
 
 /-!
-Probability bounds for individual BLT witness pairs.
+# The probability that a random set contains a given sumset
 
-Bounds the probability that a fixed BLT witness pair has its sumset contained in the random
-set, and packages the union bound over a finite family of pairs
-(`bltDimSmallWitnessPairs_probability_sum_le`, `dim_fingerprint_sum_le_gap_dim_sum`).
+Let `S` be a `δ`-random subset of `[n]`. For a pair `(A', B')` of sets of integers, the
+probability that `A' + B' ⊆ S` is at most `δ ^ |A' + B'|`. We sum this bound over the pairs in
+`bltDimSmallWitnessPairs` and over the proper progressions of each dimension. This is the union
+bound of Section 2 of *Dense sets without large sumsets* (Dahia, Marciano, Souza).
+
+## Main statements
+
+* `bltWitnessPair_probability_le`: the probability that `A' + B' ⊆ S` is at most
+  `δ ^ |A' + B'|`.
+* `dim_fingerprint_sum_le_gap_dim_sum`: the sum of `δ ^ |A' + B'|` over the proper progressions
+  `P` of dimension `1 ≤ d ≤ k` with at most `s` points and over the pairs `(A', B')` in
+  `bltDimSmallWitnessPairs` of the preimage of `P` is at most the sum over `d` of the number of
+  progressions times `((m + 1) * (s + 1) ^ m) ^ 2 * exp (-(1 - 3 * ε γ) * d * k * log (1 / δ))`,
+  where `m = ⌈lowerBltConstant C γ * √k⌉₊`.
 -/
 
 @[expose] public section
 
 namespace DenseSetsWithoutLargeSumsets
 
-open Nat hiding div_pos
+open Finset MeasureTheory ChangFreimanRuzsa
 open scoped Pointwise
 
 noncomputable section
 
-private lemma intToNat_injOn_of_subset_natCastImage {T : Finset ℤ} {S : Finset ℕ}
+private lemma toNat_injOn_of_subset_natCastImage {T : Finset ℤ} {S : Finset ℕ}
     (hT : T ⊆ natCastImage S) :
     Set.InjOn Int.toNat (T : Set ℤ) := by
   intro z hz w hw hzw
-  rw [natCastImage] at hT
-  rcases Finset.mem_image.mp (hT hz) with ⟨a, _ha, haz⟩
-  rcases Finset.mem_image.mp (hT hw) with ⟨b, _hb, hbw⟩
-  rw [← haz, ← hbw] at hzw ⊢
+  obtain ⟨a, -, rfl⟩ := mem_image.1 (hT hz)
+  obtain ⟨b, -, rfl⟩ := mem_image.1 (hT hw)
   simpa using hzw
 
-private lemma bltWitnessPairSumsetIsSubset_subset_natSuperset
-    (p : Finset ℤ × Finset ℤ) :
-    {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S} ⊆
-      {S : Finset ℕ | (p.1 + p.2).image Int.toNat ⊆ S} := by
-  intro S hS x hx
-  rcases Finset.mem_image.mp hx with ⟨z, hz, rfl⟩
-  change p.1 + p.2 ⊆ natCastImage S at hS
-  rw [natCastImage] at hS
-  rcases Finset.mem_image.mp (hS hz) with ⟨s, hs, hsz⟩
-  rw [← hsz]
-  simpa using hs
-
-lemma bltWitnessPair_probability_le (n : ℕ) {δ : unitInterval}
+/-- Let `S` be a `δ`-random subset of `[n]`. The probability that the sumset of the pair `p` is
+contained in `S` is at most `δ ^ |p.1 + p.2|`. -/
+theorem bltWitnessPair_probability_le (n : ℕ) {δ : unitInterval}
     (p : Finset ℤ × Finset ℤ) :
     (binomialFinsetSubset (Set.Icc 1 n) δ).real
         {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S} ≤
-      (δ : ℝ) ^ (p.1 + p.2).card := by
-  classical
-  by_cases hnonempty : ∃ S : Finset ℕ, bltWitnessPairSumsetIsSubset p S
-  · rcases hnonempty with ⟨S₀, hS₀⟩
-    apply le_trans (b := (binomialFinsetSubset (Set.Icc 1 n) δ).real
-      {S : Finset ℕ | (p.1 + p.2).image Int.toNat ⊆ S})
-    · rw [MeasureTheory.measureReal_def, MeasureTheory.measureReal_def]
-      apply ENNReal.toReal_mono
-      · exact MeasureTheory.measure_ne_top (binomialFinsetSubset (Set.Icc 1 n) δ) _
-      · apply MeasureTheory.measure_mono
-        simpa using bltWitnessPairSumsetIsSubset_subset_natSuperset p
-    · refine (binomialFinsetSubset_real_superset_nat
-        (Ω := Set.Icc 1 n) (p := δ) (Set.finite_Icc 1 n)
-        (T := (p.1 + p.2).image Int.toNat)).trans_eq ?_
-      rw [Finset.card_image_of_injOn (intToNat_injOn_of_subset_natCastImage hS₀)]
-  · refine le_trans (b := 0) ?_ (pow_nonneg (unitInterval.nonneg δ) _)
-    apply le_of_eq
-    rw [MeasureTheory.measureReal_def]
-    rw [ENNReal.toReal_eq_zero_iff]
-    left
-    rw [MeasureTheory.measure_eq_zero_iff_ae_notMem]
-    filter_upwards with S hS
-    exact hnonempty ⟨S, hS⟩
+      (δ : ℝ) ^ #(p.1 + p.2) := by
+  obtain h | ⟨S₀, hS₀⟩ :=
+    Set.eq_empty_or_nonempty {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S}
+  · rw [h, measureReal_empty]
+    exact pow_nonneg δ.2.1 _
+  rw [← card_image_of_injOn (toNat_injOn_of_subset_natCastImage hS₀)]
+  refine (measureReal_mono ?_).trans
+    (binomialFinsetSubset_real_superset_nat δ (Set.finite_Icc 1 n))
+  intro S hS x hx
+  obtain ⟨z, hz, rfl⟩ := mem_image.1 hx
+  obtain ⟨s, hs, rfl⟩ := mem_image.1 (hS hz)
+  simpa using hs
 
-private lemma unitInterval_pow_le_exp_neg_mul_log_inv {δ : unitInterval} {m : ℕ} {L : ℝ}
+private lemma pow_le_exp_neg_mul_log_one_div {δ : unitInterval} {m : ℕ} {L : ℝ}
     (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) (hL : L ≤ (m : ℝ)) :
     (δ : ℝ) ^ m ≤ Real.exp (-L * Real.log (1 / δ)) := by
-  rw [← Real.exp_log (pow_pos hδ_pos m), Real.log_pow, mul_comm]
-  refine (Real.exp_le_exp.mpr (mul_le_mul_of_nonpos_left hL ?_)).trans_eq ?_
-  · rw [← Real.log_one]
-    exact Real.log_le_log hδ_pos hδ_lt.le
-  · rw [Real.log_div one_ne_zero (Ne.symm (ne_of_lt hδ_pos)), Real.log_one, zero_sub]
-    ring_nf
+  rw [one_div, Real.log_inv, neg_mul_neg, mul_comm, ← Real.rpow_def_of_pos hδ_pos,
+    ← Real.rpow_natCast]
+  exact Real.rpow_le_rpow_of_exponent_ge hδ_pos hδ_lt.le hL
 
-private lemma bltDimSmallWitnessPairs_probability_sum_le (P : Finset ℕ) (D k : ℕ)
+private lemma sum_bltDimSmallWitnessPairs_pow_le (P : Finset ℕ) (D k : ℕ)
     (C γ : ℝ) {δ : unitInterval} (hC : 0 < 2 * C) (hε : 0 < ε γ)
     (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
-    ∑ p ∈ bltDimSmallWitnessPairs P D k C γ, (δ : ℝ) ^ (p.1 + p.2).card ≤
+    ∑ p ∈ bltDimSmallWitnessPairs P D k C γ, (δ : ℝ) ^ #(p.1 + p.2) ≤
       (((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
-          ((natCastImage P).card + 1) ^
+          (#(natCastImage P) + 1) ^
             ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ) *
         ((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
-          ((natCastImage P).card + 1) ^
+          (#(natCastImage P) + 1) ^
             ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
         Real.exp (-((1 - 3 * ε γ) * (D : ℝ) * (k : ℝ)) * Real.log (1 / δ)) := by
-  classical
-  refine (Finset.sum_le_sum (s := bltDimSmallWitnessPairs P D k C γ)
-    (f := fun p => (δ : ℝ) ^ (p.1 + p.2).card)
-    (g := fun _ => Real.exp (-((1 - 3 * ε γ) * (D : ℝ) * (k : ℝ)) *
-      Real.log (1 / δ))) ?_).trans ?_
-  · intro p hp
-    rw [bltDimSmallWitnessPairs, Finset.mem_filter] at hp
-    exact unitInterval_pow_le_exp_neg_mul_log_inv hδ_pos hδ_lt hp.2.2
-  · rw [Finset.sum_const, nsmul_eq_mul]
-    apply mul_le_mul_of_nonneg_right
-    · exact_mod_cast bltDimSmallWitnessPairs_card_le P D k C γ hC hε
-    · positivity
+  have h : ∀ p ∈ bltDimSmallWitnessPairs P D k C γ, (δ : ℝ) ^ #(p.1 + p.2) ≤
+      Real.exp (-((1 - 3 * ε γ) * (D : ℝ) * (k : ℝ)) * Real.log (1 / δ)) := by
+    intro p hp
+    rw [bltDimSmallWitnessPairs, mem_filter] at hp
+    exact pow_le_exp_neg_mul_log_one_div hδ_pos hδ_lt hp.2.2
+  refine (sum_le_card_nsmul _ _ _ h).trans ?_
+  rw [nsmul_eq_mul]
+  gcongr
+  exact mod_cast bltDimSmallWitnessPairs_card_le P D k C γ hC hε
 
-private lemma sum_union_le_sum_add_sum {α : Type*} [DecidableEq α] (A B : Finset α)
-    (f : α → ℝ) (hf : ∀ x, 0 ≤ f x) :
-    ∑ x ∈ A ∪ B, f x ≤ ∑ x ∈ A, f x + ∑ x ∈ B, f x := by
-  classical
-  apply le_trans (b := ∑ x ∈ A ∪ (B \ A), f x)
-  · apply le_of_eq
-    congr 1
-    ext x
-    by_cases hxA : x ∈ A <;> simp [hxA]
-  · rw [Finset.sum_union]
-    · apply add_le_add_right
-      apply Finset.sum_le_sum_of_subset_of_nonneg
-      · intro x hx
-        exact (Finset.mem_sdiff.mp hx).1
-      · intro x _hxB _hxsdiff
-        exact hf x
-    · rw [Finset.disjoint_iff_inter_eq_empty]
-      ext x
-      simp
-
-private lemma sum_biUnion_le_sum {α β : Type*} [DecidableEq β] (s : Finset α)
-    (t : α → Finset β) (f : β → ℝ) (hf : ∀ x, 0 ≤ f x) :
-    ∑ x ∈ s.biUnion t, f x ≤ ∑ a ∈ s, ∑ x ∈ t a, f x := by
-  classical
-  refine Finset.induction_on s ?base ?step
-  · simp
-  · intro a s ha ih
-    rw [Finset.biUnion_insert]
-    apply (sum_union_le_sum_add_sum (t a) (s.biUnion t) f hf).trans
-    apply (add_le_add_right ih _).trans_eq
-    rw [Finset.sum_insert ha]
-
-lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
+/-- The sum of `δ ^ |A' + B'|` over the proper progressions `P` of dimension `1 ≤ d ≤ k` with at
+most `s` points in `ZMod q` and over the pairs `(A', B')` in `bltDimSmallWitnessPairs` of the
+preimage of `P` under `ψ`. For each `d` it is at most the number of progressions times
+`((m + 1) * (s + 1) ^ m) ^ 2 * exp (-(1 - 3 * ε γ) * d * k * log (1 / δ))`, where
+`m = ⌈lowerBltConstant C γ * √k⌉₊`. -/
+theorem dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
     (hqpos : 0 < q) (hψinj : Set.InjOn ψ (interval n : Set ℕ))
     {C γ : ℝ} {δ : unitInterval} (hC : 0 < 2 * C) (hε : 0 < ε γ)
     (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
     ∑ P ∈ (by
         classical
-        exact (Finset.Icc 1 k).biUnion (fun d => properGAPsZModOfDim d s hqpos) :
-        Finset (ProperGAP (ZMod q))),
+        exact (Finset.Icc 1 k).biUnion (fun d ↦ properGAPsZModOfDim d s hqpos) :
+        Finset (GAP (ZMod q))),
         ∑ p ∈ bltDimSmallWitnessPairs (zmodGAPPreimageContainer n ψ P) P.dim k C γ,
-          (δ : ℝ) ^ (p.1 + p.2).card ≤
+          (δ : ℝ) ^ #(p.1 + p.2) ≤
       ∑ d ∈ Finset.Icc 1 k,
-        ((properGAPsZModOfDim d s hqpos).card : ℝ) *
+        (#(properGAPsZModOfDim d s hqpos) : ℝ) *
           (((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
               (s + 1) ^
                 ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ) *
@@ -165,54 +116,19 @@ lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
                 ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
           Real.exp (-((1 - 3 * ε γ) * (d : ℝ) * (k : ℝ)) * Real.log (1 / δ)) := by
   classical
-  refine (sum_biUnion_le_sum (Finset.Icc 1 k)
-    (fun d => properGAPsZModOfDim d s hqpos)
-    (fun P => ∑ p ∈ bltDimSmallWitnessPairs
-      (zmodGAPPreimageContainer n ψ P) P.dim k C γ,
-        (δ : ℝ) ^ (p.1 + p.2).card)
-    ?_).trans ?_
-  · intro P
-    apply Finset.sum_nonneg'
-    intro p
-    exact pow_nonneg (unitInterval.nonneg δ) (p.1 + p.2).card
-  apply Finset.sum_le_sum
-  intro d _hd
-  refine (Finset.sum_le_sum (s := properGAPsZModOfDim d s hqpos)
-    (f := fun P => ∑ p ∈ bltDimSmallWitnessPairs
-      (zmodGAPPreimageContainer n ψ P) P.dim k C γ,
-        (δ : ℝ) ^ (p.1 + p.2).card)
-    (g := fun _ =>
-      (((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
-          (s + 1) ^
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ) *
-        ((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
-          (s + 1) ^
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
-        Real.exp (-((1 - 3 * ε γ) * (d : ℝ) * (k : ℝ)) * Real.log (1 / δ))) ?_).trans_eq ?_
-  · intro P hP
-    apply (bltDimSmallWitnessPairs_probability_sum_le
-      (zmodGAPPreimageContainer n ψ P) P.dim k C γ hC hε hδ_pos hδ_lt).trans
-    rw [((mem_properGAPsZModOfDim hqpos).1 hP).1]
-    have hbase :
-        (natCastImage (zmodGAPPreimageContainer n ψ P)).card + 1 ≤ s + 1 := by
-      rw [natCastImage_card]
-      exact Nat.succ_le_succ
-        ((zmodGAPPreimageContainer_card_le_carrier P hψinj).trans
-          ((mem_properGAPsZModOfDim hqpos).1 hP).2)
-    apply mul_le_mul_of_nonneg_right
-    · exact_mod_cast Nat.mul_le_mul
-        (Nat.mul_le_mul_left
-          (⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1)
-          (Nat.pow_le_pow_left hbase
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊))
-        (Nat.mul_le_mul_left
-          (⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1)
-          (Nat.pow_le_pow_left hbase
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊))
-    · positivity
-  · rw [Finset.sum_const, nsmul_eq_mul]
-    ring
-
+  rw [sum_biUnion]
+  · refine sum_le_sum fun d _ ↦ ?_
+    rw [mul_assoc, ← nsmul_eq_mul]
+    refine sum_le_card_nsmul _ _ _ fun P hP ↦ ?_
+    obtain ⟨-, rfl, hPs⟩ := (mem_properGAPsZModOfDim hqpos).1 hP
+    have hcard := (zmodGAPPreimageContainer_card_le_carrier P hψinj).trans hPs
+    refine (sum_bltDimSmallWitnessPairs_pow_le _ _ k C γ hC hε hδ_pos hδ_lt).trans ?_
+    rw [natCastImage_card]
+    gcongr
+  · intro d _ d' _ hdd'
+    exact disjoint_left.2 fun P hP hP' ↦ hdd' <|
+      ((mem_properGAPsZModOfDim hqpos).1 hP).2.1.symm.trans
+        ((mem_properGAPsZModOfDim hqpos).1 hP').2.1
 
 end
 
