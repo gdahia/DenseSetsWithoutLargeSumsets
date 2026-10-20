@@ -90,7 +90,8 @@ private lemma le_phi_of_le_log_div_log_add_one {γ c θ : ℝ} {n k : ℕ} {δ :
   rw [exp_sub, exp_log hn, exp_log (one_div_pos.2 hδ₀), div_div_eq_mul_div, div_one, ← mul_assoc,
     mul_right_comm] at h₂
   have hkn : (k : ℝ) ≤ n := by
-    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul hθ₁ δ.2.2 hδ₀.le zero_le_one) hn.le]
+    nlinarith [mul_le_mul_of_nonneg_right
+      (mul_le_mul hθ₁ (unitInterval.le_one δ) hδ₀.le zero_le_one) hn.le]
   exact le_phi fun S hS hcard ↦
     pairEvent_of_mul_log_le hk (mod_cast hkn) hδ₀ hθ.le h₁ h₂ hS hcard
 
@@ -100,7 +101,6 @@ lemma eventually_forall_ceil_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) 
     ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-(γ / 4)) ≤ δ → (δ : ℝ) ≤ 1 - c →
       ⌈(1 - γ) * log n / log (1 / δ)⌉₊ ≤ phi δ n := by
   have hℓ₀ := log_one_div_pos (sub_pos.2 hc) (sub_lt_self 1 hc₀)
-  have hθ : 0 < min 1 (γ * log (1 / (1 - c)) / 12) := lt_min one_pos (by positivity)
   filter_upwards [tendsto_natCast_atTop_atTop.eventually (tendsto_log_atTop.eventually_ge_atTop 1),
     tendsto_natCast_atTop_atTop.eventually (tendsto_log_atTop.eventually_ge_atTop
       ((3 - 2 * log (min 1 (γ * log (1 / (1 - c)) / 12))) / (γ / 2))),
@@ -109,7 +109,7 @@ lemma eventually_forall_ceil_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) 
     with n h₁ h₂ h₃ δ hδ hδ'
   rcases Nat.eq_zero_or_pos ⌈(1 - γ) * log n / log (1 / (δ : ℝ))⌉₊ with h₀ | hk
   · exact h₀ ▸ Nat.zero_le _
-  · exact le_phi_of_le_log_div_log_add_one hc₀ hc hθ (min_le_left _ _)
+  · exact le_phi_of_le_log_div_log_add_one hc₀ hc (lt_min one_pos (by positivity)) (min_le_left _ _)
       ((div_le_iff₀ hℓ₀).2 ((min_le_right _ _).trans_eq (by ring)))
       h₁ ((div_le_iff₀' (half_pos hγ)).1 h₂) h₃ hδ hδ' hk
       (Nat.ceil_lt_add_one (Nat.ceil_pos.1 hk).le).le
@@ -117,7 +117,7 @@ lemma eventually_forall_ceil_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) 
 /-- The lower bound of Hernández and Hetzel in the uniform form of Corollary 1.2 of *Dense sets
 without large sumsets*: for `γ > 0` and `0 < c < 1`, for all large `n` and every `δ` with
 `n ^ (-(γ / 4)) ≤ δ ≤ 1 - c`, we have `(1 - γ) * log n / log (1 / δ) ≤ φ(δ, n)`. -/
-theorem eventually_forall_log_div_log_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) (hc : c < 1) :
+lemma eventually_forall_log_div_log_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) (hc : c < 1) :
     ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-(γ / 4)) ≤ δ → (δ : ℝ) ≤ 1 - c →
       (1 - γ) * log n / log (1 / δ) ≤ phi δ n := by
   filter_upwards [eventually_forall_ceil_le_phi hγ hc₀ hc] with n hn δ hδ hδ'

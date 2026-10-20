@@ -85,11 +85,10 @@ lemma card_large_subset_union_add_union_le_κ_mul_card
     (hXlower : (k : ℝ) / 2 ≤ (#(A₀ ∪ B₀) : ℝ))
     (hC_one : 1 ≤ C) :
     (#((A₀ ∪ B₀) + (A₀ ∪ B₀)) : ℝ) ≤ κ C * (#(A₀ ∪ B₀) : ℝ) := by
-  have hsub : #((A₀ ∪ B₀) + (A₀ ∪ B₀)) ≤ #((A ∪ B) + (A ∪ B)) :=
-    card_le_card (add_subset_add (union_subset_union hA₀A hB₀B) (union_subset_union hA₀A hB₀B))
   rw [κ]
   linarith [card_union_add_union_le_three_mul hAcard hBcard hAB hC_one,
-    (Nat.cast_le (α := ℝ)).2 hsub, mul_le_mul_of_nonneg_left hXlower (sq_nonneg C)]
+    (Nat.cast_le (α := ℝ)).2 (card_le_card (add_subset_add (union_subset_union hA₀A hB₀B)
+      (union_subset_union hA₀A hB₀B))), mul_le_mul_of_nonneg_left hXlower (sq_nonneg C)]
 
 /-- Let `A` and `B` be nonempty with `|B| ≤ |A|` and `freimanDim (A ∪ B) = r ≥ 1`. If
 `r ≤ ε * k` and `|A|, |B| ≥ (1 - ε) * k`, then `|A + B| ≥ (1 - 2 * ε) * r * k`. -/

@@ -69,7 +69,7 @@ lemma card_edgeFinset_bipartiteGraphOfRel [Fintype V] [Fintype W]
     (r : V → W → Prop) [DecidableRel r] :
     #(bipartiteGraphOfRel r).edgeFinset = #{p ∈ (univ : Finset (V × W)) | r p.1 p.2} := by
   symm
-  apply card_bij (fun p _ ↦ s(.inl p.1, .inr p.2)) (fun _ h ↦ by simpa using h) (by grind)
+  apply card_bij (fun (a, b) _ ↦ s(.inl a, .inr b)) (fun _ h ↦ by simpa using h) (by grind)
   intro e he
   induction e with | _ v w
   rw [mem_edgeFinset, mem_edgeSet] at he
@@ -115,7 +115,7 @@ lemma exists_forall_rel_of_isCompleteBetween {r : V → W → Prop} {left right 
 
 /-- A relation `r : V → W → Prop` that holds for more than `zarankiewicz |V| |W| k k` pairs holds
 on all of `A × B` for some `A ⊆ V` and `B ⊆ W` of size `k`. -/
-theorem exists_forall_rel_of_zarankiewicz_lt [Fintype V] [Fintype W]
+lemma exists_forall_rel_of_zarankiewicz_lt [Fintype V] [Fintype W]
     (r : V → W → Prop) [DecidableRel r] {k : ℕ}
     (hz : zarankiewicz (card V) (card W) k k < #{p ∈ (univ : Finset (V × W)) | r p.1 p.2}) :
     ∃ (A : Finset V) (B : Finset W), #A = k ∧ #B = k ∧ ∀ a ∈ A, ∀ b ∈ B, r a b := by

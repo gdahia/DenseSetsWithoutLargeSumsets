@@ -2,12 +2,12 @@
   "challenge_module": "Challenge",
   "solution_module": "Solution",
   "theorem_names": [
-    "DenseSetsWithoutLargeSumsets.exists_dense_subset_forall_add_not_subset",
-    "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc",
-    "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log",
-    "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_le_three_div_log_one_div",
-    "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos",
-    "DenseSetsWithoutLargeSumsets.tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero"
+    "DenseSetsWithoutLargeSumsets.exists_dense_subset_forall_add_not_subset'",
+    "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc'",
+    "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log'",
+    "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_le_three_div_log_one_div'",
+    "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos'",
+    "DenseSetsWithoutLargeSumsets.tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero'"
   ],
   "definition_names": [],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],

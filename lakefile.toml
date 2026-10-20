@@ -13,12 +13,13 @@ maxSynthPendingDepth = 3
 [[require]]
 name = "CountingSetsWithSmallSumset"
 git = "https://github.com/gdahia/CountingSetsWithSmallSumset"
-rev = "437527593f16a5f9e1b05336d36c8e09c6dadeb8"
+rev = "5dc9e2fc3947d35dd3701ffc417462033c759699"
 
 # Source of Chang's theorem in `ZMod q`. It brings in APAP and Tau Ceti.
 [[require]]
 name = "ChangFreimanRuzsa"
-path = "../ChangFreimanRuzsa"
+git = "https://github.com/gdahia/ChangFreimanRuzsa"
+rev = "6f9048bf2bc94d071eaa881835d7893932e5fd37"
 
 # Source of Theorem 2 of Bollobás, Leader and Tiba.
 [[require]]
@@ -29,13 +30,14 @@ rev = "b00aa43ebcae410e563db9024da1df0a8c074774"
 # Source of Ruzsa's lower bound for sumsets in several dimensions.
 [[require]]
 name = "SumOfSetsInSeveralDimensions"
-path = "../SumOfSetsInSeveralDimensions"
+git = "https://github.com/gdahia/SumOfSetsInSeveralDimensions"
+rev = "1f8da867debcce675e07cac515ea9598c1245a92"
 
 # Last, so that its pins of the shared dependencies take precedence on `lake update`.
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "v4.35.0-rc4"
+rev = "v4.35.0"
 
 # The proof development; `Solution.lean` imports it.
 [[lean_lib]]

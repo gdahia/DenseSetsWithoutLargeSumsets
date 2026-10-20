@@ -8,7 +8,9 @@ module
 public import DenseSetsWithoutLargeSumsets.Common
 import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.SumsetFromZarankiewicz
 import DenseSetsWithoutLargeSumsets.Mathlib.Combinatorics.SimpleGraph.Extremal.KovariSosTuran
+import Mathlib.Algebra.Order.Algebra
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Dense subsets of `[n]` contain large sumsets
@@ -57,7 +59,7 @@ lemma exists_pairEvent_of_kovariSosTuran {n m k : ℕ} (hk : 1 ≤ k) (hmn : m �
 /-- Let `S ⊆ [n]` with `|S| ≥ δ n` and let `0 < m ≤ n`. If
 `(k - 1) ^ (1 / k) * (1 + m / n) * m ^ (-1 / k) + k / n < δ`, then `S` contains a sumset `A + B`
 with `A, B ⊆ [n]` and `|A|, |B| ≥ k`. -/
-theorem pairEvent_of_lt_density {n m k : ℕ} {δ : ℝ} {S : Finset ℕ} (hk : 1 ≤ k) (hm : 0 < m)
+lemma pairEvent_of_lt_density {n m k : ℕ} {δ : ℝ} {S : Finset ℕ} (hk : 1 ≤ k) (hm : 0 < m)
     (hmn : m ≤ n) (hS : S ⊆ interval n) (hcard : δ * n ≤ #S)
     (hδ : ((k : ℝ) - 1) ^ (k : ℝ)⁻¹ * (1 + (m : ℝ) / n) * (m : ℝ) ^ (-(k : ℝ)⁻¹) + (k : ℝ) / n
       < δ) :
@@ -99,25 +101,22 @@ private lemma exp_mul_exp_mul_exp_add_div_lt {K N δ t : ℝ} (hK : 1 ≤ K) (hN
     (ht : 0 ≤ t) (hlog : K * (log (1 / δ) + t) + 2 * log K + 2 ≤ log N)
     (hKδ : K * (1 + t) < t * δ * N) :
     exp (log K / K) * exp (2 / K) * exp (-(log N - log K) / K) + K / N < δ := by
-  have hK0 : 0 < K := by linarith
   rw [one_div, log_inv] at hlog
   have h₁ : exp (log K / K) * exp (2 / K) * exp (-(log N - log K) / K) ≤ δ / (1 + t) := by
     rw [← exp_add, ← exp_add, ← add_div, ← add_div, ← exp_log hδ]
     refine le_trans ?_ (div_le_div_of_nonneg_left (exp_pos _).le (by positivity)
       (add_comm 1 t ▸ add_one_le_exp t))
-    rw [← exp_sub, exp_le_exp, div_le_iff₀ hK0]
+    rw [← exp_sub, exp_le_exp, div_le_iff₀ (by linarith : 0 < K)]
     linarith
   have h₂ : K / N < δ * t / (1 + t) := by
     rw [div_lt_div_iff₀ hN (by positivity)]
     linarith
-  have h₃ : δ / (1 + t) + δ * t / (1 + t) = δ := by
-    field_simp
-  linarith
+  linarith [(by field_simp : δ / (1 + t) + δ * t / (1 + t) = δ)]
 
 /-- Let `S ⊆ [n]` with `|S| ≥ δ n`, let `1 ≤ k ≤ n` and let `t ≥ 0`. If
 `k * (log (1 / δ) + t) + 2 * log k + 2 ≤ log n` and `k * (1 + t) < t * δ * n`, then `S` contains a
 sumset `A + B` with `A, B ⊆ [n]` and `|A|, |B| ≥ k`. -/
-theorem pairEvent_of_mul_log_le {n k : ℕ} {δ t : ℝ} {S : Finset ℕ} (hk : 1 ≤ k) (hkn : k ≤ n)
+lemma pairEvent_of_mul_log_le {n k : ℕ} {δ t : ℝ} {S : Finset ℕ} (hk : 1 ≤ k) (hkn : k ≤ n)
     (hδ : 0 < δ) (ht : 0 ≤ t)
     (hlog : k * (log (1 / δ) + t) + 2 * log k + 2 ≤ log n) (hkδ : k * (1 + t) < t * δ * n)
     (hS : S ⊆ interval n) (hcard : δ * n ≤ #S) :
@@ -136,7 +135,7 @@ theorem pairEvent_of_mul_log_le {n k : ℕ} {δ t : ℝ} {S : Finset ℕ} (hk : 
 
 /-- For fixed `k ≥ 1` and `α < 1 / k`, if `n` is large then every `S ⊆ [n]` with
 `|S| ≥ n ^ (1 - α)` contains a sumset `A + B` with `A, B ⊆ [n]` and `|A|, |B| ≥ k`. -/
-theorem eventually_pairEvent_of_rpow_le_card {k : ℕ} {α : ℝ} (hk : 1 ≤ k) (hα : α < (k : ℝ)⁻¹) :
+lemma eventually_pairEvent_of_rpow_le_card {k : ℕ} {α : ℝ} (hk : 1 ≤ k) (hα : α < (k : ℝ)⁻¹) :
     ∀ᶠ n : ℕ in atTop, ∀ S : Finset ℕ, S ⊆ interval n → (n : ℝ) ^ (1 - α) ≤ #S →
       pairEvent n k S := by
   have hK : (1 : ℝ) ≤ k := mod_cast hk
@@ -156,7 +155,7 @@ theorem eventually_pairEvent_of_rpow_le_card {k : ℕ} {α : ℝ} (hk : 1 ≤ k)
   · rw [one_div, log_inv, log_rpow hn]
     linarith
   · rw [one_mul, ← rpow_add_one hn.ne', neg_add_eq_sub]
-    linarith [hpow]
+    linarith
   · rwa [← rpow_add_one hn.ne', neg_add_eq_sub]
 
 end DenseSetsWithoutLargeSumsets

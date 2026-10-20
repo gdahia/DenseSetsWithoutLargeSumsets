@@ -92,12 +92,14 @@ private lemma measureReal_moderateSumsetEvent_le_sum (n k : ℕ) (C : ℝ) (δ :
     ((measureReal_biUnion_finset_le _ _).trans ?_)
   gcongr with m
   refine (measureReal_biUnion_finset_le _ _).trans
-    ((sum_le_card_nsmul _ _ ((δ : ℝ) ^ m) fun Y hY ↦ ?_).trans ?_)
-  · rw [← (mem_filter.1 hY).2]
+    ((sum_le_card_nsmul _ _ ((δ : ℝ) ^ m) ?_).trans ?_)
+  · intro Y hY
+    obtain ⟨-, hYm⟩ := mem_filter.1 hY
+    rw [← hYm]
     exact binomialFinsetSubset_real_superset_nat δ (Set.finite_Icc 1 n)
   rw [nsmul_eq_mul, Set.ncard_eq_toFinset_card _ (finite_pairSumsetsFamily n k m)]
   gcongr
-  · exact pow_nonneg δ.2.1 m
+  · exact pow_nonneg (unitInterval.nonneg δ) m
   · exact filter_subset _ _
 
 private lemma measureReal_moderateSumsetEvent_le {n k : ℕ} {C B : ℝ} {δ : unitInterval}
@@ -317,7 +319,7 @@ lemma pairCardThreshold_ge_two_of_density_lower {τ α : ℝ} {n : ℕ}
 `C = moderateSumsetGapConstant γ c`. The random subset of `[n]` of density `δ` contains a sumset
 `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and `C * k < |A + B| < k * (k + 1) / 2` with
 probability at most `2 * k ^ 2 / n ^ (γ * C / 2)`. -/
-theorem moderate_sumset_probability_le
+lemma moderate_sumset_probability_le
     {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 2) (hc_pos : 0 < c)
     {n : ℕ} (hn_two : 2 ≤ n)
     {δ : unitInterval}
@@ -341,7 +343,8 @@ theorem moderate_sumset_probability_le
     hn_two hδ_pos hδ_upper
   have hQ := densityCoefficient_gt_one (τ := 2 + γ) (by linarith) hc_pos hc_lt
   rw [div_eq_mul_inv, ← Real.rpow_neg hn₀.le]
-  refine measureReal_moderateSumsetEvent_le (by positivity) fun m hm ↦ ?_
+  refine measureReal_moderateSumsetEvent_le (by positivity) ?_
+  intro m hm
   have hδ := unitInterval_pow_le_exp_div_mul_log n m (2 + γ) δ hδ_pos hδ_lt hn_two hk
   obtain hm_small | hm_large := le_or_gt (m : ℝ) ((k : ℝ) ^ (1 + moderateSumsetAuxExponent))
   · exact ncard_mul_pow_le_of_le_rpow hγ_pos hγ_le hc_pos hc_lt hn_two hk hδ hkL hk_large hm

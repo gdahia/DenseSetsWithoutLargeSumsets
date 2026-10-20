@@ -5,7 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
-public import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.CoreAndCovers
+public import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.CoreParameters
 public import DenseSetsWithoutLargeSumsets.Common
 import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.ClassCountBounds
 import SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds
@@ -146,7 +146,8 @@ private lemma ncard_le_sum_ncard_mul_choose {𝒴 : Set (Finset ℕ)} {𝒳 : �
       add_mem_subsetPairSums hA hB ((hfin _).mem_toFinset.2 hX)⟩
     grind [card_union_le]
   rw [Set.ncard_coe_finset]
-  refine card_biUnion_le.trans (sum_le_sum fun t _ ↦ ?_)
+  refine card_biUnion_le.trans (sum_le_sum ?_)
+  intro t _
   rw [Set.ncard_eq_toFinset_card _ (hfin t), mul_assoc]
   exact card_subsetPairSums_le fun X hX ↦ (h𝒳 t X ((hfin t).mem_toFinset.1 hX)).2
 
@@ -294,7 +295,7 @@ private lemma ncard_boundedFreimanDimSets_mul_choose_sq_le {n r k t : ℕ} (hk :
 
 /-- If `m < k * (k + 1) / 2`, then the number of sets `A + B` with `A, B ⊆ [n]`,
 `|A| = |B| = k` and `|A + B| ≤ m` is at most `n ^ (2 * m / k + 1) * k ^ (24 * k)`. -/
-theorem pairSumsetsFamily_ncard_le (n k m : ℕ) (hm : m < k * (k + 1) / 2) :
+lemma pairSumsetsFamily_ncard_le (n k m : ℕ) (hm : m < k * (k + 1) / 2) :
     ((pairSumsetsFamily n k m).ncard : ℝ) ≤
         (n : ℝ) ^ (2 * (m : ℝ) / (k : ℝ) + 1) * (k : ℝ) ^ (24 * k) := by
   by_cases h : n < k ∨ m < k
@@ -333,7 +334,7 @@ private lemma ncard_smallSumsetFreimanDimSets_mul_choose_sq_le {n k m t : ℕ} {
 /-- If `m < k * (k + 1) / 2`, `k` is large and `m ≤ k ^ (1 + c)` with `c ≤ 2⁻⁸`, then the number
 of sets `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and `|A + B| ≤ m` is at most
 `n ^ (2 * m / k + 1) * (6 * e * m / k) ^ (6 * k) * exp (k ^ (1 - 2 * c))`. -/
-theorem pairSumsetsFamily_ncard_le_of_small_sumset (n k m : ℕ) (c : ℝ)
+lemma pairSumsetsFamily_ncard_le_of_small_sumset (n k m : ℕ) (c : ℝ)
     (hm : m < k * (k + 1) / 2)
     (hc_le : c ≤ 1 / (2 : ℝ) ^ (8 : ℕ))
     (hk_threshold : smallSumsetClassCountThreshold ≤ k)

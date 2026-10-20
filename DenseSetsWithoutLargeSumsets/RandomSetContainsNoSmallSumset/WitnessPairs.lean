@@ -5,6 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ProperGAP
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.Constants
 
 /-!
@@ -64,10 +65,13 @@ lemma natCastImage_filter_mem_eq_of_subset {A : Finset ℕ} {T : Finset ℤ}
     (hT : T ⊆ natCastImage A) :
     natCastImage (A.filter fun a ↦ (a : ℤ) ∈ T) = T := by
   ext z
-  refine ⟨fun hz ↦ ?_, fun hz ↦ ?_⟩
-  · obtain ⟨a, ha, rfl⟩ := mem_image.1 hz
-    exact (mem_filter.1 ha).2
-  · obtain ⟨a, ha, rfl⟩ := mem_image.1 (hT hz)
+  constructor
+  · intro hz
+    obtain ⟨a, ha, rfl⟩ := mem_image.1 hz
+    obtain ⟨-, haT⟩ := mem_filter.1 ha
+    exact haT
+  · intro hz
+    obtain ⟨a, ha, rfl⟩ := mem_image.1 (hT hz)
     exact mem_image.2 ⟨a, mem_filter.2 ⟨ha, hz⟩, rfl⟩
 
 lemma natCastImage_add_subset {A B S : Finset ℕ} {A' B' : Finset ℤ}
@@ -115,10 +119,11 @@ private lemma card_powerset_filter_card_le {α : Type*} (U : Finset α) (M : ℕ
   classical
   have hsub : (U.powerset.filter fun A ↦ #A ≤ M) ⊆ (range (M + 1)).biUnion U.powersetCard := by
     intro A hA
-    rw [mem_filter, mem_powerset] at hA
-    exact mem_biUnion.2 ⟨#A, by grind, mem_powersetCard.2 ⟨hA.1, rfl⟩⟩
+    obtain ⟨hAU, hAM⟩ := mem_filter.1 hA
+    exact mem_biUnion.2 ⟨#A, by grind, mem_powersetCard.2 ⟨mem_powerset.1 hAU, rfl⟩⟩
   refine (card_le_card hsub).trans (card_biUnion_le.trans ?_)
-  refine (sum_le_sum (g := fun _ ↦ (#U + 1) ^ M) fun i hi ↦ ?_).trans_eq (by simp)
+  refine (sum_le_sum (g := fun _ ↦ (#U + 1) ^ M) ?_).trans_eq (by simp)
+  intro i hi
   rw [card_powersetCard]
   exact (Nat.choose_le_pow _ _).trans ((Nat.pow_le_pow_left (Nat.le_succ _) i).trans
     (Nat.pow_le_pow_right (Nat.succ_pos _) (mem_range_succ_iff.1 hi)))

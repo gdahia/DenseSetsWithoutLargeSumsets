@@ -78,7 +78,7 @@ abbrev zmodModelEmbedding {γ C : ℝ} {n : ℕ}
 
 /-- The map `zmodModelEmbedding` is a Freiman isomorphism of order `2` from `[n]` onto its
 image. -/
-theorem zmodModelEmbedding_iso {γ C : ℝ} {n : ℕ} (hγ_pos : 0 < γ) (C_pos : 0 < C)
+lemma zmodModelEmbedding_iso {γ C : ℝ} {n : ℕ} (hγ_pos : 0 < γ) (C_pos : 0 < C)
     (hn : lowerSizeThreshold C γ < n) :
     IsAddFreimanIso 2 (interval n) (zmodModelEmbedding hγ_pos C_pos hn '' (interval n))
       (zmodModelEmbedding hγ_pos C_pos hn) :=

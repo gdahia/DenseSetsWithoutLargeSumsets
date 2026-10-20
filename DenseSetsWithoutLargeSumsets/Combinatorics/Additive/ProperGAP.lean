@@ -7,7 +7,6 @@ module
 
 public import ChangFreimanRuzsa.GapToolkit
 public import Mathlib.Basic.Real.Basic
-public import Mathlib.Data.ZMod.Defs
 import Mathlib.Algebra.Order.Archimedean.Real.Basic
 import Mathlib.Algebra.Order.BigOperators.GroupWithZero.Finset
 import Mathlib.Data.Set.Card

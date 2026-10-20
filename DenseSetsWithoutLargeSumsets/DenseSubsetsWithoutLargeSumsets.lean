@@ -10,7 +10,6 @@ public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Probabi
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.Constants
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
-import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 /-!
 # Dense subsets of `[n]` without large sumsets
@@ -37,6 +36,8 @@ contains no sumset `A + B` with `|A|, |B| ≥ k`.
 * `eventually_forall_exists_dense_subset_without_large_sumsets`: Theorem 1.1, for all large `n` and
   every `δ` with `n ^ (-α) < δ ≤ 1 - c`.
 * `dense_subset_without_large_sumsets`: Theorem 1.1 along a sequence of densities.
+* `exists_dense_subset_forall_add_not_subset`: Theorem 1.1 with the exponent `α` quantified, as
+  stated in `Challenge.lean`.
 -/
 
 @[expose] public section
@@ -182,9 +183,10 @@ lemma exists_dense_set_of_pair_probability_lt_quarter {n k : ℕ} {δ : unitInte
     existsDenseSetWithoutLargeSumsets n k δ := by
   by_contra h
   refine hprob.not_ge ((binomialFinsetSubset_real_dense_event_ge_quarter n δ hmean).trans
-    (measureReal_mono fun S hS ↦ ?_))
+    (measureReal_mono ?_))
+  rintro S ⟨hSn, hScard⟩
   by_contra hpair
-  exact h ⟨S, hS.1, hS.2, hpair⟩
+  exact h ⟨S, hSn, hScard, hpair⟩
 
 /-- The exponent `α` of Theorems 1.1 and 1.3. The densities considered are those larger than
 `n ^ (-α)`. -/
@@ -280,6 +282,23 @@ theorem dense_subset_without_large_sumsets {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_
           A + B ⊆ S := by
   filter_upwards [eventually_forall_exists_dense_subset_without_large_sumsets hγ_pos hγ_le hc_pos
     hc_lt, hδ_lower, hδ_upper] with n hmain h₁ h₂ using hmain (δ n) h₁ h₂
+
+/-- **Dense sets without large sumsets** (Theorem 1.1). For every $0 < \gamma \le 1$ and
+$0 < c < 1$ there is $\alpha > 0$ such that, for all large $n$ and every
+$n^{-\alpha} < \delta \le 1 - c$, some $S \subseteq [n]$ with $|S| \ge \delta n$ contains no sumset
+$A + B$ with $A, B \subseteq [n]$ and $|A|, |B| \ge (3 + \gamma) \log n / \log(1 / \delta)$. -/
+theorem exists_dense_subset_forall_add_not_subset {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
+    (hc : 0 < c) (hc' : c < 1) :
+    ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : ℝ, (n : ℝ) ^ (-α) < δ → δ ≤ 1 - c →
+      ∃ S ⊆ Finset.Icc 1 n, δ * n ≤ #S ∧ ∀ A ⊆ Finset.Icc 1 n, ∀ B ⊆ Finset.Icc 1 n,
+        ⌈(3 + γ) * log n / log (1 / δ)⌉₊ ≤ #A → ⌈(3 + γ) * log n / log (1 / δ)⌉₊ ≤ #B →
+          ¬ A + B ⊆ S := by
+  refine ⟨denseSubsetDensityExponent γ c, denseSubsetDensityExponent_pos hγ hc hc', ?_⟩
+  filter_upwards [eventually_forall_exists_dense_subset_without_large_sumsets hγ hγ' hc hc']
+    with n hn δ hδ hδ'
+  obtain ⟨S, hS, hcard, hfree⟩ :=
+    hn ⟨δ, (rpow_nonneg n.cast_nonneg _).trans hδ.le, by linarith⟩ hδ hδ'
+  exact ⟨S, hS, hcard, fun A hA B hB hA' hB' hAB ↦ hfree ⟨A, B, hA, hB, hA', hB', hAB⟩⟩
 
 end
 

@@ -5,10 +5,10 @@ Authors: Mitchell Horner
 -/
 module
 
-public import Mathlib.Analysis.SpecialFunctions.Pochhammer
 public import Mathlib.Analysis.SpecialFunctions.Pow.Real
 public import Mathlib.Combinatorics.SimpleGraph.Extremal.Zarankiewicz
 import DenseSetsWithoutLargeSumsets.Mathlib.Combinatorics.SimpleGraph.Bipartite
+import Mathlib.Analysis.SpecialFunctions.Pochhammer
 
 /-!
 # The Kővári-Sós-Turán theorem
@@ -17,9 +17,10 @@ This file proves the **Kővári-Sós-Turán theorem** for the Zarankiewicz funct
 
 It is a copy of `Mathlib/Combinatorics/SimpleGraph/Extremal/KovariSosTuran.lean` from the Mathlib
 pull request [#25841](https://github.com/leanprover-community/mathlib4/pull/25841) of Mitchell
-Horner, at commit `1ed83fcfe430778431dfa20c92663db040a98772`. The only change is the import of the
-lemmas that the pull request adds to `Mathlib/Combinatorics/SimpleGraph/Bipartite.lean`. Delete
-this file when Mathlib has the theorem.
+Horner, at commit `1ed83fcfe430778431dfa20c92663db040a98772`. The only changes are the import of
+the lemmas that the pull request adds to `Mathlib/Combinatorics/SimpleGraph/Bipartite.lean` and a
+private import of `Mathlib.Analysis.SpecialFunctions.Pochhammer`. Delete this file when Mathlib
+has the theorem.
 
 ## Main definitions
 

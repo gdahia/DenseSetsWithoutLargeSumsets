@@ -44,9 +44,8 @@ private lemma one_le_dim_of_subset_zmodGAPPreimageContainer {γ : ℝ} {n q k : 
   by_contra! hdim
   have h := (card_le_card hA₀P).trans (zmodGAPPreimageContainer_card_le_carrier P hψ)
   rw [card_carrier_eq_one_of_dim_eq_zero P (by grind), ← Nat.cast_le (α := ℝ), Nat.cast_one] at h
-  have hk₂ : (2 : ℝ) ≤ k := mod_cast hk
   have hε := ε_le_one_twelfth hγ_pos hγ_le
-  linarith [mul_le_mul_of_nonneg_left hk₂ (by linarith : 0 ≤ 1 - ε γ)]
+  linarith [mul_le_mul_of_nonneg_left (Nat.ofNat_le_cast (α := ℝ).2 hk) (by linarith : 0 ≤ 1 - ε γ)]
 
 private lemma mem_bltDimSmallWitnessPairs_of_le {Q : Finset ℕ} {A' B' : Finset ℤ} {D k : ℕ}
     {C γ : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ) (hA'Q : A' ⊆ natCastImage Q)
@@ -64,15 +63,15 @@ private lemma one_sub_mul_le_of_min_le {e C k N a b M : ℝ} (he : e ≤ 1 / 2) 
     (1 - e) * N ≤ M := by
   have he₁ : 0 ≤ 1 - e := by linarith
   have h₁ := mul_le_mul_of_nonneg_left hN he₁
-  have h₂ := mul_le_mul_of_nonneg_left ha hC.le
-  have h₃ := mul_le_mul_of_nonneg_left hb hC.le
-  have h₄ := mul_nonneg hC.le (mul_nonneg he₁ hk)
-  exact (le_min (le_min le_rfl (by linarith)) (by linarith)).trans hmin
+  have h₂ := mul_nonneg hC.le (mul_nonneg he₁ hk)
+  refine (le_min (le_min le_rfl ?_) ?_).trans hmin
+  · linarith [mul_le_mul_of_nonneg_left ha hC.le]
+  · linarith [mul_le_mul_of_nonneg_left hb hC.le]
 
 /-- Let `k = pairCardThreshold (3 + γ) n δ`. If `S` contains `A + B` for some `A, B ⊆ [n]` of size
 `k` with `|A + B| ≤ C * k`, then there are a progression `P` in `lowerModelGAPs` and a pair `p` in
 `bltDimSmallWitnessPairs` of the preimage of `P` such that `S` contains the sumset of `p`. -/
-theorem pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ C c : ℝ} {n : ℕ}
+lemma pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (C_pos : 0 < C)
     (hc_pos : 0 < c) (hc_lt : c < 1) (hn : lowerSizeThreshold C γ < n)
@@ -107,7 +106,7 @@ theorem pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ 
     largeSubsets_exists_zmodGAPPreimageContainer hγ_pos hγ_le C_pos hc_pos hc_lt hn hn_gap
       hδ_lower hδ_upper hδ_upper_c hAint hBint hAcard hBcard (bltLargePreimage_subset A A'')
       (bltLargePreimage_subset B B'') hA₀large hB₀large hAB
-  rw [mem_properGAPsZModUpToDim] at hP
+  obtain ⟨hPproper, hPdim_le, hPcard⟩ := (mem_properGAPsZModUpToDim _).1 hP
   have hdim₁ := one_le_dim_of_subset_zmodGAPPreimageContainer hγ_pos hγ_le
     (two_le_pairCardThreshold_of_one_le hγ_pos hC hn hδ_lower hδ_upper) hψ.bijOn.injOn hA₀P
     hA₀large
@@ -119,8 +118,8 @@ theorem pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ 
   rw [← natCastImage_card (A + B)] at hAB
   have hA''B'' := (Nat.cast_le (α := ℝ)).2
     (card_le_card (natCastImage_add_subset hA''A hB''B subset_rfl))
-  refine Set.mem_iUnion₂.2 ⟨P, mem_biUnion.2 ⟨P.dim, mem_Icc.2 ⟨hdim₁, hP.2.1⟩,
-    (mem_properGAPsZModOfDim _).2 ⟨hP.1, rfl, hP.2.2⟩⟩, ?_⟩
+  refine Set.mem_iUnion₂.2 ⟨P, mem_biUnion.2 ⟨P.dim, mem_Icc.2 ⟨hdim₁, hPdim_le⟩,
+    (mem_properGAPsZModOfDim _).2 ⟨hPproper, rfl, hPcard⟩⟩, ?_⟩
   refine Set.mem_iUnion₂.2 ⟨(A', B'), ?_,
     natCastImage_add_subset (hA'A''.trans hA''A) (hB'B''.trans hB''B) hABS⟩
   refine mem_bltDimSmallWitnessPairs_of_le (by positivity) (ε_pos hγ_pos) ?_ ?_ hA'card hB'card

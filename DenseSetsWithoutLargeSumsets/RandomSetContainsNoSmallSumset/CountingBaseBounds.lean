@@ -5,6 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ProperGAP
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.WitnessPairs
@@ -206,15 +207,14 @@ private lemma lower_counting_base_le {γ C c : ℝ} {n : ℕ} {δ : unitInterval
     3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ) ≤
       max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC_two hε * log n := by
   have hL := (lowerConstant_pos C γ hC_two hε).le
-  have hlog : 0 ≤ log (n : ℝ) := by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn]
   linarith [mul_le_mul_of_nonneg_left
       (pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower hδ_upper_c)
       (mul_nonneg zero_le_three hL),
     mul_le_mul_of_nonneg_right (le_max_right 42 (3 * densityCoefficient (3 + γ) c))
-      (mul_nonneg hL hlog)]
+      (mul_nonneg hL (log_natCast_nonneg n))]
 
 /-- The logarithm of the base `3 * L * k` is at most `ε γ * log n / 8`. -/
-theorem lower_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
+lemma lower_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C)
     (hc_pos : 0 < c) (hn : lowerSizeThreshold C γ < n)
@@ -231,7 +231,7 @@ theorem lower_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ
 
 /-- With `β = lowerBltConstant C γ`, the product `β * √k * log (3 * L * k)` is at most
 `ε γ * log n / 8`. -/
-theorem lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
+lemma lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
     (hc_pos : 0 < c) (hc_lt : c < 1) (hn : lowerSizeThreshold C γ < n)
@@ -242,7 +242,6 @@ theorem lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {
     lowerBltConstant C γ hC_two hε * √(pairCardThreshold (3 + γ) n δ : ℝ) *
         log (3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)) ≤
       ε γ * log (n : ℝ) / 8 := by
-  have hlogn : 0 ≤ log (n : ℝ) := by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn]
   have hβ : 0 ≤ lowerBltConstant C γ hC_two hε := zero_le_one.trans (one_le_lowerBltConstant _ _)
   have hk := sqrt_le_sqrt
     (pairCardThreshold_le_density_log_of_lower_density hγ_pos hc_pos hn hδ_lower hδ_upper_c)
@@ -255,8 +254,8 @@ theorem lower_c_sqrt_counting_base_log_le_epsilon_log_div_eight {γ C c : ℝ} {
   have h₂ := mul_le_mul_of_nonneg_right
     (lowerGapSqrtScale_log_bound hγ_pos hγ_le hC_two hε hc_pos hc_lt hn_gap)
     (sqrt_nonneg (log n))
-  rw [mul_self_sqrt hlogn, lowerGapSqrtScale, div_mul_eq_mul_div, div_mul_eq_mul_div,
-    div_le_iff₀ hε] at h₂
+  rw [mul_self_sqrt (log_natCast_nonneg n), lowerGapSqrtScale, div_mul_eq_mul_div,
+    div_mul_eq_mul_div, div_le_iff₀ hε] at h₂
   linarith
 
 end

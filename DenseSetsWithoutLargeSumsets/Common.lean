@@ -128,9 +128,9 @@ lemma pairCardThreshold_le_densityCoefficient_mul_log {τ c : ℝ} {n : ℕ}
       densityCoefficient τ c * Real.log (n : ℝ) := by
   have hc : (0 : ℝ) < 1 - c := hδ_pos.trans_le hδ_upper
   have hn : 0 ≤ τ * Real.log (n : ℝ) := mul_nonneg hτ_nonneg (Real.log_natCast_nonneg n)
-  have hδ := log_one_div_pos hδ_pos (by linarith)
   rw [pairCardThreshold, densityCoefficient, add_mul, div_mul_eq_mul_div]
-  refine (Nat.ceil_lt_add_one (div_nonneg hn hδ.le)).le.trans (add_le_add ?_ ?_)
+  refine (Nat.ceil_lt_add_one (div_nonneg hn (log_one_div_pos hδ_pos (by linarith)).le)).le.trans
+    (add_le_add ?_ ?_)
   · exact div_le_div_of_nonneg_left hn (log_one_div_pos hc (by linarith))
       (Real.log_le_log (one_div_pos.2 hc) (one_div_le_one_div_of_le hδ_pos hδ_upper))
   · rw [one_div_mul_eq_div, le_div_iff₀ (Real.log_pos one_lt_two), one_mul]

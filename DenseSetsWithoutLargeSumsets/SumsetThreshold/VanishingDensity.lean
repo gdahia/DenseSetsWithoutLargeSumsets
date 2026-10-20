@@ -5,9 +5,9 @@ Authors: Gabriel Dahia
 -/
 module
 
-public import DenseSetsWithoutLargeSumsets.SumsetThreshold.UpperBound
+public import DenseSetsWithoutLargeSumsets.SumsetThreshold.Basic
+import DenseSetsWithoutLargeSumsets.SumsetThreshold.UpperBound
 import Mathlib.Analysis.Complex.ExponentialBounds
-import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 /-!
 # `φ(δ_N, N)` for densities tending to zero
@@ -26,7 +26,8 @@ For a fixed `0 < y < 1` the upper bound gives `φ(y, N) / log N ≤ 4 / log (1 /
 
 ## Main statements
 
-* `tendsto_phi_div_log_atTop_nhds_zero`: `φ(δ_N, N) / log N → 0` for every `δ_N → 0`.
+* `tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero`: `φ(δ_N, N) / log N → 0` for every
+  `δ_N → 0`.
 * `liminf_phi_div_log_eq_zero`: the `liminf` of Question 4.12 is `0`.
 * `liminf_phi_logDensity_div_log_eq_zero`: the same for `δ_N = 1 / log N`.
 * `eventually_phi_logDensity_lt_log_div_log_log`: `φ(1 / log N, N) < 4 * log N / log (log N)` for
@@ -51,11 +52,12 @@ lemma eventually_phi_div_log_le_of_tendsto (δ : ℕ → unitInterval)
     (log_natCast_nonneg N)).trans hy
 
 /-- For every sequence of densities `δ_N → 0`, `φ(δ_N, N) / log N → 0`. -/
-theorem tendsto_phi_div_log_atTop_nhds_zero (δ : ℕ → unitInterval)
+theorem tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero (δ : ℕ → unitInterval)
     (hδ : Tendsto (fun N : ℕ ↦ (δ N : ℝ)) atTop (nhds 0)) :
     Tendsto (fun N : ℕ ↦ (phi (δ N) N : ℝ) / log N) atTop (nhds 0) := by
-  refine tendsto_order.mpr ⟨fun a ha ↦ .of_forall fun N ↦ ha.trans_le (phi_div_log_nonneg _ _),
-    fun a ha ↦ ?_⟩
+  refine tendsto_order.mpr
+    ⟨fun a ha ↦ .of_forall fun N ↦ ha.trans_le (phi_div_log_nonneg _ _), ?_⟩
+  intro a ha
   have hy : 4 / log (1 / exp (-(8 / a))) < a := by
     rw [one_div, log_inv, log_exp, neg_neg, div_div_eq_mul_div, div_lt_iff₀ (by norm_num)]
     linarith
@@ -69,7 +71,7 @@ theorem tendsto_phi_div_log_atTop_nhds_zero (δ : ℕ → unitInterval)
 theorem liminf_phi_div_log_eq_zero (δ : ℕ → unitInterval)
     (hδ : Tendsto (fun N : ℕ ↦ (δ N : ℝ)) atTop (nhds 0)) :
     liminf (fun N : ℕ ↦ (phi (δ N) N : ℝ) / log N) atTop = 0 :=
-  (tendsto_phi_div_log_atTop_nhds_zero δ hδ).liminf_eq
+  (tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero δ hδ).liminf_eq
 
 /-! ### The sequence `δ_N = 1 / log N` -/
 
@@ -95,9 +97,9 @@ lemma tendsto_coe_logDensity :
   rw [Pi.inv_apply, coe_logDensity hN, one_div, Function.comp_apply]
 
 /-- `φ(1 / log N, N) / log N → 0`. -/
-theorem tendsto_phi_logDensity_div_log_atTop_nhds_zero :
+lemma tendsto_phi_logDensity_div_log_atTop_nhds_zero :
     Tendsto (fun N : ℕ ↦ (phi (logDensity N) N : ℝ) / log N) atTop (nhds 0) :=
-  tendsto_phi_div_log_atTop_nhds_zero _ tendsto_coe_logDensity
+  tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero _ tendsto_coe_logDensity
 
 /-- The answer to the second part of Question 4.12: `liminf φ(1 / log N, N) / log N = 0`. -/
 theorem liminf_phi_logDensity_div_log_eq_zero :
@@ -115,9 +117,8 @@ lemma eventually_rpow_neg_lt_coe_logDensity {α : ℝ} (hα : 0 < α) :
     ∀ᶠ N : ℕ in atTop, (N : ℝ) ^ (-α) < logDensity N := by
   filter_upwards [tendsto_natCast_atTop_atTop.eventually (eventually_log_lt_rpow hα),
     eventually_ge_atTop 3] with N hN hN₃
-  have hlog : 0 < log N := one_pos.trans_le (one_le_log_of_three_le hN₃)
   rw [coe_logDensity hN₃, rpow_neg N.cast_nonneg, ← one_div]
-  exact one_div_lt_one_div_of_lt hlog hN
+  exact one_div_lt_one_div_of_lt (one_pos.trans_le (one_le_log_of_three_le hN₃)) hN
 
 lemma eventually_coe_logDensity_le_half :
     ∀ᶠ N : ℕ in atTop, (logDensity N : ℝ) ≤ 1 - 1 / 2 := by
@@ -127,7 +128,7 @@ lemma eventually_coe_logDensity_le_half :
   linarith [one_div_le_one_div_of_le two_pos hN]
 
 /-- For all large `N`, `φ(1 / log N, N) < 4 * log N / log (log N)`. -/
-theorem eventually_phi_logDensity_lt_log_div_log_log :
+lemma eventually_phi_logDensity_lt_log_div_log_log :
     ∀ᶠ N : ℕ in atTop, (phi (logDensity N) N : ℝ) < 4 * log N / log (log N) := by
   filter_upwards [eventually_phi_lt_log_div_log (γ := 1) (c := 1 / 2) one_pos le_rfl
       (by norm_num) (by norm_num) logDensity

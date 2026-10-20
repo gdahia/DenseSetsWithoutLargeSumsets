@@ -20,7 +20,7 @@ that the counting argument uses.
 
 * `fifteen_lt_log_of_lowerAnalyticThreshold`: `15 < log n`.
 * `two_mul_chang_size_threshold_lt_pairCardThreshold`:
-  `2 * exp (changContainerExponent (κ C)) < k`.
+  `2 * exp (containerExponent (κ C)) < k`.
 * `fourteen_mul_sq_lt_ε_mul_pairCardThreshold`: `14 * C ^ 2 < ε γ * k`.
 * `density_coeff_log_lt_exp_neg_mul_q`: `2 * K * log n < exp (-changExponent C) * q` for
   `K = densityCoefficient (3 + γ) c` and `q ≥ 2 * n`.
@@ -76,12 +76,11 @@ private lemma mul_log_mul_le_sqrt {A T x : ℝ} (hA : 42 ≤ A) (hT : 1 ≤ T) (
     (h : 4 * T * log (2 * A * T) ≤ √x) : T * log (A * x) ≤ √x := by
   have hT₀ : 0 < T := by linarith
   have hA₀ : 0 < A := by linarith
-  have hs := sqrt_pos.2 hx
   have h₈₄ : log 84 ≤ log (2 * A * T) := log_le_log (by norm_num) (by nlinarith)
   have hAT : log (2 * A * T) = log 2 + log A + log T := by
     rw [log_mul (by positivity) hT₀.ne', log_mul two_ne_zero hA₀.ne']
   have hlog : log (A * x) = log A + 2 * (log (√x / T) + log T) := by
-    rw [log_mul hA₀.ne' hx.ne', log_div hs.ne' hT₀.ne', log_sqrt hx.le]
+    rw [log_mul hA₀.ne' hx.ne', log_div (sqrt_pos.2 hx).ne' hT₀.ne', log_sqrt hx.le]
     ring
   have h' : 4 * log (2 * A * T) ≤ √x / T := by
     rw [le_div_iff₀ hT₀]
@@ -112,10 +111,10 @@ lemma one_lt_densityCoefficient {γ c : ℝ} (hγ_pos : 0 < γ)
 private lemma one_le_lowerGapSqrtScale {C γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
     (hC : 0 < 2 * C) (hε : 0 < ε γ) (hc_pos : 0 < c) (hc_lt : c < 1) :
     1 ≤ lowerGapSqrtScale C γ c hC hε := by
-  have hK := one_le_sqrt.2 (one_lt_densityCoefficient hγ_pos hc_pos hc_lt).le
   rw [lowerGapSqrtScale, le_div_iff₀ hε]
-  linarith [ε_le_one_twelfth hγ_pos hγ_le,
-    one_le_mul_of_one_le_of_one_le (one_le_lowerBltConstant hC hε) hK]
+  linarith [ε_le_one_twelfth hγ_pos hγ_le, one_le_mul_of_one_le_of_one_le
+    (one_le_lowerBltConstant hC hε)
+    (one_le_sqrt.2 (one_lt_densityCoefficient hγ_pos hc_pos hc_lt).le)]
 
 lemma κ_ge_six_of_one_le {C : ℝ} (hC : 1 ≤ C) : 6 ≤ κ C := by
   rw [κ]
@@ -144,8 +143,8 @@ private lemma sq_mul_lowerDensityExponent_le {C : ℝ} (γ : ℝ) (hC : 1 ≤ C)
   ring
 
 private lemma exp_mul_lowerDensityExponent_le (C γ : ℝ) :
-    exp (changContainerExponent (κ C)) * lowerDensityExponent C γ ≤ (2 + γ) / 4 := by
-  have h : lowerDensityExponent C γ ≤ (2 + γ) / (2 * exp (changContainerExponent (κ C))) / 2 :=
+    exp (containerExponent (κ C)) * lowerDensityExponent C γ ≤ (2 + γ) / 4 := by
+  have h : lowerDensityExponent C γ ≤ (2 + γ) / (2 * exp (containerExponent (κ C))) / 2 :=
     div_le_div_of_nonneg_right (min_le_right _ _) zero_le_two
   refine (mul_le_mul_of_nonneg_left h (exp_pos _).le).trans_eq ?_
   field_simp
@@ -174,8 +173,9 @@ lemma freiman_image_sum_card {G H : Type*} [DecidableEq G] [DecidableEq H]
   rw [add_def, add_def, ← prodMap_image_product, image_image]
   apply card_image_eq_of_kernel_iff
   rintro ⟨a, b⟩ hab ⟨a', b'⟩ hab'
-  rw [mem_product] at hab hab'
-  exact hiso.add_eq_add (hAX hab.1) (hBX hab.2) (hAX hab'.1) (hBX hab'.2)
+  obtain ⟨ha, hb⟩ := mem_product.1 hab
+  obtain ⟨ha', hb'⟩ := mem_product.1 hab'
+  exact hiso.add_eq_add (hAX ha) (hBX hb) (hAX ha') (hBX hb')
 
 private lemma log_one_div_lt_lowerDensityExponent_mul_log {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hn_pos : 0 < n) (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) :
@@ -189,9 +189,8 @@ private lemma log_one_div_lt_lowerDensityExponent_mul_log {γ C : ℝ} {n : ℕ}
 lemma log_one_div_unitInterval_pos {γ C : ℝ} {n : ℕ} {δ : unitInterval}
     (hn_pos : 0 < n) (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ))
     (hδ_upper : (δ : ℝ) < 1) :
-    0 < log (1 / δ) := by
-  have hn : (0 : ℝ) < n := mod_cast hn_pos
-  exact log_pos ((one_lt_div ((rpow_pos_of_pos hn _).trans hδ_lower)).2 hδ_upper)
+    0 < log (1 / δ) :=
+  log_pos ((one_lt_div ((rpow_pos_of_pos (Nat.cast_pos.2 hn_pos) _).trans hδ_lower)).2 hδ_upper)
 
 lemma pairCardThreshold_arg_le {γ : ℝ} {n : ℕ} {δ : unitInterval} :
     (3 + γ) * log (n : ℝ) / log (1 / δ) ≤
@@ -212,20 +211,19 @@ private lemma lt_pairCardThreshold_of_mul_lowerDensityExponent_lt {γ C R : ℝ}
     R < (pairCardThreshold (3 + γ) n δ : ℝ) := by
   have hn_pos := zero_lt_one.trans hn_one
   have hlog : 0 < log n := log_pos (mod_cast hn_one)
-  have hα := mul_pos (lowerDensityExponent_pos_of_one_le hγ_pos hC_one) hlog
   refine lt_of_lt_of_le ?_ pairCardThreshold_arg_le
   refine lt_trans ?_ (div_lt_div_of_pos_left (mul_pos (by linarith) hlog)
     (log_one_div_unitInterval_pos hn_pos hδ_lower hδ_upper)
     (log_one_div_lt_lowerDensityExponent_mul_log hn_pos hδ_lower))
-  rw [lt_div_iff₀ hα]
+  rw [lt_div_iff₀ (mul_pos (lowerDensityExponent_pos_of_one_le hγ_pos hC_one) hlog)]
   linarith [mul_lt_mul_of_pos_right hR hlog]
 
-/-- The size `k` is larger than `2 * exp (changContainerExponent (κ C))`. -/
+/-- The size `k` is larger than `2 * exp (containerExponent (κ C))`. -/
 lemma two_mul_chang_size_threshold_lt_pairCardThreshold {γ C : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hC_one : 1 ≤ C) (hn_one : 1 < n)
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1) :
-    2 * (exp (changContainerExponent (κ C))) <
+    2 * (exp (containerExponent (κ C))) <
       (pairCardThreshold (3 + γ) n δ : ℝ) :=
   lt_pairCardThreshold_of_mul_lowerDensityExponent_lt hγ_pos hC_one hn_one hδ_lower hδ_upper
     (by linarith [exp_mul_lowerDensityExponent_le C γ])

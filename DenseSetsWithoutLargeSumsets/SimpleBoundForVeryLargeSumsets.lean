@@ -56,8 +56,8 @@ private lemma natCastImage_injective : Function.Injective natCastImage :=
   image_injective Int.ofNat_injective
 
 /-- The image in `ℤ` of a pair of finite sets of natural numbers. -/
-private def castPair (p : Finset ℕ × Finset ℕ) : Finset ℤ × Finset ℤ :=
-  (natCastImage p.1, natCastImage p.2)
+private def castPair : Finset ℕ × Finset ℕ → Finset ℤ × Finset ℤ :=
+  Prod.map natCastImage natCastImage
 
 private lemma castPair_injective : Function.Injective castPair :=
   natCastImage_injective.prodMap natCastImage_injective
@@ -114,9 +114,10 @@ private lemma coverFinset_card_le (n k r : ℕ) (hrk : r ≤ k) :
   refine card_biUnion_le.trans ((sum_le_card_nsmul _ _ ((k ^ 3).choose k) ?_).trans_eq
     (by simp [card_integerInterval]))
   intro F hF
-  rw [mem_powersetCard] at hB hF
+  obtain ⟨-, hB⟩ := mem_powersetCard.1 hB
+  obtain ⟨-, hF⟩ := mem_powersetCard.1 hF
   refine card_image_le.trans ((card_powersetCard _ _).trans_le (Nat.choose_le_choose k ?_))
-  exact ruzsa_container_card_le_cube (hF.2.trans_le hrk) hB.2
+  exact ruzsa_container_card_le_cube (hF.trans_le hrk) hB
 
 /-- The pairs `(A, B)` of `k`-subsets of `[n]` with `|A + B| ≤ m`. -/
 private abbrev smallSumsetPairs (n k m : ℕ) : Set (Finset ℕ × Finset ℕ) :=
@@ -131,9 +132,9 @@ private lemma castPair_mem_coverFinset {n k m : ℕ} (hrn : m / k ≤ n) {p : Fi
       ⟨image_subset_image hA, image_subset_image hB, (natCastImage_card _).trans hAk,
         (natCastImage_card _).trans hBk, (natCastImage_sum_card _ _).trans_le hAB⟩
   obtain ⟨F, hF₀F, hFI, hF⟩ := exists_subsuperset_card_eq hF₀I hF₀ (by rwa [card_integerInterval])
-  rw [mem_powersetCard] at hBmem hAmem
+  obtain ⟨hAsub, hAcard⟩ := mem_powersetCard.1 hAmem
   simp only [coverFinset, mem_biUnion, mem_image, mem_powersetCard]
-  exact ⟨_, hBmem, F, ⟨hFI, hF⟩, _, ⟨hAmem.1.trans (by gcongr), hAmem.2⟩, rfl⟩
+  exact ⟨_, mem_powersetCard.1 hBmem, F, ⟨hFI, hF⟩, _, ⟨hAsub.trans (by gcongr), hAcard⟩, rfl⟩
 
 private lemma smallSumsetPairs_subset (n k m : ℕ) :
     smallSumsetPairs n k m ⊆ ↑((interval n).powersetCard k ×ˢ (interval n).powersetCard k) := by
@@ -269,8 +270,8 @@ lemma veryLargeSumsetPairSlice_card_le (n k m : ℕ) :
   refine (Set.ncard_le_ncard ?_ ((finite_toSet _).subset (smallSumsetPairs_subset n k m))).trans
     (pair_small_sumset_family_card_le n k m)
   intro p hp
-  rw [mem_coe, mem_veryLargeSumsetPairSlice] at hp
-  exact ⟨hp.1, hp.2.1, hp.2.2.1, hp.2.2.2.1, hp.2.2.2.2.le⟩
+  obtain ⟨hA, hB, hAk, hBk, hAB⟩ := mem_veryLargeSumsetPairSlice.1 (mem_coe.1 hp)
+  exact ⟨hA, hB, hAk, hBk, hAB.le⟩
 
 /-- The set `S` contains a sumset `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and
 `|A + B| ≥ (k + 1) * k / 2`. -/
@@ -368,9 +369,8 @@ private lemma rpow_mul_choose_mul_pow_le {γ δ : ℝ} (hγ : 0 < γ) {n k m : �
   exact rpow_le_rpow_of_exponent_le (mod_cast hn.le) (by linarith [cast_add_div_add_le hγ hk hm])
 
 private lemma card_Icc_le_sq {k : ℕ} (hk : 0 < k) : #(Icc ((k + 1) * k / 2) (k * k)) ≤ k ^ 2 := by
-  have h : 0 < (k + 1) * k / 2 := Nat.div_pos (by nlinarith) two_pos
   rw [Nat.card_Icc, sq]
-  grind
+  grind [(Nat.div_pos (by nlinarith) two_pos : 0 < (k + 1) * k / 2)]
 
 private lemma veryLargeSumsetAnalyticBound_of_lt {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
     (hc_pos : 0 < c) {n : ℕ} (hn : veryLargeSumsetStrictThreshold γ c < n) {δ : unitInterval}
@@ -386,8 +386,10 @@ private lemma veryLargeSumsetAnalyticBound_of_lt {γ c : ℝ} (hγ_pos : 0 < γ)
     unitInterval_pow_le_exp_div_mul_log n m (3 + γ) δ hδ₀ hδ₁ hn₂ hk
   rw [veryLargeSumsetAnalyticBound]
   generalize pairCardThreshold (3 + γ) n δ = k at hk hlogk hpow ⊢
-  refine (sum_le_card_nsmul _ _ ((n : ℝ) ^ (-γ * k / 3)) fun m hm ↦ ?_).trans ?_
-  · exact rpow_mul_choose_mul_pow_le hγ_pos hn₂ hk (mem_Icc.1 hm).1 hlogk δ.2.1 (hpow m)
+  refine (sum_le_card_nsmul _ _ ((n : ℝ) ^ (-γ * k / 3)) ?_).trans ?_
+  · intro m hm
+    obtain ⟨hm, -⟩ := mem_Icc.1 hm
+    exact rpow_mul_choose_mul_pow_le hγ_pos hn₂ hk hm hlogk (unitInterval.nonneg δ) (hpow m)
   · rw [nsmul_eq_mul, neg_mul, neg_div, rpow_neg hn₀.le, ← div_eq_mul_inv]
     gcongr
     exact_mod_cast card_Icc_le_sq hk
@@ -401,16 +403,16 @@ lemma veryLargeSumsetEvent_measure_le (γ : ℝ) (n : ℕ) (δ : unitInterval)
       (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
         (n : ℝ) ^ (γ * (pairCardThreshold (3 + γ) n δ : ℝ) / 3) := by
   refine (veryLargeSumsetEvent_measure_le_sum n _ (fun m ↦ (δ : ℝ) ^ m)
-    (fun m ↦ pow_nonneg δ.2.1 m) ?_).trans hanalytic
-  intro m p hp
-  rw [← (mem_veryLargeSumsetPairSlice.1 hp).2.2.2.2]
-  exact fixed_pair_sumset_probability_le n δ p.1 p.2
+    (fun m ↦ pow_nonneg (unitInterval.nonneg δ) m) ?_).trans hanalytic
+  rintro m ⟨A, B⟩ hp
+  obtain ⟨-, -, -, -, rfl⟩ := mem_veryLargeSumsetPairSlice.1 hp
+  exact fixed_pair_sumset_probability_le n δ A B
 
 /-- Let `k = ⌈(3 + γ) * log n / log (1 / δ)⌉` and `n ^ (-1 / 2) < δ ≤ 1 - c`. If `n` is large, then
 the random subset of `[n]` of density `δ` contains a sumset `A + B` with `A, B ⊆ [n]`,
 `|A| = |B| = k` and `|A + B| ≥ (k + 1) * k / 2` with probability at most
 `k ^ 2 / n ^ (γ * k / 3)`. -/
-theorem very_large_sumset_probability_le {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
+lemma very_large_sumset_probability_le {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
     (hc_pos : 0 < c) {n : ℕ} (hn : veryLargeSumsetStrictThreshold γ c < n) {δ : unitInterval}
     (hδ_lower : (n : ℝ) ^ (-(1 / 2 : ℝ)) < (δ : ℝ)) (hδ_upper : (δ : ℝ) ≤ 1 - c) :
     (binomialFinsetSubset (Set.Icc 1 n) δ).real

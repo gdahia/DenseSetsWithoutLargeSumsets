@@ -6,7 +6,6 @@ Authors: Gabriel Dahia
 module
 
 public import ChangFreimanRuzsa.CyclicFreimanDimension
-public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ProperGAP
 public import DenseSetsWithoutLargeSumsets.Common
 public import LargeSumsetsFromSubsets.MediumSizedSubsets
 import Mathlib.NumberTheory.Bertrand
@@ -42,9 +41,9 @@ open ChangFreimanRuzsa LargeSumsetsFromSubsets
 
 noncomputable section
 
-/-- The bound `exp (changFreimanDimExponent κ) * k` on the size of the proper progression that
+/-- The bound `exp (freimanDimExponent κ) * k` on the size of the proper progression that
 Chang's theorem gives for a set of size at most `k` and doubling at most `κ`. -/
-def changCarrierBound (k : ℕ) (κ : ℝ) : ℝ := Real.exp (changFreimanDimExponent κ) * k
+def changCarrierBound (k : ℕ) (κ : ℝ) : ℝ := Real.exp (freimanDimExponent κ) * k
 
 private lemma natCast_zmod_inj {q a b : ℕ} (ha : a < q) (hb : b < q) :
     (a : ZMod q) = b ↔ a = b := by
@@ -52,7 +51,7 @@ private lemma natCast_zmod_inj {q a b : ℕ} (ha : a < q) (hb : b < q) :
 
 /-- For `n > 0` there is a prime `q` with `2 * n ≤ q ≤ 4 * n` for which the cast `ℕ → ZMod q` is
 a Freiman isomorphism of order `2` from `[n]` to its image. -/
-theorem exists_zmod_model (n : ℕ) (hn : 0 < n) : ∃ q : ℕ, Nat.Prime q ∧ 2 * n ≤ q ∧ q ≤ 4 * n ∧
+lemma exists_zmod_model (n : ℕ) (hn : 0 < n) : ∃ q : ℕ, Nat.Prime q ∧ 2 * n ≤ q ∧ q ≤ 4 * n ∧
     ∃ ψ : ℕ → ZMod q, IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ := by
   obtain ⟨q, hq, hq_gt, hq_le⟩ := Nat.exists_prime_lt_and_le_two_mul (2 * n) (by grind)
   refine ⟨q, hq, hq_gt.le, by grind, fun x ↦ (x : ZMod q), ?_⟩
@@ -72,7 +71,7 @@ def ε (γ : ℝ) : ℝ := γ / (4 * (γ + 2))
 def κ (C : ℝ) : ℝ := 6 * C ^ (2 : ℕ)
 
 /-- The exponent of Chang's theorem for doubling `κ C`. -/
-def changExponent (C : ℝ) : ℝ := changFreimanDimExponent (κ C)
+def changExponent (C : ℝ) : ℝ := freimanDimExponent (κ C)
 
 /-- The constant of the Bollobás–Leader–Tiba theorem for `σ = 2 * C` and the error `ε γ`. -/
 def lowerBltConstant (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
@@ -116,7 +115,7 @@ lemma one_le_lowerConstant {C γ : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ) :
 
 lemma lowerConstant_eq (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) :
     lowerConstant C γ hC hε =
-      max (Real.exp (changFreimanDimExponent (κ C))) (4 * lowerBltConstant C γ hC hε) :=
+      max (Real.exp (freimanDimExponent (κ C))) (4 * lowerBltConstant C γ hC hε) :=
   rfl
 
 lemma lowerConstant_pos (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : 0 < lowerConstant C γ hC hε :=
@@ -169,7 +168,7 @@ def lowerAnalyticThreshold (C γ : ℝ) : ℝ :=
 /-- The exponent `α`. The densities considered are those larger than `n ^ (-α)`. -/
 def lowerDensityExponent (C γ : ℝ) : ℝ := min
     ((2 + γ) * ε γ / (12 * C ^ (2 : ℕ)))
-    ((2 + γ) / (2 * Real.exp (changContainerExponent (κ C)))) / 2
+    ((2 + γ) / (2 * Real.exp (containerExponent (κ C)))) / 2
 
 lemma ε_pos {γ : ℝ} (hγ : 0 < γ) : 0 < ε γ := by
   unfold ε

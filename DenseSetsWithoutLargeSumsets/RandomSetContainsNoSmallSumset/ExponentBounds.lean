@@ -5,6 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
+public import DenseSetsWithoutLargeSumsets.Combinatorics.Additive.ProperGAP
 public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ZModModel
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.CountingBaseBounds
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
@@ -77,12 +78,13 @@ private lemma lower_negative_log_margin {γ C : ℝ} {n : ℕ} {δ : unitInterva
   have hk := pairCardThreshold_arg_le (γ := γ) (n := n) (δ := δ)
   rw [div_le_iff₀ (log_one_div_unitInterval_pos
     (zero_lt_one.trans (one_lt_nat_of_lowerSizeThreshold_lt hn)) hδ_lower hδ_upper)] at hk
-  have hlog : 0 ≤ log (n : ℝ) := by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn]
   have hd₀ : (0 : ℝ) ≤ d := zero_le_one.trans hd
   linarith [mul_le_mul_of_nonneg_left hk
       (mul_nonneg (one_sub_three_mul_ε_pos hγ_pos hγ_le).le hd₀),
-    mul_le_mul_of_nonneg_right (lower_exponent_coefficient hγ_pos) (mul_nonneg hd₀ hlog),
-    mul_nonneg (mul_nonneg (by linarith [ε_pos hγ_pos] : 0 ≤ 1 + ε γ) hlog) (sub_nonneg.2 hd)]
+    mul_le_mul_of_nonneg_right (lower_exponent_coefficient hγ_pos)
+      (mul_nonneg hd₀ (log_natCast_nonneg n)),
+    mul_nonneg (mul_nonneg (by linarith [ε_pos hγ_pos] : 0 ≤ 1 + ε γ) (log_natCast_nonneg n))
+      (sub_nonneg.2 hd)]
 
 private lemma lower_summand_exponent_le {γ C c : ℝ} {n : ℕ} {δ : unitInterval} {d : ℕ}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC_one : 1 ≤ C)
@@ -98,9 +100,9 @@ private lemma lower_summand_exponent_le {γ C c : ℝ} {n : ℕ} {δ : unitInter
           log (3 * lowerConstant C γ hC_two hε * (pairCardThreshold (3 + γ) n δ : ℝ)) -
         (1 - 3 * ε γ) * d * (pairCardThreshold (3 + γ) n δ : ℝ) * log (1 / δ) ≤
       -(ε γ / 2) * log n := by
-  have hd₁ : (1 : ℝ) ≤ d := mod_cast (mem_Icc.1 hd).1
-  have hlog : 0 ≤ ε γ * log n :=
-    mul_nonneg hε.le (by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn])
+  obtain ⟨hd₁, -⟩ := mem_Icc.1 hd
+  rify at hd₁
+  have hlog := mul_nonneg hε.le (log_natCast_nonneg n)
   linarith [lower_negative_log_margin hγ_pos hγ_le hn hδ_lower hδ_upper hd₁,
     mul_le_mul_of_nonneg_left
       (lower_counting_base_log_le_epsilon_log_div_eight hγ_pos hC_one hc_pos hn hn_gap
@@ -113,7 +115,7 @@ private lemma lower_summand_exponent_le {γ C c : ℝ} {n : ℕ} {δ : unitInter
 `m = ⌈lowerBltConstant C γ * √k⌉₊`. For `1 ≤ d ≤ k`, the number of proper progressions of
 dimension `d` in `ZMod q` with at most `s` points, times `((m + 1) * (s + 1) ^ m) ^ 2`, times
 `exp (-(1 - 3 * ε γ) * d * k * log (1 / δ))`, is at most `n ^ (-(ε γ / 2))`. -/
-theorem lower_gap_dim_summand_le {γ C c : ℝ} {n : ℕ} {δ : unitInterval} {d : ℕ}
+lemma lower_gap_dim_summand_le {γ C c : ℝ} {n : ℕ} {δ : unitInterval} {d : ℕ}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (C_pos : 0 < C) (hC_one : 1 ≤ C)
     (hc_pos : 0 < c) (hc_lt : c < 1) (hn : lowerSizeThreshold C γ < n)
     (hn_gap : lowerGapThreshold C γ c < n)

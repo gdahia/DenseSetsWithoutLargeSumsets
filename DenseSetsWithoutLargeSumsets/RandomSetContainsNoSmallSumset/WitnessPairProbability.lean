@@ -46,7 +46,7 @@ private lemma toNat_injOn_of_subset_natCastImage {T : Finset ℤ} {S : Finset �
 
 /-- Let `S` be a `δ`-random subset of `[n]`. The probability that the sumset of the pair `p` is
 contained in `S` is at most `δ ^ |p.1 + p.2|`. -/
-theorem bltWitnessPair_probability_le (n : ℕ) {δ : unitInterval}
+lemma bltWitnessPair_probability_le (n : ℕ) {δ : unitInterval}
     (p : Finset ℤ × Finset ℤ) :
     (binomialFinsetSubset (Set.Icc 1 n) δ).real
         {S : Finset ℕ | bltWitnessPairSumsetIsSubset p S} ≤
@@ -96,7 +96,7 @@ most `s` points in `ZMod q` and over the pairs `(A', B')` in `bltDimSmallWitness
 preimage of `P` under `ψ`. For each `d` it is at most the number of progressions times
 `((m + 1) * (s + 1) ^ m) ^ 2 * exp (-(1 - 3 * ε γ) * d * k * log (1 / δ))`, where
 `m = ⌈lowerBltConstant C γ * √k⌉₊`. -/
-theorem dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
+lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
     (hqpos : 0 < q) (hψinj : Set.InjOn ψ (interval n : Set ℕ))
     {C γ : ℝ} {δ : unitInterval} (hC : 0 < 2 * C) (hε : 0 < ε γ)
     (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
@@ -117,18 +117,22 @@ theorem dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
           Real.exp (-((1 - 3 * ε γ) * (d : ℝ) * (k : ℝ)) * Real.log (1 / δ)) := by
   classical
   rw [sum_biUnion]
-  · refine sum_le_sum fun d _ ↦ ?_
+  · refine sum_le_sum ?_
+    intro d _
     rw [mul_assoc, ← nsmul_eq_mul]
-    refine sum_le_card_nsmul _ _ _ fun P hP ↦ ?_
+    refine sum_le_card_nsmul _ _ _ ?_
+    intro P hP
     obtain ⟨-, rfl, hPs⟩ := (mem_properGAPsZModOfDim hqpos).1 hP
     have hcard := (zmodGAPPreimageContainer_card_le_carrier P hψinj).trans hPs
     refine (sum_bltDimSmallWitnessPairs_pow_le _ _ k C γ hC hε hδ_pos hδ_lt).trans ?_
     rw [natCastImage_card]
     gcongr
   · intro d _ d' _ hdd'
-    exact disjoint_left.2 fun P hP hP' ↦ hdd' <|
-      ((mem_properGAPsZModOfDim hqpos).1 hP).2.1.symm.trans
-        ((mem_properGAPsZModOfDim hqpos).1 hP').2.1
+    refine disjoint_left.2 ?_
+    intro P hP hP'
+    obtain ⟨-, hPd, -⟩ := (mem_properGAPsZModOfDim hqpos).1 hP
+    obtain ⟨-, hPd', -⟩ := (mem_properGAPsZModOfDim hqpos).1 hP'
+    exact hdd' (hPd.symm.trans hPd')
 
 end
 

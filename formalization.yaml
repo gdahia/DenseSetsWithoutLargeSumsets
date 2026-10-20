@@ -13,12 +13,10 @@ project:
     from the Kővári-Sós-Turán theorem. Conjecture 4.10 of Kra, Moreira, Richter and
     Robertson and the negative answer to their Question 4.12 follow.
   authors:
-    - name: "Gabriel Dahia"
-      github: "gdahia"
+    - "Gabriel Dahia"
   license: "Apache-2.0"
   responsible_maintainers:
-    - name: "Gabriel Dahia"
-      github: "gdahia"
+    - "Gabriel Dahia"
 
 classification:
   arxiv: ["math.CO", "math.NT"]
@@ -75,7 +73,7 @@ sources:
     relationship: "background"
     note: >-
       Colloq. Math. 3 (1954), 50-57. The Lean proof is the one of Mitchell Horner in the
-      Mathlib pull request 25841, copied here; see related_formalizations.
+      Mathlib pull request 25841; see related_formalizations.
   - title: "A polynomial bound in Freiman's theorem"
     authors:
       - "Mei-Chu Chang"
@@ -112,43 +110,49 @@ sources:
     note: "Theorem 2 is proved in LargeSumsetsFromSubsets."
 
 related_formalizations:
+  - id: "https://github.com/leanprover-community/mathlib4"
+    relationship: "builds-on"
+    note: >-
+      The statements use finite sets of natural numbers, pointwise sums, the unit interval,
+      logarithms and real powers, and limits inferior and superior in the reals and the
+      extended reals. The proofs use its Freiman isomorphisms, the Plünnecke-Ruzsa
+      inequality, the binomial distribution, Bertrand's postulate and the Zarankiewicz
+      function.
   - id: "https://github.com/gdahia/ChangFreimanRuzsa"
     relationship: "builds-on"
     note: >-
-      Source of Chang's theorem in ZMod q with a 2-proper progression of dimension at most the
-      Freiman dimension, and of the definition of the Freiman dimension. A Lake dependency,
-      private for now. Its proof was split from this repository at commit
-      5f4b915 and uses Chang's lemma on large spectra from
-      https://github.com/YaelDillies/apap and Minkowski's second theorem from
+      A Lake dependency and the source of Chang's theorem in ZMod q with a 2-proper progression
+      of dimension at most the Freiman dimension,
+      ChangFreimanRuzsa.exists_twoProperGAP_zmod_dim_le_freimanDim, and of generalized
+      arithmetic progressions, ChangFreimanRuzsa.GAP. It uses Chang's lemma on large spectra
+      from https://github.com/YaelDillies/apap and Minkowski's second theorem from
       https://github.com/TauCetiProject/TauCeti.
   - id: "https://github.com/gdahia/LargeSumsetsFromSubsets"
     relationship: "builds-on"
     note: >-
-      Source of Theorem 2 of Bollobás, Leader and Tiba. A Lake dependency, private for now,
-      split from this repository at commit 5f4b915.
+      A Lake dependency and the source of Theorem 2 of Bollobás, Leader and Tiba, used for
+      small sumsets.
   - id: "https://github.com/gdahia/SumOfSetsInSeveralDimensions"
     relationship: "builds-on"
     note: >-
-      Source of Ruzsa's lower bound for sumsets in R^D, of the affine dimension of a finite
-      set, of the definition of the Freiman dimension, and of the bounds for sets of given
-      Freiman dimension. A Lake dependency, private for now, split from this repository at
-      commit 5f4b915; the modules on the Freiman dimension were moved there later.
+      A Lake dependency and the source of the Freiman dimension, of Ruzsa's lower bound for
+      sumsets of sets of given Freiman dimension, used for small sumsets, and of the bound
+      freimanDim_le_two_mul_sub_one_of_card_add_le.
   - id: "https://github.com/gdahia/CountingSetsWithSmallSumset"
     relationship: "builds-on"
     note: >-
-      Source of the results of Sections 3 and 4 of Green's paper: the number of sets of given
-      Freiman dimension and the number of Freiman isomorphism classes of sets with small
-      sumset. A Lake dependency, split from this repository after the rewriting of
-      11 October 2026. It is not on GitHub yet.
+      A Lake dependency and the source of the results of Sections 3 and 4 of Green's paper,
+      used for moderate sumsets: the number of sets of given Freiman dimension and the number
+      of Freiman isomorphism classes of sets with small sumset.
   - id: "https://github.com/leanprover-community/mathlib4/pull/25841"
     relationship: "adapts"
     note: >-
-      The Kővári-Sós-Turán theorem, by Mitchell Horner. The file
-      Mathlib/Combinatorics/SimpleGraph/Extremal/KovariSosTuran.lean of the pull request at
-      commit 1ed83fcfe430778431dfa20c92663db040a98772 is copied to
+      The Kővári-Sós-Turán theorem, by Mitchell Horner, used for the lower bound of
+      Corollary 1.2. The file Mathlib/Combinatorics/SimpleGraph/Extremal/KovariSosTuran.lean
+      of the pull request at commit 1ed83fcfe430778431dfa20c92663db040a98772 is in
       DenseSetsWithoutLargeSumsets/Mathlib/, with the four lemmas that the pull request adds
-      to Mathlib/Combinatorics/SimpleGraph/Bipartite.lean. The pull request was open on
-      10 October 2026. The copies are to be deleted when Mathlib has the theorem.
+      to Mathlib/Combinatorics/SimpleGraph/Bipartite.lean, to be deleted when Mathlib has the
+      theorem.
 
 status:
   scope: >-
@@ -157,8 +161,8 @@ status:
     Robertson for 0 < δ < 1, and the negative answer to their Question 4.12. No statement
     takes a cited theorem as a hypothesis. Chang's theorem, Theorem 2 of Bollobás, Leader and
     Tiba, Ruzsa's lower bound and the results of Sections 3 and 4 of Green's paper are proved
-    in the repositories listed under related_formalizations; the reduction of the lower bound
-    to the Kővári-Sós-Turán theorem is proved here. Question 4.11 of Kra,
+    in the Lake dependencies listed under related_formalizations. The reduction of the lower
+    bound to the Kővári-Sós-Turán theorem is proved here. Question 4.11 of Kra,
     Moreira, Richter and Robertson, on the existence of the limit of φ(δ, N)/log N, is not
     addressed. The sorry counts refer to the library and Solution.lean; Challenge.lean has
     one placeholder for each of its six statements.
@@ -190,7 +194,7 @@ automation:
         and Hetzel and of Kra, Moreira, Richter and Robertson, and the branches of this
         repository.
       cost:
-        wall_time: "two sessions"
+        wall_time: "three sessions"
         spend_usd: "not tracked"
         hardware: "local machine"
       prompting_notes: >-
@@ -203,7 +207,8 @@ automation:
         others, and to state the solution of the conjectures in Challenge.lean. The second
         used one subagent for each group of files. Then two instructions to move Green's
         Sections 3 and 4 to a repository of their own and the Freiman dimension to
-        SumOfSetsInSeveralDimensions.
+        SumOfSetsInSeveralDimensions. Then one instruction to take ChangFreimanRuzsa from
+        GitHub and to follow the author's Palomar conventions.
   spend_usd: "not tracked"
   notes: >-
     The proofs up to commit 5f4b915 were written by Codex agents directed by Gabriel Dahia.
@@ -215,42 +220,36 @@ automation:
     the dimension by the Freiman dimension to ChangFreimanRuzsa and rewrote the proofs and
     the documentation of the modules written by Codex, without changing the definitions or
     the main statements; the rewritten proofs follow the same arguments and are about half
-    as long. Every proof is checked by Lean.
+    as long. In a third session it moved the repository to Lean v4.35.0, took
+    ChangFreimanRuzsa and SumOfSetsInSeveralDimensions from GitHub, adapted the proofs to the
+    renamed exponents of ChangFreimanRuzsa, renamed the library theorems after the
+    statements of Challenge.lean, gave the statements of Challenge.lean and Solution.lean
+    primed names, and minimized the imports. Every proof is checked by Lean.
 
 fidelity:
   divergences: >-
     Theorem 1.1. The exponent α is denseSubsetDensityExponent γ c in the library and is
     existentially quantified in Challenge.lean. The sets A and B range over subsets of
     {1, ..., n}; the paper takes them in the positive integers, and a sumset of sets of
-    positive integers contained in S ⊆ {1, ..., n} has both summands in {1, ..., n}. The
-    proof does not move the random set to ZMod q as the paper does: it maps only the sets
-    A' ∪ B' to ZMod q, applies Chang's theorem there and pulls the progression back to
-    {1, ..., n}, so the random set and the events stay in {1, ..., n}.
+    positive integers contained in S ⊆ {1, ..., n} has both summands in {1, ..., n}.
 
-    Chang's theorem. The paper cites Corollary 8.4 of Campos, Dahia and Marciano, which rests
-    on a result of Cwalina and Schoen. The formalization uses the statement of
-    ChangFreimanRuzsa, proved from Chang's argument in ZMod q followed by a reduction of the
-    dimension of the progression to the Freiman dimension. The size of the progression is
-    exp(changFreimanDimExponent κ) |X|, with a larger exponent than κ^4 (log κ)^2; the
-    argument uses only that it depends on κ alone.
+    Chang's theorem. The paper cites Corollary 8.4 of Campos, Dahia and Marciano. The
+    statement used, from ChangFreimanRuzsa, gives a progression of dimension at most the
+    Freiman dimension of X and of size exp(freimanDimExponent κ) |X|, with an exponent larger
+    than κ^4 (log κ)^2 that depends on κ alone.
 
     Corollary 1.2. φ(δ, N) is phi δ N for δ in the unit interval, defined as the supremum of
-    the set of admissible k, which is attained. The lower bound holds for δ ≥ n^(-γ/4) and
-    the upper bound for δ > n^(-denseSubsetDensityExponent γ c); the corollary takes α below
-    both. The lower bound is quoted in the paper from Hernández and Hetzel, whose
-    Corollary C is for fixed δ. Here the uniform form is proved by a different argument:
-    writing each s in S as (i + s) - i for 0 ≤ i < m gives a relation between {1, ..., n + m}
-    and {1, ..., m}, a k × k rectangle in it gives a sumset in S, and the Kővári-Sós-Turán
-    theorem with m = ⌈n/k⌉ applies.
+    the set of admissible k, which is attained. The exponent α is existentially quantified.
+    The lower bound is quoted in the paper from Hernández and Hetzel, whose Corollary C is for
+    fixed δ; here it is stated for n^(-α) ≤ δ ≤ 1 - c, uniformly in δ.
 
     Conjecture 4.10 is stated by Kra, Moreira, Richter and Robertson for every δ > 0. It is
     false for δ = 1, where φ(1, N) = ⌊N/2⌋, and is formalized for 0 < δ < 1, as in Hernández
     and Hetzel. In Challenge.lean both limits are taken in the extended reals, so that
     limsup < ∞ and liminf > 0 are the assertions of the conjecture; the bounds
     1/log(1/δ) ≤ liminf and limsup ≤ 3/log(1/δ) are stated with real limits. Question 4.12
-    is answered for every sequence δ_N → 0 with values in the unit
-    interval, by the monotonicity of φ in δ; the sequence 1/log N is clamped to the unit
-    interval in logDensity and equals 1/log N for N ≥ 3.
+    is answered for every sequence δ_N → 0 with values in the unit interval; the sequence
+    1/log N is clamped to the unit interval in logDensity and equals 1/log N for N ≥ 3.
 
     Green's Sections 3 and 4 are formalized, in CountingSetsWithSmallSumset, in the form the
     count of moderate sumsets needs; the differences from the paper are recorded there.
@@ -258,23 +257,18 @@ fidelity:
 review:
   status: "unchecked"
   reviewers: []
-  notes: >-
-    No independent mathematical or formalization review. The version at commit 5f4b915
-    recorded a self-assessment by Gabriel Dahia of the statement of Theorem 1.1; the
-    statements about φ and the present layout have not been reviewed. lake comparator, run on
-    macOS on 10 October 2026 with its sandbox disabled, accepts the solution with Lean's
-    kernel, nanoda and con-ron. scripts/verify-comparator.sh, which runs it in the sandbox
-    and needs Linux, has not been run.
+  notes: "Unreviewed"
 
 alignment:
   namespace: "DenseSetsWithoutLargeSumsets"
   statements:
     - source: "Dense sets without large sumsets, Theorem 1.1"
-      lean: "DenseSetsWithoutLargeSumsets.exists_dense_subset_forall_add_not_subset"
+      lean: "DenseSetsWithoutLargeSumsets.exists_dense_subset_forall_add_not_subset'"
       module: "Challenge"
       status: "proved"
       note: >-
-        Library forms: eventually_forall_exists_dense_subset_without_large_sumsets and
+        Library forms: exists_dense_subset_forall_add_not_subset,
+        eventually_forall_exists_dense_subset_without_large_sumsets and
         dense_subset_without_large_sumsets in
         DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets.
     - source: "Dense sets without large sumsets, Theorem 1.3"
@@ -285,36 +279,38 @@ alignment:
         With the explicit bound 4 k^2 / n^(γ / (8 (γ + 3))) for the probability, where
         k = ⌈(3 + γ) log n / log(1/δ)⌉.
     - source: "Dense sets without large sumsets, Corollary 1.2"
-      lean: "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc"
+      lean: "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc'"
       module: "Challenge"
       status: "proved"
       note: >-
-        Library form: exists_forall_div_log_le_phi_div_log_le in
+        Library form: exists_forall_phi_div_log_mem_Icc in
         DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
     - source: "On growth rates of infinite and finite sumsets, Corollary C"
-      lean: "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log"
+      lean: "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log'"
       module: "Challenge"
       status: "proved"
-      note: "By a different proof; see fidelity.divergences."
+      note: >-
+        Proved from the Kővári-Sós-Turán theorem, not by the argument of Hernández and
+        Hetzel.
     - source: "Dense sets without large sumsets, Corollary 1.2, upper bound for fixed δ"
-      lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_le_three_div_log_one_div"
+      lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_le_three_div_log_one_div'"
       module: "Challenge"
       status: "proved"
       note: "limsup φ(δ, N)/log N ≤ 3/log(1/δ)."
     - source: >-
         Problems on infinite sumset configurations in the integers and beyond,
         Conjecture 4.10
-      lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos"
+      lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos'"
       module: "Challenge"
       status: "proved"
       note: >-
         For 0 < δ < 1, with the limits in the extended reals. Library form:
-        limsup_lt_top_and_liminf_pos_phi_div_log in
+        limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos in
         DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
     - source: >-
         Problems on infinite sumset configurations in the integers and beyond,
         Question 4.12
-      lean: "DenseSetsWithoutLargeSumsets.tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero"
+      lean: "DenseSetsWithoutLargeSumsets.tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero'"
       module: "Challenge"
       status: "proved"
       note: >-
@@ -329,7 +325,7 @@ alignment:
         Theorem 2.3 of the paper, with a larger exponent for the size of the progression.
         Proved in the dependency ChangFreimanRuzsa.
     - source: "Counting sets with small sumset, Sections 3 and 4"
-      lean: "CountingSetsWithSmallSumset.exists_smallRestrictedSumsetFreimanClassCover"
+      lean: "CountingSetsWithSmallSumset.exists_coversFreimanIsoClasses_card_restrictedSumset_le"
       module: "CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.ClassCountBounds"
       status: "proved"
       note: >-
@@ -339,7 +335,7 @@ alignment:
       lean: "SimpleGraph.zarankiewicz_le"
       module: "DenseSetsWithoutLargeSumsets.Mathlib.Combinatorics.SimpleGraph.Extremal.KovariSosTuran"
       status: "proved"
-      note: "Copied from the Mathlib pull request 25841 of Mitchell Horner."
+      note: "From the Mathlib pull request 25841 of Mitchell Horner."
 
 acknowledgements: >-
   Lean 4 and Mathlib; APAP and Tau Ceti, through ChangFreimanRuzsa; Mitchell Horner's proof of

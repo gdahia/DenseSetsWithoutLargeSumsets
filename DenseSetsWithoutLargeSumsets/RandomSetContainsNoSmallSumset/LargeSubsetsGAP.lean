@@ -78,7 +78,7 @@ private lemma exp_mul_card_image_union_le {γ C c : ℝ} {n q : ℕ} {δ : unitI
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) ≤ 1 - c)
     (hAcard : #A = pairCardThreshold (3 + γ) n δ) (hBcard : #B = pairCardThreshold (3 + γ) n δ)
     (hA₀A : A₀ ⊆ A) (hB₀B : B₀ ⊆ B) :
-    Real.exp (changFreimanDimExponent (κ C)) * #(A₀.image ψ ∪ B₀.image ψ) ≤ q := by
+    Real.exp (freimanDimExponent (κ C)) * #(A₀.image ψ ∪ B₀.image ψ) ≤ q := by
   have hX : (#(A₀.image ψ ∪ B₀.image ψ) : ℝ) ≤ 2 * pairCardThreshold (3 + γ) n δ :=
     mod_cast card_image_union_le_two_mul hAcard hBcard hA₀A hB₀B
   have hq := density_coeff_log_lt_exp_neg_mul_q hγ_pos hc_pos hc_lt hn hq_lower
@@ -106,7 +106,7 @@ private lemma exp_lt_card_image_union {γ C : ℝ} {n q : ℕ} {δ : unitInterva
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hψ : IsAddFreimanIso 2 (interval n) (ψ '' (interval n)) ψ) (hA₀int : A₀ ⊆ interval n)
     (hA₀large : (1 - ε γ) * pairCardThreshold (3 + γ) n δ ≤ #A₀) :
-    Real.exp (changContainerExponent (κ C)) < #(A₀.image ψ ∪ B₀.image ψ) := by
+    Real.exp (containerExponent (κ C)) < #(A₀.image ψ ∪ B₀.image ψ) := by
   linarith [two_mul_chang_size_threshold_lt_pairCardThreshold hγ_pos hC_one
     (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper,
     half_le_card_image_union (B₀ := B₀) hγ_pos hγ_le hψ hA₀int hA₀large]
@@ -160,7 +160,7 @@ and let `A₀ ⊆ A`, `B₀ ⊆ B` have size at least `(1 - ε γ) * k`. Let `X`
 in `ZMod q`. Then there is a proper progression `P` of dimension at most
 `min k (freimanDim X)` with at most `changCarrierBound (2 * k) (κ C)` points whose preimage in
 `[n]` contains `A₀` and `B₀`. Moreover `freimanDim X ≤ 2 * ⌈κ C⌉₊ - 1`. -/
-theorem largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
+lemma largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
     {δ : unitInterval}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (C_pos : 0 < C)
     (hc_pos : 0 < c) (hc_lt : c < 1) (hn : lowerSizeThreshold C γ < n)
@@ -198,11 +198,11 @@ theorem largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
     hc_pos hc_lt hn_gap (zmodModelQ_lower hγ_pos C_pos hn) hδ_lower hδ_upper_c hAcard hBcard
     hA₀A hB₀B
   obtain ⟨P, hP, hXP, -, hPdim, hPcard⟩ :=
-    exists_twoProperGAP_zmod_dim_le_freimanDim _ hq (two_le_κ_of_one_le hC) hXX hXlower hXupper
+    exists_twoProperGAP_zmod_dim_le_freimanDim _ hq (two_le_κ_of_one_le hC) hXX
+      (mul_bohrGAPDim_le_of_exp_lt (two_le_κ_of_one_le hC) hXlower) hXupper
   have hdim := freimanDim_le_two_mul_ceil_sub_one
     (card_pos.1 (mod_cast (Real.exp_pos _).trans hXlower)) hXX
-  refine ⟨P, (mem_properGAPsZModUpToDim hq.pos).2 ⟨P.twoProper_proper hP, ?_, ?_⟩,
-    ?_, ?_, hPdim, hdim⟩
+  refine ⟨P, (mem_properGAPsZModUpToDim hq.pos).2 ⟨hP.proper, ?_, ?_⟩, ?_, ?_, hPdim, hdim⟩
   · exact (hPdim.trans hdim).trans (two_mul_ceil_κ_sub_one_le_pairCardThreshold hγ_pos hC
       (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper)
   · exact card_carrier_le_ceil_changCarrierBound

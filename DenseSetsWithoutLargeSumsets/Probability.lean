@@ -125,7 +125,7 @@ lemma binomialFinsetSubset_real_superset_nat
     refine measureReal_mono ?_
     rintro _ ⟨S, hS, rfl⟩
     simpa using hS
-  · refine (le_of_eq ?_).trans (pow_nonneg p.2.1 _)
+  · refine (le_of_eq ?_).trans (pow_nonneg (unitInterval.nonneg p) _)
     rw [measureReal_eq_zero_iff, measure_eq_zero_iff_ae_notMem]
     filter_upwards [setBernoulli_ae_subset] with S hSΩ
     rintro ⟨S', hS', rfl⟩
@@ -359,9 +359,10 @@ private lemma deriv_eval_binomialLowerPolynomial_le (n s : ℕ) (hs : 0 < s) (hn
     {x : ℝ} (hx : x ∈ Set.Icc ((s : ℝ) / (n + 1)) ((s : ℝ) / n)) :
     deriv (fun y : ℝ ↦ (binomialLowerPolynomial n s).eval y) x ≤
       -(n : ℝ) * ((n - 1).choose (s - 1) : ℝ) * boundaryKernel n s (s / n) := by
+  obtain ⟨hxa, hxb⟩ := hx
   rw [deriv_eval_binomialLowerPolynomial n s hs]
-  have hk := antitoneOn_boundaryKernel n s hs hns hx ⟨hx.1.trans hx.2, le_rfl⟩ hx.2
-  linarith [mul_le_mul_of_nonneg_left hk
+  linarith [mul_le_mul_of_nonneg_left
+    (antitoneOn_boundaryKernel n s hs hns ⟨hxa, hxb⟩ ⟨hxa.trans hxb, le_rfl⟩ hxb)
     (by positivity : (0 : ℝ) ≤ n * (n - 1).choose (s - 1))]
 
 /-- For `0 < s ≤ d`, the probability that a binomial variable with parameters `n` and `s / n` is
@@ -375,11 +376,10 @@ private lemma centered_binomialLowerPolynomial_step (s d : ℕ) (hs : 0 < s) (hs
     (f := fun x ↦ (binomialLowerPolynomial (s + d) s).eval x) (by fun_prop) (by fun_prop)
     (fun x hx ↦ deriv_eval_binomialLowerPolynomial_le (s + d) s hs (by grind)
       (interior_subset hx)) _ ⟨le_rfl, hab⟩ _ ⟨hab, le_rfl⟩ hab
-  have hcost := centered_boundary_cost_le s d hs (hs.trans_le hsd)
   rw [boundaryKernel, Nat.add_sub_cancel_left] at hsec
   rw [eval_binomialLowerPolynomial_degree_succ (s + d) s hs (by grind), Nat.add_sub_cancel_left]
   push_cast at hsec ⊢
-  linarith
+  linarith [centered_boundary_cost_le s d hs (hs.trans_le hsd)]
 
 /-! ### The upper tail for `p ≤ 1 / 2` -/
 
@@ -415,14 +415,13 @@ private lemma le_of_paired_recurrences {x y z w a b c d P Q : ℝ}
 private lemma paired_binomial_factor_inequality {N R J x : ℝ} (hR : 0 < R) (hJ0 : 0 ≤ J)
     (hJ : J < R) (hNR : R ≤ N) (hx1 : x ≤ 1) (hratio : R * (1 - x) ≤ N * x) :
     (R - J) * (1 - x) * ((R + J) * (1 - x)) ≤ (N + J + 1) * x * ((N - J + 1) * x) := by
-  have hN0 : 0 ≤ N := hR.le.trans hNR
-  have hsq := pow_le_pow_left₀ (mul_nonneg hR.le (sub_nonneg.2 hx1)) hratio 2
   have hcoef : N ^ 2 * ((R - J) * (R + J)) ≤ R ^ 2 * ((N + J + 1) * (N - J + 1)) := by
     linarith [mul_nonneg (sq_nonneg R) (by linarith : 0 ≤ 2 * N + 1),
       mul_nonneg (sq_nonneg J) (sub_nonneg.2 (pow_le_pow_left₀ hR.le hNR 2))]
   refine le_of_mul_le_mul_left ?_ (pow_pos hR 2)
   linear_combination
-    mul_le_mul_of_nonneg_left hsq (mul_nonneg (sub_nonneg.2 hJ.le) (add_nonneg hR.le hJ0)) +
+    mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (mul_nonneg hR.le (sub_nonneg.2 hx1)) hratio 2)
+      (mul_nonneg (sub_nonneg.2 hJ.le) (add_nonneg hR.le hJ0)) +
       mul_le_mul_of_nonneg_right hcoef (sq_nonneg x)
 
 /-- Reflection of the binomial masses about `r`: if `2 * r ≤ n`, `r ≤ p * n` and `p ≤ 1 / 2`, then
@@ -455,7 +454,7 @@ private lemma binomialMass_reflection (n r : ℕ) (p : unitInterval) (h2r : 2 * 
       push_cast [Nat.cast_sub (by grind : j + 1 ≤ n - r), Nat.cast_sub (by grind : j + 1 ≤ r)]
       linear_combination paired_binomial_factor_inequality (N := (n - r : ℕ)) (R := r)
         (J := j + 1) (x := p) hr0 (by positivity) (mod_cast hjr)
-        (mod_cast (by grind : r ≤ n - r)) p.2.2 hratio
+        (mod_cast (by grind : r ≤ n - r)) (unitInterval.le_one p) hratio
 
 /-- If `2 * r ≤ n`, `r ≤ p * n` and `p ≤ 1 / 2`, then a binomial variable with parameters `n` and
 `p` is at least `r` with probability at least `1 / 2`. -/
@@ -467,7 +466,10 @@ private lemma one_half_le_binomialUpperTail_of_le_half (n r : ℕ) (p : unitInte
     refine (sum_le_sum fun j hj ↦
       binomialMass_reflection n r p h2r hmean hp_half j (mem_range.1 hj)).trans ?_
     rw [range_eq_Ico, sum_Ico_add (fun k ↦ binomialMass n k p) 0 r r]
-    exact sum_le_sum_of_subset_of_nonneg (fun k hk ↦ by grind) fun _ _ _ ↦ binomialMass_nonneg ..
+    gcongr
+    · intros
+      apply binomialMass_nonneg
+    · grind
   linarith [sum_range_add_binomialUpperTail n p (by grind : r ≤ n + 1)]
 
 private lemma binomialMass_le_next_add_next (n r : ℕ) (p : unitInterval) (hr : 3 ≤ r)
@@ -485,10 +487,9 @@ private lemma binomialMass_le_next_add_next (n r : ℕ) (p : unitInterval) (hr :
       linarith
     · push_cast
       ring
-  have hquad : (0 : ℝ) ≤ r ^ 2 - 2 * r - 2 := by nlinarith
   refine le_of_mul_le_mul_left ?_ (by positivity : (0 : ℝ) < (r + 1) * (r + 2))
   linear_combination (2 * (r : ℝ) + 1) * h₁ + ((r : ℝ) + 1) * h₂ +
-    mul_nonneg (binomialMass_nonneg n r p) hquad
+    mul_nonneg (binomialMass_nonneg n r p) (by nlinarith : (0 : ℝ) ≤ r ^ 2 - 2 * r - 2)
 
 /-- If `3 ≤ r`, `2 * r ≤ n`, `r ≤ p * n` and `p ≤ 1 / 2`, then a binomial variable with parameters
 `n` and `p` is greater than `r` with probability at least `1 / 4`. -/
@@ -501,7 +502,10 @@ private lemma one_fourth_le_binomialUpperTail_succ_of_le_half (n r : ℕ) (p : u
     refine (binomialMass_le_next_add_next n r p hr h2r hmean hp_half).trans ?_
     rw [← sum_pair (f := fun k ↦ binomialMass n k p) (by grind : r + 1 ≠ r + 2),
       binomialUpperTail]
-    exact sum_le_sum_of_subset_of_nonneg (fun k hk ↦ by grind) fun _ _ _ ↦ binomialMass_nonneg ..
+    gcongr
+    · intros
+      apply binomialMass_nonneg
+    · grind
   rw [binomialUpperTail_eq_add n p (by grind : r ≤ n)] at hhalf
   linarith
 
@@ -510,7 +514,7 @@ least `p * n` with probability at least `1 / 4`. -/
 private lemma one_fourth_le_binomialUpperTail_of_three_le_mean_of_le_half (n : ℕ)
     (p : unitInterval) (hmean : (3 : ℝ) ≤ (p : ℝ) * (n : ℝ)) (hp_half : (p : ℝ) ≤ 1 / 2) :
     (1 / 4 : ℝ) ≤ binomialUpperTail n ⌈(p : ℝ) * (n : ℝ)⌉₊ p := by
-  have hr := Nat.floor_le (mul_nonneg p.2.1 n.cast_nonneg)
+  have hr := Nat.floor_le (mul_nonneg (unitInterval.nonneg p) n.cast_nonneg)
   have hpn := mul_le_mul_of_nonneg_right hp_half (Nat.cast_nonneg (α := ℝ) n)
   have h2r : 2 * ⌊(p : ℝ) * n⌋₊ ≤ n := mod_cast (by linarith : (2 : ℝ) * ⌊(p : ℝ) * n⌋₊ ≤ n)
   exact (one_fourth_le_binomialUpperTail_succ_of_le_half n _ p (Nat.le_floor (mod_cast hmean)) h2r
@@ -530,7 +534,8 @@ private lemma eval_one_sub_binomialLowerPolynomial (n s : ℕ) (p : unitInterval
     (hsn : s ≤ n + 1) :
     (binomialLowerPolynomial n s).eval (1 - (p : ℝ)) = binomialUpperTail n (n + 1 - s) p := by
   rw [eval_binomialLowerPolynomial, binomialUpperTail]
-  refine sum_nbij' (n - ·) (n - ·) (by grind) (by grind) (by grind) (by grind) fun k hk ↦ ?_
+  refine sum_nbij' (n - ·) (n - ·) (by grind) (by grind) (by grind) (by grind) ?_
+  intro k hk
   have hkn : k ≤ n := by grind
   simp only [binomialMass]
   rw [Nat.choose_symm hkn, Nat.sub_sub_self hkn, sub_sub_cancel]
@@ -544,11 +549,13 @@ private lemma eval_half_binomialLowerPolynomial (n s : ℕ) (hsn : s ≤ n + 1) 
 
 private lemma ceil_mul_add_floor_one_sub_mul (n : ℕ) (p : unitInterval) :
     ⌈(p : ℝ) * n⌉₊ + ⌊(1 - (p : ℝ)) * n⌋₊ = n := by
-  have hpn : 0 ≤ (p : ℝ) * n := mul_nonneg p.2.1 n.cast_nonneg
-  have hceil : ⌈(p : ℝ) * n⌉₊ ≤ n := Nat.ceil_le.2 (mul_le_of_le_one_left n.cast_nonneg p.2.2)
+  have hceil : ⌈(p : ℝ) * n⌉₊ ≤ n :=
+    Nat.ceil_le.2 (mul_le_of_le_one_left n.cast_nonneg (unitInterval.le_one p))
   have hfloor : ⌊(1 - (p : ℝ)) * n⌋₊ = n - ⌈(p : ℝ) * n⌉₊ := by
-    rw [Nat.floor_eq_iff (mul_nonneg (sub_nonneg.2 p.2.2) n.cast_nonneg), Nat.cast_sub hceil]
-    constructor <;> linarith [Nat.le_ceil ((p : ℝ) * n), Nat.ceil_lt_add_one hpn]
+    rw [Nat.floor_eq_iff (mul_nonneg (unitInterval.one_sub_nonneg p) n.cast_nonneg),
+      Nat.cast_sub hceil]
+    constructor <;> linarith [Nat.le_ceil ((p : ℝ) * n),
+      Nat.ceil_lt_add_one (mul_nonneg (unitInterval.nonneg p) n.cast_nonneg)]
   grind
 
 private lemma one_fourth_le_eval_half_binomialLowerPolynomial_midpoint (n : ℕ) :
@@ -600,7 +607,7 @@ private lemma one_fourth_le_binomialLowerPolynomial_of_le_half (n : ℕ) (q : un
     (hn : 0 < n) (hq_half : (q : ℝ) ≤ 1 / 2) :
     (1 / 4 : ℝ) ≤ (binomialLowerPolynomial n (⌊(q : ℝ) * n⌋₊ + 1)).eval (q : ℝ) := by
   have hn0 : (0 : ℝ) < n := mod_cast hn
-  have hr₁ := Nat.floor_le (mul_nonneg q.2.1 hn0.le)
+  have hr₁ := Nat.floor_le (mul_nonneg (unitInterval.nonneg q) hn0.le)
   have hr₂ := Nat.lt_floor_add_one ((q : ℝ) * n)
   generalize ⌊(q : ℝ) * n⌋₊ = r at hr₁ hr₂ ⊢
   have hanti := antitoneOn_eval_binomialLowerPolynomial n (r + 1) r.succ_pos q.2
@@ -640,22 +647,18 @@ private lemma binomialFinsetSubset_real_card_ge_eq_upperTail {Ω : Set ℕ} (hΩ
     (binomialFinsetSubset Ω p).real {S : Finset ℕ | (S : Set ℕ) ⊆ Ω ∧ m ≤ #S} =
       binomialUpperTail Ω.ncard m p := by
   have hA : {S : Finset ℕ | (S : Set ℕ) ⊆ Ω ∧ m ≤ #S} =
-      ↑(hΩ.toFinset.powerset.filter fun S ↦ m ≤ #S) := by
+      ↑((Icc m #hΩ.toFinset).biUnion hΩ.toFinset.powersetCard) := by
     ext S
-    simp
-  have hmaps : ∀ S ∈ hΩ.toFinset.powerset.filter fun S ↦ m ≤ #S, #S ∈ Icc m #hΩ.toFinset :=
-    fun S hS ↦ mem_Icc.2 ⟨(mem_filter.1 hS).2, card_le_card (mem_powerset.1 (mem_filter.1 hS).1)⟩
-  rw [hA, ← sum_measureReal_singleton, binomialUpperTail, Set.ncard_eq_toFinset_card Ω hΩ,
-    ← sum_fiberwise_of_maps_to hmaps]
-  refine sum_congr rfl fun k hk ↦ ?_
-  have hfiber : ((hΩ.toFinset.powerset.filter fun S ↦ m ≤ #S).filter fun S ↦ #S = k) =
-      hΩ.toFinset.powersetCard k := by
-    ext S
-    grind
-  rw [hfiber, binomialMass, ← card_powersetCard, mul_assoc, ← nsmul_eq_mul, ← sum_const]
-  refine sum_congr rfl fun S hS ↦ ?_
-  rw [mem_powersetCard] at hS
-  rw [binomialFinsetSubset_real_singleton_nat_of_subset p hΩ (by simpa using hS.1), hS.2,
+    simpa using fun hS _ ↦ card_le_card (hΩ.subset_toFinset.2 hS)
+  rw [hA, ← sum_measureReal_singleton,
+    sum_biUnion (hΩ.toFinset.pairwise_disjoint_powersetCard.set_pairwise _), binomialUpperTail,
+    Set.ncard_eq_toFinset_card Ω hΩ]
+  congr with k
+  rw [binomialMass, ← card_powersetCard, mul_assoc, ← nsmul_eq_mul]
+  apply sum_eq_card_nsmul
+  intro S hS
+  obtain ⟨hSΩ, rfl⟩ := mem_powersetCard.1 hS
+  rw [binomialFinsetSubset_real_singleton_nat_of_subset p hΩ (by simpa using hSΩ),
     Set.ncard_eq_toFinset_card Ω hΩ]
 
 private lemma binomialFinsetSubset_real_dense_event_eq_upperTail (n : ℕ) (δ : unitInterval) :
@@ -671,7 +674,7 @@ private lemma binomialFinsetSubset_real_dense_event_eq_upperTail (n : ℕ) (δ :
 
 /-- If `δ n ≥ 3`, then the `δ`-random subset of `[n]` has at least `δ n` elements with probability
 at least `1 / 4`. -/
-theorem binomialFinsetSubset_real_dense_event_ge_quarter (n : ℕ) (δ : unitInterval)
+lemma binomialFinsetSubset_real_dense_event_ge_quarter (n : ℕ) (δ : unitInterval)
     (hmean : (3 : ℝ) ≤ (δ : ℝ) * (n : ℝ)) :
     (1 / 4 : ℝ) ≤
       (binomialFinsetSubset (Set.Icc 1 n) δ).real

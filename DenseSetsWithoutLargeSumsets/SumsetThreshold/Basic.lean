@@ -63,7 +63,7 @@ lemma card_interval (N : ℕ) : (interval N).card = N := by
 /-- Every element of `sumsetThresholdSet δ N` is at most `N`, as the set `S = [N]` shows. -/
 lemma le_of_mem_sumsetThresholdSet (hk : k ∈ sumsetThresholdSet δ N) : k ≤ N := by
   obtain ⟨A, -, hA, -, hAcard, -⟩ := hk (interval N) subset_rfl
-    (by simpa [card_interval] using mul_le_of_le_one_left N.cast_nonneg δ.2.2)
+    (by simpa [card_interval] using mul_le_of_le_one_left N.cast_nonneg (unitInterval.le_one δ))
   exact hAcard.trans ((Finset.card_le_card hA).trans_eq (card_interval N))
 
 lemma bddAbove_sumsetThresholdSet (δ : unitInterval) (N : ℕ) :
@@ -90,12 +90,15 @@ lemma pairEvent_of_le_phi (hk : k ≤ phi δ N) {S : Finset ℕ} (hS : S ⊆ int
 `A, B ⊆ [N]` and `|A|, |B| ≥ k`. -/
 lemma phi_lt_iff_existsDenseSetWithoutLargeSumsets :
     phi δ N < k ↔ existsDenseSetWithoutLargeSumsets N k δ := by
-  refine ⟨fun hlt ↦ ?_, fun ⟨S, hS, hcard, hpair⟩ ↦ ?_⟩
-  · by_contra hcon
-    refine hlt.not_ge (le_phi fun S hS hcard ↦ ?_)
+  constructor
+  · intro hlt
+    by_contra hcon
+    refine hlt.not_ge (le_phi ?_)
+    intro S hS hcard
     by_contra hpair
     exact hcon ⟨S, hS, hcard, hpair⟩
-  · by_contra hle
+  · rintro ⟨S, hS, hcard, hpair⟩
+    by_contra hle
     exact hpair (pairEvent_of_le_phi (not_lt.mp hle) hS hcard)
 
 alias ⟨_, phi_lt_of_existsDenseSetWithoutLargeSumsets⟩ :=
