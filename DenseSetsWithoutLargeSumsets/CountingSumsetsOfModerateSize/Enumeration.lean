@@ -7,7 +7,7 @@ module
 
 public import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.CoreParameters
 public import DenseSetsWithoutLargeSumsets.Common
-import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.ClassCountBounds
+public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.BoundedFreimanDimSets
 import SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 
@@ -19,8 +19,8 @@ Let `Y = A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and `|Y| ≤ m < k * (k + 1
 the Ruzsa triangle inequality, `|X + X| ≤ 3 * m ^ 2 / k`. Since `A` and `B` are `k`-subsets of
 `X`, the number of such `Y` is at most the sum over `k ≤ t ≤ 2 * k` of the number of sets `X ⊆ [n]`
 of size `t` with these properties times `(t.choose k) ^ 2`. The counts of the sets `X` are in
-`FreimanIsomorphismClasses` and `SmallSumsetIsomorphismClasses`. This is Section 3 of *Dense sets
-without large sumsets* (Dahia, Marciano, Souza).
+`CountingSumsetsOfModerateSize.BoundedFreimanDimSets`. This is Section 3 of *Dense sets without
+large sumsets* (Dahia, Marciano, Souza).
 
 ## Main definitions
 
@@ -290,7 +290,7 @@ private lemma ncard_boundedFreimanDimSets_mul_choose_sq_le {n r k t : ℕ} (hk :
   rw [Nat.cast_mul, Nat.cast_mul, (by grind : 10 * k = 8 * k + k + k), pow_add _ (8 * k + k),
     pow_add _ (8 * k), ← mul_assoc, ← mul_assoc]
   gcongr
-  exact (card_boundedFreimanDimSets n r t (by grind)).trans
+  exact (card_boundedFreimanDimSets n r (by grind : 0 < t)).trans
     (mul_le_mul_of_nonneg_left h₁ (by positivity))
 
 /-- If `m < k * (k + 1) / 2`, then the number of sets `A + B` with `A, B ⊆ [n]`,
@@ -319,7 +319,7 @@ private lemma ncard_smallSumsetFreimanDimSets_mul_choose_sq_le {n k m t : ℕ} {
       (n : ℝ) ^ (2 * m / k + 1) * ((6 * Real.exp 1 * (m : ℝ)) / (k : ℝ)) ^ (6 * k) *
         Real.exp (((2 * k : ℕ) : ℝ) ^ ((31 : ℝ) / 32)) := by
   have hk' := two_pow_200_le_smallSumsetClassCountThreshold.trans hk
-  have hcount := smallSumsetFreimanDimSets_ncard_le_of_class_cover n (2 * m / k)
+  have hcount := smallSumsetFreimanDimSets_ncard_le n (2 * m / k)
     (3 * (m * m / k)) t (hk.trans hkt) (three_mul_sq_div_le_rpow hc hk' hm hkt)
   have hexp : Real.exp ((t : ℝ) ^ ((31 : ℝ) / 32)) ≤
       Real.exp (((2 * k : ℕ) : ℝ) ^ ((31 : ℝ) / 32)) :=

@@ -7,10 +7,10 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "5dc9e2fc3947d35dd3701ffc417462033c759699",
+   "rev": "3d2269518ae8d6b2ba971e2a9cd93325ed4d1ab4",
    "name": "CountingSetsWithSmallSumset",
    "manifestFile": "lake-manifest.json",
-   "inputRev": "5dc9e2fc3947d35dd3701ffc417462033c759699",
+   "inputRev": "3d2269518ae8d6b2ba971e2a9cd93325ed4d1ab4",
    "inherited": false,
    "configFile": "lakefile.toml"
   },

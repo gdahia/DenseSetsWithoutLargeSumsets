@@ -1,6 +1,6 @@
 {
-  "challenge_module": "Challenge",
-  "solution_module": "Solution",
+  "challenge_module": "DenseSetsWithoutLargeSumsetsPalomar.Challenge",
+  "solution_module": "DenseSetsWithoutLargeSumsetsPalomar.Solution",
   "theorem_names": [
     "DenseSetsWithoutLargeSumsets.exists_dense_subset_forall_add_not_subset'",
     "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc'",

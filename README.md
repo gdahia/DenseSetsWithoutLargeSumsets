@@ -57,9 +57,10 @@ $\delta_N = 1 / \log N$. It is not: for every sequence $\delta_N \to 0$,
 
 $$\frac{\varphi(\delta_N, N)}{\log N} \to 0.$$
 
-[Challenge.lean](Challenge.lean) states these six theorems under the library names with a prime,
-with `sorry` placeholders, in terms of Mathlib and of the definitions `interval`, `pairEvent`,
-`sumsetThresholdSet` and `phi`. [Solution.lean](Solution.lean) proves each statement by the
+[Challenge.lean](DenseSetsWithoutLargeSumsetsPalomar/Challenge.lean) states these six theorems
+under the library names with a prime, with `sorry` placeholders, in terms of Mathlib and of the
+definitions `interval`, `pairEvent`, `sumsetThresholdSet` and `phi`.
+[Solution.lean](DenseSetsWithoutLargeSumsetsPalomar/Solution.lean) proves each statement by the
 library theorem. The library and the solution contain no `sorry`, and the theorems depend on no
 axioms other than `propext`, `Classical.choice` and `Quot.sound`.
 
@@ -116,9 +117,10 @@ Four results that the paper cites are proved in Lake dependencies pinned to a co
   [*Large sumsets from medium-sized subsets*](https://arxiv.org/abs/2206.09366).
 - [CountingSetsWithSmallSumset](https://github.com/gdahia/CountingSetsWithSmallSumset): Sections 3
   and 4 of Ben Green, *Counting sets with small sumset, and the clique number of random Cayley
-  graphs*, Combinatorica 25 (2005), 307–326: the number of sets of given Freiman dimension,
-  `card_boundedFreimanDimSets`, and the number of Freiman isomorphism classes of sets with small
-  sumset, `exists_coversFreimanIsoClasses_card_restrictedSumset_le`.
+  graphs*, Combinatorica 25 (2005), 307–326: Lemma 11, Proposition 18 and the bound for the members
+  of a Freiman isomorphism class in an interval from the proof of Proposition 23. From them,
+  `CountingSumsetsOfModerateSize/BoundedFreimanDimSets.lean` counts the sets of natural numbers of
+  given Freiman dimension, `card_boundedFreimanDimSets` and `smallSumsetFreimanDimSets_ncard_le`.
 
 ## Files
 
@@ -153,8 +155,11 @@ scope, and the use of AI coding agents.
 `one_div_log_one_div_le_liminf_phi_div_log'`, `limsup_phi_div_log_le_three_div_log_one_div'`,
 `limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos'` and
 `tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero'` with `sorry`. `comparator.json` names these
-six theorems, `Challenge` and `Solution` as the modules to compare, and `propext`,
-`Classical.choice` and `Quot.sound` as the permitted axioms.
+six theorems, `DenseSetsWithoutLargeSumsetsPalomar.Challenge` and
+`DenseSetsWithoutLargeSumsetsPalomar.Solution` as the modules to compare, and `propext`,
+`Classical.choice` and `Quot.sound` as the permitted axioms. The two modules sit in
+`DenseSetsWithoutLargeSumsetsPalomar/` rather than at the root, so that they do not clash with the
+`Challenge` and `Solution` modules of the projects this one requires.
 
 ## Build
 
@@ -168,9 +173,8 @@ lake build
 ```
 
 The default build includes the library, challenge, and solution. The `sorry` warnings from
-`Challenge.lean` are expected. LargeSumsetsFromSubsets and CountingSetsWithSmallSumset are private
-for now, so Lake cannot fetch them over HTTPS without credentials; a checkout of each at the pinned
-commit under `.lake/packages/` works.
+`Challenge.lean` are expected. LargeSumsetsFromSubsets is private for now, so Lake cannot fetch it
+over HTTPS without credentials; a checkout at the pinned commit under `.lake/packages/` works.
 
 CI also runs `scripts/check-lean-sources.py`, `scripts/validate-formalization.rb` and
 `scripts/verify-comparator.sh`. The last one needs Linux with `bwrap`.

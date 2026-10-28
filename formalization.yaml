@@ -141,9 +141,11 @@ related_formalizations:
   - id: "https://github.com/gdahia/CountingSetsWithSmallSumset"
     relationship: "builds-on"
     note: >-
-      A Lake dependency and the source of the results of Sections 3 and 4 of Green's paper,
-      used for moderate sumsets: the number of sets of given Freiman dimension and the number
-      of Freiman isomorphism classes of sets with small sumset.
+      A Lake dependency and the source of Lemma 11, Proposition 18 and the bound for the
+      members of a Freiman isomorphism class in an interval from the proof of Proposition 23
+      of Green's paper. They give the counts of sets of natural numbers of given Freiman
+      dimension in CountingSumsetsOfModerateSize.BoundedFreimanDimSets, used for moderate
+      sumsets.
   - id: "https://github.com/leanprover-community/mathlib4/pull/25841"
     relationship: "adapts"
     note: >-
@@ -194,7 +196,7 @@ automation:
         and Hetzel and of Kra, Moreira, Richter and Robertson, and the branches of this
         repository.
       cost:
-        wall_time: "three sessions"
+        wall_time: "four sessions"
         spend_usd: "not tracked"
         hardware: "local machine"
       prompting_notes: >-
@@ -208,7 +210,10 @@ automation:
         used one subagent for each group of files. Then two instructions to move Green's
         Sections 3 and 4 to a repository of their own and the Freiman dimension to
         SumOfSetsInSeveralDimensions. Then one instruction to take ChangFreimanRuzsa from
-        GitHub and to follow the author's Palomar conventions.
+        GitHub and to follow the author's Palomar conventions. Then one instruction to follow
+        the author's Palomar submission standards. Then one instruction to move here from
+        CountingSetsWithSmallSumset the counts of sets of natural numbers that Green does not
+        state, and to take CountingSetsWithSmallSumset from GitHub.
   spend_usd: "not tracked"
   notes: >-
     The proofs up to commit 5f4b915 were written by Codex agents directed by Gabriel Dahia.
@@ -224,7 +229,10 @@ automation:
     ChangFreimanRuzsa and SumOfSetsInSeveralDimensions from GitHub, adapted the proofs to the
     renamed exponents of ChangFreimanRuzsa, renamed the library theorems after the
     statements of Challenge.lean, gave the statements of Challenge.lean and Solution.lean
-    primed names, and minimized the imports. Every proof is checked by Lean.
+    primed names, and minimized the imports. In a fourth session it moved Challenge.lean and
+    Solution.lean to DenseSetsWithoutLargeSumsetsPalomar/, moved card_boundedFreimanDimSets
+    and smallSumsetFreimanDimSets_ncard_le here from CountingSetsWithSmallSumset, and moved
+    to its public version on GitHub. Every proof is checked by Lean.
 
 fidelity:
   divergences: >-
@@ -251,8 +259,11 @@ fidelity:
     is answered for every sequence δ_N → 0 with values in the unit interval; the sequence
     1/log N is clamped to the unit interval in logDensity and equals 1/log N for N ≥ 3.
 
-    Green's Sections 3 and 4 are formalized, in CountingSetsWithSmallSumset, in the form the
-    count of moderate sumsets needs; the differences from the paper are recorded there.
+    Green's paper is formalized in CountingSetsWithSmallSumset, and the differences from it
+    are recorded there. Green does not state the counts card_boundedFreimanDimSets and
+    smallSumsetFreimanDimSets_ncard_le of sets of natural numbers; they are proved here from
+    Lemma 11 or Proposition 18 and the bound n^(r + 1) for the members of a Freiman
+    isomorphism class in {1, ..., n}, as in the proof of Proposition 23.
 
 review:
   status: "unchecked"
@@ -264,7 +275,7 @@ alignment:
   statements:
     - source: "Dense sets without large sumsets, Theorem 1.1"
       lean: "DenseSetsWithoutLargeSumsets.exists_dense_subset_forall_add_not_subset'"
-      module: "Challenge"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
         Library forms: exists_dense_subset_forall_add_not_subset,
@@ -280,28 +291,28 @@ alignment:
         k = ⌈(3 + γ) log n / log(1/δ)⌉.
     - source: "Dense sets without large sumsets, Corollary 1.2"
       lean: "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc'"
-      module: "Challenge"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
         Library form: exists_forall_phi_div_log_mem_Icc in
         DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
     - source: "On growth rates of infinite and finite sumsets, Corollary C"
       lean: "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log'"
-      module: "Challenge"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
         Proved from the Kővári-Sós-Turán theorem, not by the argument of Hernández and
         Hetzel.
     - source: "Dense sets without large sumsets, Corollary 1.2, upper bound for fixed δ"
       lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_le_three_div_log_one_div'"
-      module: "Challenge"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: "limsup φ(δ, N)/log N ≤ 3/log(1/δ)."
     - source: >-
         Problems on infinite sumset configurations in the integers and beyond,
         Conjecture 4.10
       lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos'"
-      module: "Challenge"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
         For 0 < δ < 1, with the limits in the extended reals. Library form:
@@ -311,7 +322,7 @@ alignment:
         Problems on infinite sumset configurations in the integers and beyond,
         Question 4.12
       lean: "DenseSetsWithoutLargeSumsets.tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero'"
-      module: "Challenge"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
         The answer is negative. For δ_N = 1/log N see also
@@ -325,7 +336,7 @@ alignment:
         Theorem 2.3 of the paper, with a larger exponent for the size of the progression.
         Proved in the dependency ChangFreimanRuzsa.
     - source: "Counting sets with small sumset, Sections 3 and 4"
-      lean: "CountingSetsWithSmallSumset.exists_coversFreimanIsoClasses_card_restrictedSumset_le"
+      lean: "CountingSetsWithSmallSumset.exists_representsFreimanIsoClasses_card_restrictedSumset_le"
       module: "CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.ClassCountBounds"
       status: "proved"
       note: >-
