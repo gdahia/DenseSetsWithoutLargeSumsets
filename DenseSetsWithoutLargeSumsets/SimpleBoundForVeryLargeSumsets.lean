@@ -34,6 +34,8 @@ the pair is determined by `B`, by `F` and by a `k`-subset of `F + B - B`, a set 
 * `pair_small_sumset_family_card_le`: there are at most `n ^ (k + m / k) * (k ^ 3).choose k`
   pairs `(A, B)` of `k`-subsets of `[n]` with `|A + B| ≤ m`.
 * `very_large_sumset_probability_le`: the probability bound above, for `n ^ (-1 / 2) < δ ≤ 1 - c`.
+* `eventually_forall_setBernoulli_real_veryLargeSumsetEvent_le`: Lemma 4.1 of the paper, for all
+  large `n`, with the random set distributed as `setBernoulli (Set.Icc 1 n) δ`.
 -/
 
 @[expose] public section
@@ -421,6 +423,22 @@ lemma very_large_sumset_probability_le {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le :
         (n : ℝ) ^ (γ * (pairCardThreshold (3 + γ) n δ : ℝ) / 3) :=
   veryLargeSumsetEvent_measure_le γ n δ
     (veryLargeSumsetAnalyticBound_of_lt hγ_pos hγ_le hc_pos hn hδ_lower hδ_upper)
+
+/-- **Lemma 4.1.** Let `0 < γ ≤ 1`, `c > 0` and `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`. For all large
+`n` and every `n ^ (-1 / 2) < δ ≤ 1 - c`, the `δ`-random subset of `[n]` contains a sumset `A + B`
+with `A, B ⊆ [n]`, `|A| = |B| = k` and `|A + B| ≥ (k + 1) * k / 2` with probability at most
+`k ^ 2 / n ^ (γ * k / 3)`. -/
+theorem eventually_forall_setBernoulli_real_veryLargeSumsetEvent_le {γ c : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 1) (hc : 0 < c) :
+    ∀ᶠ n : ℕ in Filter.atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-(1 / 2 : ℝ)) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (ProbabilityTheory.setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | veryLargeSumsetEvent n (pairCardThreshold (3 + γ) n δ) S}) ≤
+          pairCardThreshold (3 + γ) n δ ^ 2 / n ^ (γ * pairCardThreshold (3 + γ) n δ / 3) := by
+  filter_upwards [Filter.eventually_gt_atTop (veryLargeSumsetStrictThreshold γ c)]
+    with n hn δ hδ hδ'
+  rw [← binomialFinsetSubset_real_eq_image (Set.finite_Icc 1 n)]
+  exact very_large_sumset_probability_le hγ hγ' hc hn hδ hδ'
 
 end
 

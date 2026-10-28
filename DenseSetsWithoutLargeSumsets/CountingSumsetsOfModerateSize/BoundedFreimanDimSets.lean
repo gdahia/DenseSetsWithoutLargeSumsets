@@ -7,7 +7,6 @@ module
 
 public import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.CoreParameters
 public import SumOfSetsInSeveralDimensions.FreimanDimension
-public import Mathlib.Analysis.SpecialFunctions.Exp
 import CountingSetsWithSmallSumset.FreimanIsomorphismClasses.MembersInInterval
 import CountingSetsWithSmallSumset.FreimanIsomorphismClasses.RelationSpaces
 import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.ClassCountBounds

@@ -36,6 +36,8 @@ is at most `n ^ (-(ε γ / 2))`.
 * `small_sumset_pair_probability_le_fingerprint_sum`: the union bound over progressions and
   pairs.
 * `small_sumset_pair_probability_le`: the probability is at most `2 * k / n ^ (ε γ / 2)`.
+* `exists_forall_setBernoulli_real_pairSumsetIsSubset_le`: Lemma 2.1 of the paper, with the
+  exponent `α` quantified and the random set distributed as `setBernoulli (Set.Icc 1 n) δ`.
 -/
 
 @[expose] public section
@@ -131,6 +133,23 @@ lemma small_sumset_pair_probability_le {γ C c : ℝ} {n : ℕ} {δ : unitInterv
         hδ_lt hAcard hBcard hAB)
     · rw [measureReal_empty]
       positivity
+
+/-- **Lemma 2.1.** Let `0 < γ ≤ 1`, `C > 1` and `c > 0`. There is `α > 0` such that, for all large
+`n`, every `n ^ (-α) < δ ≤ 1 - c` and `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`, the `δ`-random subset
+of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and `|A + B| ≤ C * k` with
+probability at most `2 * k / n ^ (γ / (8 * (γ + 2)))`. -/
+theorem exists_forall_setBernoulli_real_pairSumsetIsSubset_le {γ C c : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 1) (hC : 1 < C) (hc : 0 < c) :
+    ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in Filter.atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-α) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (ProbabilityTheory.setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
+              (C * pairCardThreshold (3 + γ) n δ) S}) ≤
+          2 * pairCardThreshold (3 + γ) n δ / n ^ (γ / (8 * (γ + 2))) := by
+  refine ⟨lowerDensityExponent C γ, lowerDensityExponent_pos_of_one_le hγ hC.le, ?_⟩
+  filter_upwards [Filter.eventually_gt_atTop ⌈lowerGapThreshold C γ c⌉₊] with n hn δ hδ hδ'
+  rw [← binomialFinsetSubset_real_eq_image (Set.finite_Icc 1 n), ← ε_div_two]
+  exact small_sumset_pair_probability_le hγ hγ' (by linarith) hc (Nat.lt_of_ceil_lt hn) hδ hδ'
 
 end
 

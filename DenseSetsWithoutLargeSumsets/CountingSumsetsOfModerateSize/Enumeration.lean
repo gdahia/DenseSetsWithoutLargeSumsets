@@ -5,9 +5,8 @@ Authors: Gabriel Dahia
 -/
 module
 
-public import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.CoreParameters
 public import DenseSetsWithoutLargeSumsets.Common
-public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.BoundedFreimanDimSets
+import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.BoundedFreimanDimSets
 import SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 
@@ -32,8 +31,8 @@ large sumsets* (Dahia, Marciano, Souza).
 
 * `pairSumsetsFamily_ncard_le`: if `m < k * (k + 1) / 2`, then
   `|pairSumsetsFamily n k m| ≤ n ^ (2 * m / k + 1) * k ^ (24 * k)`.
-* `pairSumsetsFamily_ncard_le_of_small_sumset`: if moreover `k` is large and `m ≤ k ^ (1 + c)` with
-  `c ≤ 2⁻⁸`, then `|pairSumsetsFamily n k m|` is at most
+* `pairSumsetsFamily_ncard_le_of_small_sumset`: if moreover `k ≥ 2 ^ 9000` and `m ≤ k ^ (1 + c)`
+  with `c ≤ 2⁻⁸`, then `|pairSumsetsFamily n k m|` is at most
   `n ^ (2 * m / k + 1) * (6 * e * m / k) ^ (6 * k) * exp (k ^ (1 - 2 * c))`.
 -/
 
@@ -331,18 +330,19 @@ private lemma ncard_smallSumsetFreimanDimSets_mul_choose_sq_le {n k m t : ℕ} {
     (by positivity)) hexp (by positivity) (by positivity))
   ring
 
-/-- If `m < k * (k + 1) / 2`, `k` is large and `m ≤ k ^ (1 + c)` with `c ≤ 2⁻⁸`, then the number
+/-- If `m < k * (k + 1) / 2`, `k ≥ 2 ^ 9000` and `m ≤ k ^ (1 + c)` with `c ≤ 2⁻⁸`, then the number
 of sets `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and `|A + B| ≤ m` is at most
 `n ^ (2 * m / k + 1) * (6 * e * m / k) ^ (6 * k) * exp (k ^ (1 - 2 * c))`. -/
 lemma pairSumsetsFamily_ncard_le_of_small_sumset (n k m : ℕ) (c : ℝ)
     (hm : m < k * (k + 1) / 2)
     (hc_le : c ≤ 1 / (2 : ℝ) ^ (8 : ℕ))
-    (hk_threshold : smallSumsetClassCountThreshold ≤ k)
+    (hk_threshold : 2 ^ 9000 ≤ k)
     (hm_small : (m : ℝ) ≤ (k : ℝ) ^ (1 + c)) :
     ((pairSumsetsFamily n k m).ncard : ℝ) ≤
       (n : ℝ) ^ (2 * (m : ℝ) / (k : ℝ) + 1) *
         ((6 * Real.exp 1 * (m : ℝ)) / (k : ℝ)) ^ (6 * k) *
           Real.exp ((k : ℝ) ^ (1 - 2 * c)) := by
+  rw [← smallSumsetClassCountThreshold_def] at hk_threshold
   by_cases h : n < k ∨ m < k
   · rw [pairSumsetsFamily_eq_empty h, Set.ncard_empty, Nat.cast_zero]
     positivity

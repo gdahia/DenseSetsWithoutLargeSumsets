@@ -32,6 +32,8 @@ For a fixed `0 < y < 1` the upper bound gives `φ(y, N) / log N ≤ 4 / log (1 /
 * `liminf_phi_logDensity_div_log_eq_zero`: the same for `δ_N = 1 / log N`.
 * `eventually_phi_logDensity_lt_log_div_log_log`: `φ(1 / log N, N) < 4 * log N / log (log N)` for
   all large `N`.
+* `eventually_phi_lt_log_div_log_log`: the same for every sequence `δ_N` that equals `1 / log N`
+  for all large `N`.
 -/
 
 @[expose] public section
@@ -137,5 +139,14 @@ lemma eventually_phi_logDensity_lt_log_div_log_log :
       eventually_coe_logDensity_le_half,
     eventually_ge_atTop 3] with N hN hN₃
   rwa [coe_logDensity hN₃, one_div_one_div, (by norm_num : (3 + 1 : ℝ) = 4)] at hN
+
+/-- The rate in the second part of Question 4.12: if `δ_N = 1 / log N` for all large `N`, then
+`φ(δ_N, N) < 4 * log N / log (log N)` for all large `N`. -/
+theorem eventually_phi_lt_log_div_log_log (δ : ℕ → unitInterval)
+    (hδ : ∀ᶠ N : ℕ in atTop, (δ N : ℝ) = 1 / log N) :
+    ∀ᶠ N : ℕ in atTop, (phi (δ N) N : ℝ) < 4 * log N / log (log N) := by
+  filter_upwards [hδ, eventually_phi_logDensity_lt_log_div_log_log, eventually_ge_atTop 3]
+    with N hδN hN hN₃
+  rwa [(Subtype.ext (hδN.trans (coe_logDensity hN₃).symm) : δ N = logDensity N)]
 
 end DenseSetsWithoutLargeSumsets

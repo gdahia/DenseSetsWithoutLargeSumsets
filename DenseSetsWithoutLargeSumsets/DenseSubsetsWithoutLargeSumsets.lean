@@ -33,6 +33,8 @@ contains no sumset `A + B` with `|A|, |B| ≥ k`.
 ## Main statements
 
 * `eventually_pairEvent_probability_le`: Theorem 1.3, with the bound above on the probability.
+* `exists_forall_setBernoulli_real_pairEvent_le`: Theorem 1.3 with the exponent `α` quantified
+  and the random set distributed as `setBernoulli (Set.Icc 1 n) δ`.
 * `eventually_forall_exists_dense_subset_without_large_sumsets`: Theorem 1.1, for all large `n` and
   every `δ` with `n ^ (-α) < δ ≤ 1 - c`.
 * `dense_subset_without_large_sumsets`: Theorem 1.1 along a sequence of densities.
@@ -225,6 +227,22 @@ theorem eventually_pairEvent_probability_le {γ c : ℝ} (hγ_pos : 0 < γ) (hγ
   · exact pairCardThreshold_ge_two_of_density_lower (by linarith)
       ((min_le_left _ _).trans (by linarith)) hn_two (by linarith) hδ_lower
 
+/-- **Theorem 1.3.** For `0 < γ ≤ 1` and `0 < c < 1` there is `α > 0` such that, for all large
+`n`, every `n ^ (-α) < δ ≤ 1 - c` and `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`, the `δ`-random subset
+of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]` and `|A|, |B| ≥ k` with probability at most
+`4 * k ^ 2 / n ^ (γ / (8 * (γ + 3)))`. -/
+theorem exists_forall_setBernoulli_real_pairEvent_le {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
+    (hc : 0 < c) (hc' : c < 1) :
+    ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-α) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (ProbabilityTheory.setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | pairEvent n (pairCardThreshold (3 + γ) n δ) S}) ≤
+          4 * pairCardThreshold (3 + γ) n δ ^ 2 / n ^ (γ / (8 * (γ + 3))) := by
+  refine ⟨denseSubsetDensityExponent γ c, denseSubsetDensityExponent_pos hγ hc hc', ?_⟩
+  filter_upwards [eventually_pairEvent_probability_le hγ hγ' hc hc'] with n hn δ hδ hδ'
+  rw [← binomialFinsetSubset_real_eq_image (Set.finite_Icc 1 n)]
+  exact hn δ hδ hδ'
+
 private lemma three_le_rpow_neg_mul {n : ℕ} {α : ℝ} (hn : 9 ≤ n) (hα : α ≤ 1 / 2) :
     3 ≤ (n : ℝ) ^ (-α) * n := by
   have hn₉ : (9 : ℝ) ≤ n := mod_cast hn
@@ -283,10 +301,9 @@ theorem dense_subset_without_large_sumsets {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_
   filter_upwards [eventually_forall_exists_dense_subset_without_large_sumsets hγ_pos hγ_le hc_pos
     hc_lt, hδ_lower, hδ_upper] with n hmain h₁ h₂ using hmain (δ n) h₁ h₂
 
-/-- **Dense sets without large sumsets** (Theorem 1.1). For every $0 < \gamma \le 1$ and
-$0 < c < 1$ there is $\alpha > 0$ such that, for all large $n$ and every
-$n^{-\alpha} < \delta \le 1 - c$, some $S \subseteq [n]$ with $|S| \ge \delta n$ contains no sumset
-$A + B$ with $A, B \subseteq [n]$ and $|A|, |B| \ge (3 + \gamma) \log n / \log(1 / \delta)$. -/
+/-- **Theorem 1.1.** For `0 < γ ≤ 1` and `0 < c < 1` there is `α > 0` such that, for all large `n`
+and every `n ^ (-α) < δ ≤ 1 - c`, some `S ⊆ [n]` with `|S| ≥ δ n` contains no sumset `A + B` with
+`A, B ⊆ [n]` and `|A|, |B| ≥ (3 + γ) * log n / log (1 / δ)`. -/
 theorem exists_dense_subset_forall_add_not_subset {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
     (hc : 0 < c) (hc' : c < 1) :
     ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : ℝ, (n : ℝ) ^ (-α) < δ → δ ≤ 1 - c →

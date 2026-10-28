@@ -40,6 +40,9 @@ bounds at `1 / 2` follow from the case `p ≤ 1 / 2`.
 
 ## Main statements
 
+* `binomialFinsetSubset_real_eq_image`: for finite `Ω`, the `p`-random subset of `Ω` lies in a
+  family of finsets with the same probability as a random set with distribution
+  `setBernoulli Ω p` lies in its image.
 * `setBernoulli_real_superset`: a random set with distribution `setBernoulli Ω p` contains a given
   finite set `T ⊆ Ω` with probability `p ^ |T|`.
 * `binomialFinsetSubset_real_superset_nat`: the `p`-random subset of a finite set `Ω ⊆ ℕ` contains
@@ -102,7 +105,7 @@ private lemma measurable_dite_toFinset {α : Type*} [Countable α] :
 
 /-- For finite `Ω`, the `p`-random subset of `Ω` lies in a family `A` of finsets with the same
 probability as a random set with distribution `setBernoulli Ω p` lies in `A`. -/
-private lemma binomialFinsetSubset_real_eq_image {Ω : Set ℕ} (hΩ : Ω.Finite) (p : unitInterval)
+lemma binomialFinsetSubset_real_eq_image {Ω : Set ℕ} (hΩ : Ω.Finite) (p : unitInterval)
     (A : Set (Finset ℕ)) :
     (binomialFinsetSubset Ω p).real A = (setBernoulli Ω p).real ((↑) '' A) := by
   rw [binomialFinsetSubset, map_measureReal_apply measurable_dite_toFinset

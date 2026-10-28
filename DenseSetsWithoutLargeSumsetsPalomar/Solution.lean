@@ -3,32 +3,38 @@ Copyright (c) 2026 Gabriel Dahia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Dahia
 -/
-module
+module -- shake: keep-all
 
+public import Mathlib.Probability.Distributions.SetBernoulli
+public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Probability
+public import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
 public import DenseSetsWithoutLargeSumsets.SumsetThreshold.Basic
+import DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets
+import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem
 import DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth
+import DenseSetsWithoutLargeSumsets.SumsetThreshold.LowerBound
 import DenseSetsWithoutLargeSumsets.SumsetThreshold.UpperBound
 import DenseSetsWithoutLargeSumsets.SumsetThreshold.VanishingDensity
 
 /-!
 # Dense sets without large sumsets
 
-The statements of `Challenge.lean`, which are the results of the library with the same names
-without the prime. The definitions `interval` and `pairEvent` are those of `Common.lean`, and
-`sumsetThresholdSet` and `phi` those of `SumsetThreshold/Basic.lean`.
+The statements of `Challenge.lean`, proved by the results of the library with the same names
+without the prime.
 -/
 
 public section
 
-open Filter Real
+open Filter ProbabilityTheory Real
 open scoped Finset Pointwise
 
 namespace DenseSetsWithoutLargeSumsets
 
-/-- **Dense sets without large sumsets** (Theorem 1.1). For every $0 < \gamma \le 1$ and
-$0 < c < 1$ there is $\alpha > 0$ such that, for all large $n$ and every
-$n^{-\alpha} < \delta \le 1 - c$, some $S \subseteq [n]$ with $|S| \ge \delta n$ contains no sumset
-$A + B$ with $A, B \subseteq [n]$ and $|A|, |B| \ge (3 + \gamma) \log n / \log(1 / \delta)$. -/
+/-! ### Dense sets without large sumsets -/
+
+/-- **Theorem 1.1.** For `0 < γ ≤ 1` and `0 < c < 1` there is `α > 0` such that, for all large `n`
+and every `n ^ (-α) < δ ≤ 1 - c`, some `S ⊆ [n]` with `|S| ≥ δ n` contains no sumset `A + B` with
+`A, B ⊆ [n]` and `|A|, |B| ≥ (3 + γ) * log n / log (1 / δ)`. -/
 theorem exists_dense_subset_forall_add_not_subset' {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
     (hc : 0 < c) (hc' : c < 1) :
     ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : ℝ, (n : ℝ) ^ (-α) < δ → δ ≤ 1 - c →
@@ -37,10 +43,9 @@ theorem exists_dense_subset_forall_add_not_subset' {γ c : ℝ} (hγ : 0 < γ) (
           ¬ A + B ⊆ S :=
   exists_dense_subset_forall_add_not_subset hγ hγ' hc hc'
 
-/-- **Corollary 1.2.** For every $0 < \gamma \le 1$ and $0 < c < 1$ there is $\alpha > 0$ such
-that, for all large $n$ and every $n^{-\alpha} \le \delta \le 1 - c$,
-$(1 - \gamma) / \log(1 / \delta) \le \varphi(\delta, n) / \log n$ and
-$\varphi(\delta, n) / \log n \le (3 + \gamma) / \log(1 / \delta)$. -/
+/-- **Corollary 1.2.** For `0 < γ ≤ 1` and `0 < c < 1` there is `α > 0` such that, for all large
+`n` and every `n ^ (-α) ≤ δ ≤ 1 - c`,
+`(1 - γ) / log (1 / δ) ≤ φ(δ, n) / log n ≤ (3 + γ) / log (1 / δ)`. -/
 theorem exists_forall_phi_div_log_mem_Icc' {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1) (hc : 0 < c)
     (hc' : c < 1) :
     ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval,
@@ -49,38 +54,164 @@ theorem exists_forall_phi_div_log_mem_Icc' {γ c : ℝ} (hγ : 0 < γ) (hγ' : �
           Set.Icc ((1 - γ) / log (1 / δ)) ((3 + γ) / log (1 / δ)) :=
   exists_forall_phi_div_log_mem_Icc hγ hγ' hc hc'
 
-/-- **Corollary C of Hernández and Hetzel.** For fixed $0 < \delta < 1$,
-$1 / \log(1 / \delta) \le \liminf_N \varphi(\delta, N) / \log N$. -/
+/-- **Theorem 1.3.** For `0 < γ ≤ 1` and `0 < c < 1` there is `α > 0` such that, for all large
+`n`, every `n ^ (-α) < δ ≤ 1 - c` and `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`, the `δ`-random subset
+of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]` and `|A|, |B| ≥ k` with probability at most
+`4 * k ^ 2 / n ^ (γ / (8 * (γ + 3)))`. -/
+theorem exists_forall_setBernoulli_real_pairEvent_le' {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
+    (hc : 0 < c) (hc' : c < 1) :
+    ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-α) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | pairEvent n (pairCardThreshold (3 + γ) n δ) S}) ≤
+          4 * pairCardThreshold (3 + γ) n δ ^ 2 / n ^ (γ / (8 * (γ + 3))) :=
+  exists_forall_setBernoulli_real_pairEvent_le hγ hγ' hc hc'
+
+/-- **Lemma 2.1.** Let `0 < γ ≤ 1`, `C > 1` and `c > 0`. There is `α > 0` such that, for all large
+`n`, every `n ^ (-α) < δ ≤ 1 - c` and `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`, the `δ`-random subset
+of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and `|A + B| ≤ C * k` with
+probability at most `2 * k / n ^ (γ / (8 * (γ + 2)))`. -/
+theorem exists_forall_setBernoulli_real_pairSumsetIsSubset_le' {γ C c : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 1) (hC : 1 < C) (hc : 0 < c) :
+    ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-α) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
+              (C * pairCardThreshold (3 + γ) n δ) S}) ≤
+          2 * pairCardThreshold (3 + γ) n δ / n ^ (γ / (8 * (γ + 2))) :=
+  exists_forall_setBernoulli_real_pairSumsetIsSubset_le hγ hγ' hC hc
+
+/-- **Theorem 3.1.** If `m < k * (k + 1) / 2`, then the number of sets `A + B` with `A, B ⊆ [n]`,
+`|A| = |B| = k` and `|A + B| ≤ m` is at most `n ^ (2 * m / k + 1) * k ^ (24 * k)`. -/
+theorem pairSumsetsFamily_ncard_le' (n k m : ℕ) (hm : m < k * (k + 1) / 2) :
+    ((pairSumsetsFamily n k m).ncard : ℝ) ≤
+        (n : ℝ) ^ (2 * (m : ℝ) / (k : ℝ) + 1) * (k : ℝ) ^ (24 * k) :=
+  pairSumsetsFamily_ncard_le n k m hm
+
+/-- **Theorem 3.1**, second part. If moreover `k ≥ 2 ^ 9000` and `m ≤ k ^ (1 + c)` with
+`c ≤ 2⁻⁸`, then the number of these sets is at most
+`n ^ (2 * m / k + 1) * (6 * e * m / k) ^ (6 * k) * exp (k ^ (1 - 2 * c))`. -/
+theorem pairSumsetsFamily_ncard_le_of_small_sumset' (n k m : ℕ) (c : ℝ)
+    (hm : m < k * (k + 1) / 2)
+    (hc_le : c ≤ 1 / (2 : ℝ) ^ (8 : ℕ))
+    (hk_threshold : 2 ^ 9000 ≤ k)
+    (hm_small : (m : ℝ) ≤ (k : ℝ) ^ (1 + c)) :
+    ((pairSumsetsFamily n k m).ncard : ℝ) ≤
+      (n : ℝ) ^ (2 * (m : ℝ) / (k : ℝ) + 1) *
+        ((6 * Real.exp 1 * (m : ℝ)) / (k : ℝ)) ^ (6 * k) *
+          Real.exp ((k : ℝ) ^ (1 - 2 * c)) :=
+  pairSumsetsFamily_ncard_le_of_small_sumset n k m c hm hc_le hk_threshold hm_small
+
+/-- **Corollary 3.3.** For `0 < γ ≤ 2` and `0 < c < 1` there are `C > 1` and `α > 0` such that,
+for `n ≥ 2`, every `n ^ (-α) < δ ≤ 1 - c` and `k = ⌈(2 + γ) * log n / log (1 / δ)⌉`, the
+`δ`-random subset of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and
+`C * k < |A + B| < k * (k + 1) / 2` with probability at most `2 * k ^ 2 / n ^ (γ * C / 2)`. -/
+theorem exists_forall_setBernoulli_real_moderateSumsetEvent_le' {γ c : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 2) (hc : 0 < c) (hc' : c < 1) :
+    ∃ C α : ℝ, 1 < C ∧ 0 < α ∧ ∀ n : ℕ, 2 ≤ n → ∀ δ : unitInterval, (n : ℝ) ^ (-α) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | moderateSumsetEvent n (pairCardThreshold (2 + γ) n δ) C S}) ≤
+          2 * pairCardThreshold (2 + γ) n δ ^ 2 / n ^ (γ * C / 2) :=
+  exists_forall_setBernoulli_real_moderateSumsetEvent_le hγ hγ' hc hc'
+
+/-- **Lemma 4.1.** Let `0 < γ ≤ 1`, `c > 0` and `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`. For all large
+`n` and every `n ^ (-1 / 2) < δ ≤ 1 - c`, the `δ`-random subset of `[n]` contains a sumset `A + B`
+with `A, B ⊆ [n]`, `|A| = |B| = k` and `|A + B| ≥ (k + 1) * k / 2` with probability at most
+`k ^ 2 / n ^ (γ * k / 3)`. -/
+theorem eventually_forall_setBernoulli_real_veryLargeSumsetEvent_le' {γ c : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 1) (hc : 0 < c) :
+    ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-(1 / 2 : ℝ)) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | veryLargeSumsetEvent n (pairCardThreshold (3 + γ) n δ) S}) ≤
+          pairCardThreshold (3 + γ) n δ ^ 2 / n ^ (γ * pairCardThreshold (3 + γ) n δ / 3) :=
+  eventually_forall_setBernoulli_real_veryLargeSumsetEvent_le hγ hγ' hc
+
+/-- **Corollary 4.3.** There are at most `n ^ (k + m / k) * (k ^ 3).choose k` pairs `(A, B)` of
+`k`-subsets of `[n]` with `|A + B| ≤ m`. -/
+theorem pair_small_sumset_family_card_le' (n k m : ℕ) :
+    {p : Finset ℕ × Finset ℕ |
+      p.1 ⊆ interval n ∧ p.2 ⊆ interval n ∧
+        #p.1 = k ∧ #p.2 = k ∧ #(p.1 + p.2) ≤ m}.ncard ≤
+      n ^ (k + m / k) * (k ^ 3).choose k :=
+  pair_small_sumset_family_card_le n k m
+
+/-! ### The lower bound of Hernández and Hetzel -/
+
+/-- **Corollary C of Hernández and Hetzel.** For fixed `0 < δ < 1`,
+`1 / log (1 / δ) ≤ liminf φ(δ, N) / log N`. -/
 theorem one_div_log_one_div_le_liminf_phi_div_log' {δ : unitInterval} (hδ : 0 < (δ : ℝ))
     (hδ' : (δ : ℝ) < 1) :
     1 / log (1 / δ) ≤ liminf (fun N : ℕ ↦ (phi δ N : ℝ) / log N) atTop :=
   one_div_log_one_div_le_liminf_phi_div_log hδ hδ'
 
-/-- For fixed $0 < \delta < 1$, $\limsup_N \varphi(\delta, N) / \log N \le 3 / \log(1 / \delta)$.
--/
+/-- Corollary C of Hernández and Hetzel for all large `N`: for fixed `0 < δ < 1` and `γ > 0`,
+`(1 - γ) / log (1 / δ) ≤ φ(δ, N) / log N` for all large `N`. -/
+theorem eventually_div_log_le_phi_div_log' {γ : ℝ} {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ))
+    (hδ_lt : (δ : ℝ) < 1) (hγ : 0 < γ) :
+    ∀ᶠ N : ℕ in atTop, (1 - γ) / log (1 / δ) ≤ (phi δ N : ℝ) / log N :=
+  eventually_div_log_le_phi_div_log hδ_pos hδ_lt hγ
+
+/-- Corollary C of Hernández and Hetzel, uniformly in the density: for `γ > 0` and `0 < c < 1`,
+for all large `n` and every `n ^ (-(γ / 4)) ≤ δ ≤ 1 - c`,
+`(1 - γ) * log n / log (1 / δ) ≤ φ(δ, n)`. -/
+theorem eventually_forall_log_div_log_le_phi' {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) (hc : c < 1) :
+    ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-(γ / 4)) ≤ δ → (δ : ℝ) ≤ 1 - c →
+      (1 - γ) * log n / log (1 / δ) ≤ phi δ n :=
+  eventually_forall_log_div_log_le_phi hγ hc₀ hc
+
+/-! ### Conjecture 4.10 and Question 4.12 of Kra, Moreira, Richter and Robertson -/
+
+/-- For fixed `0 < δ < 1`, `limsup φ(δ, N) / log N ≤ 3 / log (1 / δ)`. -/
 theorem limsup_phi_div_log_le_three_div_log_one_div' {δ : unitInterval} (hδ : 0 < (δ : ℝ))
     (hδ' : (δ : ℝ) < 1) :
     limsup (fun N : ℕ ↦ (phi δ N : ℝ) / log N) atTop ≤ 3 / log (1 / δ) :=
   limsup_phi_div_log_le_three_div_log_one_div hδ hδ'
 
-/-- **Conjecture 4.10 of Kra, Moreira, Richter and Robertson.** For fixed $0 < \delta < 1$,
-$\limsup_N \varphi(\delta, N) / \log N < \infty$ and $\liminf_N \varphi(\delta, N) / \log N > 0$.
-Both limits are taken in the extended reals, as in the conjecture. The conjecture is stated for
-every $\delta > 0$. The function $\varphi(\delta, N)$ is defined for $\delta \le 1$, and
-$\varphi(1, N) = \lfloor N / 2 \rfloor$, so the range is $0 < \delta < 1$. -/
+/-- **Conjecture 4.10 of Kra, Moreira, Richter and Robertson.** For fixed `0 < δ < 1`,
+`limsup φ(δ, N) / log N < ∞` and `liminf φ(δ, N) / log N > 0`, with both limits taken in the
+extended reals. The conjecture is stated for every `δ > 0`; it fails for `δ = 1`, where
+`φ(1, N) = N / 2`. -/
 theorem limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos' {δ : unitInterval}
     (hδ : 0 < (δ : ℝ)) (hδ' : (δ : ℝ) < 1) :
     limsup (fun N : ℕ ↦ ((phi δ N / log N : ℝ) : EReal)) atTop < ⊤ ∧
       0 < liminf (fun N : ℕ ↦ ((phi δ N / log N : ℝ) : EReal)) atTop :=
   limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos hδ hδ'
 
+/-- The lower half of Conjecture 4.10 with the limit in the reals: for fixed `0 < δ < 1`,
+`liminf φ(δ, N) / log N > 0`. -/
+theorem liminf_phi_div_log_pos' {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
+    0 < liminf (fun N : ℕ ↦ (phi δ N : ℝ) / log N) atTop :=
+  liminf_phi_div_log_pos hδ_pos hδ_lt
+
+/-- Conjecture 4.10 for all large `N`: for fixed `0 < δ < 1` there are `c > 0` and `C` with
+`c * log N ≤ φ(δ, N) ≤ C * log N` for all large `N`. -/
+theorem exists_mul_log_le_phi_le_mul_log' {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ))
+    (hδ_lt : (δ : ℝ) < 1) :
+    ∃ c C : ℝ, 0 < c ∧ ∀ᶠ N : ℕ in atTop,
+      c * log N ≤ phi δ N ∧ (phi δ N : ℝ) ≤ C * log N :=
+  exists_mul_log_le_phi_le_mul_log hδ_pos hδ_lt
+
 /-- **Question 4.12 of Kra, Moreira, Richter and Robertson** asks whether
-$\liminf_N \varphi(\delta_N, N) / \log N > 0$ for some sequence $\delta_N \to 0$, for instance
-$\delta_N = 1 / \log N$. It is not: $\varphi(\delta_N, N) / \log N \to 0$ for every sequence
-$\delta_N \to 0$. -/
+`liminf φ(δ_N, N) / log N > 0` for some sequence `δ_N → 0`, for instance `δ_N = 1 / log N`. It is
+not: `φ(δ_N, N) / log N → 0` for every sequence `δ_N → 0`. -/
 theorem tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero' (δ : ℕ → unitInterval)
     (hδ : Tendsto (fun N : ℕ ↦ (δ N : ℝ)) atTop (nhds 0)) :
     Tendsto (fun N : ℕ ↦ (phi (δ N) N : ℝ) / log N) atTop (nhds 0) :=
   tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero δ hδ
+
+/-- Question 4.12 as asked: for every sequence `δ_N → 0`, `liminf φ(δ_N, N) / log N = 0`. -/
+theorem liminf_phi_div_log_eq_zero' (δ : ℕ → unitInterval)
+    (hδ : Tendsto (fun N : ℕ ↦ (δ N : ℝ)) atTop (nhds 0)) :
+    liminf (fun N : ℕ ↦ (phi (δ N) N : ℝ) / log N) atTop = 0 :=
+  liminf_phi_div_log_eq_zero δ hδ
+
+/-- The rate for `δ_N = 1 / log N` in Question 4.12: if `δ_N = 1 / log N` for all large `N`, then
+`φ(δ_N, N) < 4 * log N / log (log N)` for all large `N`. -/
+theorem eventually_phi_lt_log_div_log_log' (δ : ℕ → unitInterval)
+    (hδ : ∀ᶠ N : ℕ in atTop, (δ N : ℝ) = 1 / log N) :
+    ∀ᶠ N : ℕ in atTop, (phi (δ N) N : ℝ) < 4 * log N / log (log N) :=
+  eventually_phi_lt_log_div_log_log δ hδ
 
 end DenseSetsWithoutLargeSumsets

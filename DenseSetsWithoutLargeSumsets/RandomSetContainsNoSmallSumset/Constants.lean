@@ -174,6 +174,10 @@ lemma ε_pos {γ : ℝ} (hγ : 0 < γ) : 0 < ε γ := by
   unfold ε
   positivity
 
+lemma ε_div_two (γ : ℝ) : ε γ / 2 = γ / (8 * (γ + 2)) := by
+  rw [ε, div_div]
+  ring
+
 lemma ε_le_one_twelfth {γ : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) : ε γ ≤ 1 / 12 := by
   rw [ε, div_le_iff₀ (by positivity)]
   linarith

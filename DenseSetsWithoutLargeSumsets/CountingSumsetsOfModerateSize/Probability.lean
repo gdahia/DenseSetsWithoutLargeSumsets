@@ -5,6 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
+public import CountingSetsWithSmallSumset.SmallSumsetIsomorphismClasses.CoreParameters
 public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Enumeration
 public import DenseSetsWithoutLargeSumsets.Probability
 import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
@@ -33,6 +34,8 @@ Souza).
 
 * `moderate_sumset_probability_le`: if `0 < γ ≤ 2`, `n ≥ 2` and `n ^ (-α) < δ ≤ 1 - c`, then the
   probability of `moderateSumsetEvent n k C` is at most `2 * k ^ 2 / n ^ (γ * C / 2)`.
+* `exists_forall_setBernoulli_real_moderateSumsetEvent_le`: Corollary 3.3 of the paper, with `C`
+  and `α` quantified and the random set distributed as `setBernoulli (Set.Icc 1 n) δ`.
 -/
 
 @[expose] public section
@@ -199,7 +202,8 @@ private lemma ncard_mul_pow_le_of_le_rpow {γ c : ℝ} {n k m : ℕ} {δ : unitI
     rw [le_div_iff₀ hγ_pos]
     linarith
   have hratio := mul_log_add_one_le hγ_pos hγ_le hQ hC
-  have hcount := pairSumsetsFamily_ncard_le_of_small_sumset n k m _ hm_lt le_rfl hk_large hm_small
+  have hcount := pairSumsetsFamily_ncard_le_of_small_sumset n k m _ hm_lt le_rfl
+    (by rwa [← smallSumsetClassCountThreshold_def]) hm_small
   rw [mul_assoc] at hcount
   simp only [mul_div_assoc] at hcount hδ
   refine mul_le_rpow_neg hγ_pos hn hC ?_ (by positivity) (pow_mul_exp_le_exp hk hq₀
@@ -352,6 +356,25 @@ lemma moderate_sumset_probability_le
   · exact ncard_mul_pow_le_of_rpow_lt hγ_pos hn_two hk hδ hm hm_large
       (by linarith [one_le_moderateSumsetGapConstant hγ_pos hc_pos hc_lt])
       (mul_log_add_log_le hγ_pos (by linarith) hn_two hk hkL h4 hB)
+
+/-- **Corollary 3.3.** For `0 < γ ≤ 2` and `0 < c < 1` there are `C > 1` and `α > 0` such that,
+for `n ≥ 2`, every `n ^ (-α) < δ ≤ 1 - c` and `k = ⌈(2 + γ) * log n / log (1 / δ)⌉`, the
+`δ`-random subset of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]`, `|A| = |B| = k` and
+`C * k < |A + B| < k * (k + 1) / 2` with probability at most `2 * k ^ 2 / n ^ (γ * C / 2)`. -/
+theorem exists_forall_setBernoulli_real_moderateSumsetEvent_le {γ c : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 2) (hc : 0 < c) (hc' : c < 1) :
+    ∃ C α : ℝ, 1 < C ∧ 0 < α ∧ ∀ n : ℕ, 2 ≤ n → ∀ δ : unitInterval, (n : ℝ) ^ (-α) < δ →
+      (δ : ℝ) ≤ 1 - c →
+        (ProbabilityTheory.setBernoulli (Set.Icc 1 n) δ).real
+            ((↑) '' {S : Finset ℕ | moderateSumsetEvent n (pairCardThreshold (2 + γ) n δ) C S}) ≤
+          2 * pairCardThreshold (2 + γ) n δ ^ 2 / n ^ (γ * C / 2) := by
+  refine ⟨moderateSumsetGapConstant γ c, moderateSumsetDensityExponent γ c, ?_,
+    moderateSumsetDensityExponent_pos hγ, ?_⟩
+  · exact Real.one_lt_exp_iff.2 (div_pos (by
+      linarith [densityCoefficient_gt_one (τ := 2 + γ) (by linarith) hc hc']) hγ)
+  intro n hn δ hδ hδ'
+  rw [← binomialFinsetSubset_real_eq_image (Set.finite_Icc 1 n)]
+  exact moderate_sumset_probability_le hγ hγ' hc hn hδ hδ'
 
 end
 

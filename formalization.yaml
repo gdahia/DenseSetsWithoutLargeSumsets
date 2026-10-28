@@ -7,11 +7,13 @@ project:
     Lean 4 formalization of Dahia, Marciano and Souza's theorem that for 0 < δ < 1 and all
     large n there is S ⊆ {1, ..., n} with |S| ≥ δn that contains no sumset A + B with
     min{|A|, |B|} ≥ (3 + o(1)) log n / log(1/δ), for n^(-α) < δ ≤ 1 - c, together with the
-    probabilistic statement it follows from. It includes Corollary 1.2 of the paper on the
-    function φ(δ, N) of Kra, Moreira, Richter and Robertson: (1 - γ)/log(1/δ) ≤ φ(δ, n)/log n
-    ≤ (3 + γ)/log(1/δ). The lower bound is that of Hernández and Hetzel and is proved here
-    from the Kővári-Sós-Turán theorem. Conjecture 4.10 of Kra, Moreira, Richter and
-    Robertson and the negative answer to their Question 4.12 follow.
+    probabilistic statement it follows from and the lemmas of the paper that bound the
+    probability for small, moderate and very large sumsets and count the sumsets. It includes
+    Corollary 1.2 of the paper on the function φ(δ, N) of Kra, Moreira, Richter and Robertson:
+    (1 - γ)/log(1/δ) ≤ φ(δ, n)/log n ≤ (3 + γ)/log(1/δ). The lower bound is that of Hernández
+    and Hetzel, stated in the limit and for all large N, and is proved here from the
+    Kővári-Sós-Turán theorem. Conjecture 4.10 of Kra, Moreira, Richter and Robertson and the
+    negative answer to their Question 4.12 follow.
   authors:
     - "Gabriel Dahia"
   license: "Apache-2.0"
@@ -114,8 +116,8 @@ related_formalizations:
     relationship: "builds-on"
     note: >-
       The statements use finite sets of natural numbers, pointwise sums, the unit interval,
-      logarithms and real powers, and limits inferior and superior in the reals and the
-      extended reals. The proofs use its Freiman isomorphisms, the Plünnecke-Ruzsa
+      logarithms and real powers, the distribution setBernoulli of a random subset, and limits
+      inferior and superior in the reals and the extended reals. The proofs use its Freiman isomorphisms, the Plünnecke-Ruzsa
       inequality, the binomial distribution, Bertrand's postulate and the Zarankiewicz
       function.
   - id: "https://github.com/gdahia/ChangFreimanRuzsa"
@@ -158,16 +160,18 @@ related_formalizations:
 
 status:
   scope: >-
-    Theorem 1.1, Theorem 1.3 (the bound for a δ-random subset) and Corollary 1.2 of the paper,
-    Corollary C of Hernández and Hetzel, Conjecture 4.10 of Kra, Moreira, Richter and
-    Robertson for 0 < δ < 1, and the negative answer to their Question 4.12. No statement
-    takes a cited theorem as a hypothesis. Chang's theorem, Theorem 2 of Bollobás, Leader and
+    Theorem 1.1, Theorem 1.3 (the bound for a δ-random subset), Corollary 1.2, Lemma 2.1,
+    Theorem 3.1, Corollary 3.3, Lemma 4.1 and Corollary 4.3 of the paper, Corollary C of
+    Hernández and Hetzel and its forms for all large N, Conjecture 4.10 of Kra, Moreira,
+    Richter and Robertson for 0 < δ < 1, and the negative answer to their Question 4.12. The
+    finitistic intersectivity lemma of Hernández and Hetzel (their Theorem B) and its
+    generalization are not formalized. No statement takes a cited theorem as a hypothesis. Chang's theorem, Theorem 2 of Bollobás, Leader and
     Tiba, Ruzsa's lower bound and the results of Sections 3 and 4 of Green's paper are proved
     in the Lake dependencies listed under related_formalizations. The reduction of the lower
     bound to the Kővári-Sós-Turán theorem is proved here. Question 4.11 of Kra,
     Moreira, Richter and Robertson, on the existence of the limit of φ(δ, N)/log N, is not
     addressed. The sorry counts refer to the library and Solution.lean; Challenge.lean has
-    one placeholder for each of its six statements.
+    one placeholder for each of its nineteen statements.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -196,7 +200,7 @@ automation:
         and Hetzel and of Kra, Moreira, Richter and Robertson, and the branches of this
         repository.
       cost:
-        wall_time: "four sessions"
+        wall_time: "five sessions"
         spend_usd: "not tracked"
         hardware: "local machine"
       prompting_notes: >-
@@ -213,7 +217,10 @@ automation:
         GitHub and to follow the author's Palomar conventions. Then one instruction to follow
         the author's Palomar submission standards. Then one instruction to move here from
         CountingSetsWithSmallSumset the counts of sets of natural numbers that Green does not
-        state, and to take CountingSetsWithSmallSumset from GitHub.
+        state, and to take CountingSetsWithSmallSumset from GitHub. Later, one instruction to
+        follow the author's Palomar submission standards, and a second in the same session to
+        state in Challenge.lean the finitary results of Hernández and Hetzel and the resolution
+        of the conjectures.
   spend_usd: "not tracked"
   notes: >-
     The proofs up to commit 5f4b915 were written by Codex agents directed by Gabriel Dahia.
@@ -232,7 +239,13 @@ automation:
     primed names, and minimized the imports. In a fourth session it moved Challenge.lean and
     Solution.lean to DenseSetsWithoutLargeSumsetsPalomar/, moved card_boundedFreimanDimSets
     and smallSumsetFreimanDimSets_ncard_le here from CountingSetsWithSmallSumset, and moved
-    to its public version on GitHub. Every proof is checked by Lean.
+    to its public version on GitHub. Later, the agent stated in Challenge.lean Lemma 2.1,
+    Theorem 3.1, Corollary 3.3, Lemma 4.1 and Corollary 4.3 of the paper, Theorem 1.3 with the
+    random set distributed as setBernoulli, the forms of Corollary C of Hernández and Hetzel
+    for all large N, and further forms of Conjecture 4.10 and Question 4.12; added the library
+    theorems with these statements; reduced the imports of Challenge.lean to one Mathlib
+    module; and left Challenge out of the default build targets. Every proof is checked by
+    Lean.
 
 fidelity:
   divergences: >-
@@ -251,13 +264,42 @@ fidelity:
     The lower bound is quoted in the paper from Hernández and Hetzel, whose Corollary C is for
     fixed δ; here it is stated for n^(-α) ≤ δ ≤ 1 - c, uniformly in δ.
 
+    Theorem 1.3. The paper states that the probability tends to 0, with
+    k = (3 + γ) log n / log(1/δ) and A, B ⊆ ℕ. Here k is rounded up, A and B range over subsets
+    of {1, ..., n}, and the probability is at most 4 k^2 / n^(γ / (8 (γ + 3))). The random set
+    has distribution setBernoulli (Set.Icc 1 n) δ, and the event is the image of a family of
+    finite sets. The exponent α is denseSubsetDensityExponent γ c in the library and is
+    existentially quantified in Challenge.lean.
+
+    Lemma 2.1. The paper takes 0 < γ ≤ 2, k = (2 + γ) log n / log(1/δ) and the bound
+    2k / n^(γ/64). Here 0 < γ ≤ 1, k = ⌈(3 + γ) log n / log(1/δ)⌉ and the bound is
+    2k / n^(γ / (8 (γ + 2))). The exponent α is lowerDensityExponent C γ in the library and is
+    existentially quantified in Challenge.lean.
+
+    Theorem 3.1. The paper assumes 2 ≤ k ≤ m ≤ n, and k ≥ 2^200 for the second bound, which
+    has the factor (6em/k)^(4k). Here the first bound has no such hypothesis, and the second
+    assumes k ≥ 2^9000, the threshold of the counts of Green in CountingSetsWithSmallSumset,
+    and has the factor (6em/k)^(6k).
+
+    Corollary 3.3. The paper bounds the probability by 2k^2/n^2 for all large n. Here the bound
+    is 2k^2 / n^(γC/2) for every n ≥ 2, with k rounded up and 0 < c < 1. The constants C and α
+    are moderateSumsetGapConstant γ c and moderateSumsetDensityExponent γ c in the library and
+    are existentially quantified in Challenge.lean.
+
+    Lemma 4.1. The paper gives some α > 0 and the bound k^2/n^2. Here α = 1/2, k is rounded up
+    and the bound is k^2 / n^(γk/3).
+
+    Corollary 4.3. The paper bounds the number of pairs by n^(k + m/k) binom(mk, k). Here the
+    bound is n^(k + ⌊m/k⌋) binom(k^3, k).
+
     Conjecture 4.10 is stated by Kra, Moreira, Richter and Robertson for every δ > 0. It is
     false for δ = 1, where φ(1, N) = ⌊N/2⌋, and is formalized for 0 < δ < 1, as in Hernández
     and Hetzel. In Challenge.lean both limits are taken in the extended reals, so that
     limsup < ∞ and liminf > 0 are the assertions of the conjecture; the bounds
     1/log(1/δ) ≤ liminf and limsup ≤ 3/log(1/δ) are stated with real limits. Question 4.12
-    is answered for every sequence δ_N → 0 with values in the unit interval; the sequence
-    1/log N is clamped to the unit interval in logDensity and equals 1/log N for N ≥ 3.
+    is answered for every sequence δ_N → 0 with values in the unit interval. The rate for
+    δ_N = 1/log N is stated for every sequence in the unit interval that equals 1/log N for
+    all large N.
 
     Green's paper is formalized in CountingSetsWithSmallSumset, and the differences from it
     are recorded there. Green does not state the counts card_boundedFreimanDimSets and
@@ -282,13 +324,6 @@ alignment:
         eventually_forall_exists_dense_subset_without_large_sumsets and
         dense_subset_without_large_sumsets in
         DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets.
-    - source: "Dense sets without large sumsets, Theorem 1.3"
-      lean: "DenseSetsWithoutLargeSumsets.eventually_pairEvent_probability_le"
-      module: "DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets"
-      status: "proved"
-      note: >-
-        With the explicit bound 4 k^2 / n^(γ / (8 (γ + 3))) for the probability, where
-        k = ⌈(3 + γ) log n / log(1/δ)⌉.
     - source: "Dense sets without large sumsets, Corollary 1.2"
       lean: "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc'"
       module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
@@ -296,6 +331,66 @@ alignment:
       note: >-
         Library form: exists_forall_phi_div_log_mem_Icc in
         DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
+    - source: "Dense sets without large sumsets, Theorem 1.3"
+      lean: "DenseSetsWithoutLargeSumsets.exists_forall_setBernoulli_real_pairEvent_le'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        With the explicit bound 4 k^2 / n^(γ / (8 (γ + 3))) for the probability, where
+        k = ⌈(3 + γ) log n / log(1/δ)⌉. Library forms:
+        exists_forall_setBernoulli_real_pairEvent_le and, with the explicit exponent,
+        eventually_pairEvent_probability_le in
+        DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets.
+    - source: "Dense sets without large sumsets, Lemma 2.1"
+      lean: "DenseSetsWithoutLargeSumsets.exists_forall_setBernoulli_real_pairSumsetIsSubset_le'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        For k = ⌈(3 + γ) log n / log(1/δ)⌉ with 0 < γ ≤ 1. Library forms:
+        exists_forall_setBernoulli_real_pairSumsetIsSubset_le and, with explicit constants,
+        small_sumset_pair_probability_le in
+        DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem.
+    - source: "Dense sets without large sumsets, Theorem 3.1"
+      lean: "DenseSetsWithoutLargeSumsets.pairSumsetsFamily_ncard_le'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        The first bound. Library form: pairSumsetsFamily_ncard_le in
+        DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Enumeration.
+    - source: "Dense sets without large sumsets, Theorem 3.1, second bound"
+      lean: "DenseSetsWithoutLargeSumsets.pairSumsetsFamily_ncard_le_of_small_sumset'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        With the factor (6em/k)^(6k) and k ≥ 2^9000. Library form:
+        pairSumsetsFamily_ncard_le_of_small_sumset in
+        DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Enumeration.
+    - source: "Dense sets without large sumsets, Corollary 3.3"
+      lean: "DenseSetsWithoutLargeSumsets.exists_forall_setBernoulli_real_moderateSumsetEvent_le'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        With the bound 2k^2 / n^(γC/2). Library forms:
+        exists_forall_setBernoulli_real_moderateSumsetEvent_le and, with explicit constants,
+        moderate_sumset_probability_le in
+        DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Probability.
+    - source: "Dense sets without large sumsets, Lemma 4.1"
+      lean: "DenseSetsWithoutLargeSumsets.eventually_forall_setBernoulli_real_veryLargeSumsetEvent_le'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        With α = 1/2 and the bound k^2 / n^(γk/3). Library forms:
+        eventually_forall_setBernoulli_real_veryLargeSumsetEvent_le and, with an explicit
+        threshold on n, very_large_sumset_probability_le in
+        DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets.
+    - source: "Dense sets without large sumsets, Corollary 4.3"
+      lean: "DenseSetsWithoutLargeSumsets.pair_small_sumset_family_card_le'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        With the bound n^(k + ⌊m/k⌋) binom(k^3, k). Library form:
+        pair_small_sumset_family_card_le in
+        DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets.
     - source: "On growth rates of infinite and finite sumsets, Corollary C"
       lean: "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log'"
       module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
@@ -303,6 +398,24 @@ alignment:
       note: >-
         Proved from the Kővári-Sós-Turán theorem, not by the argument of Hernández and
         Hetzel.
+    - source: "On growth rates of infinite and finite sumsets, Corollary C, for all large N"
+      lean: "DenseSetsWithoutLargeSumsets.eventually_div_log_le_phi_div_log'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        (1 - γ)/log(1/δ) ≤ φ(δ, N)/log N for fixed 0 < δ < 1, γ > 0 and all large N. Library
+        form: eventually_div_log_le_phi_div_log in
+        DenseSetsWithoutLargeSumsets.SumsetThreshold.LowerBound.
+    - source: >-
+        On growth rates of infinite and finite sumsets, Corollary C, uniformly in the density
+      lean: "DenseSetsWithoutLargeSumsets.eventually_forall_log_div_log_le_phi'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        (1 - γ) log n / log(1/δ) ≤ φ(δ, n) for all large n and every n^(-γ/4) ≤ δ ≤ 1 - c.
+        This is the lower bound of Corollary 1.2. Library form:
+        eventually_forall_log_div_log_le_phi in
+        DenseSetsWithoutLargeSumsets.SumsetThreshold.LowerBound.
     - source: "Dense sets without large sumsets, Corollary 1.2, upper bound for fixed δ"
       lean: "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_le_three_div_log_one_div'"
       module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
@@ -320,13 +433,52 @@ alignment:
         DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
     - source: >-
         Problems on infinite sumset configurations in the integers and beyond,
+        Conjecture 4.10, lower bound in the reals
+      lean: "DenseSetsWithoutLargeSumsets.liminf_phi_div_log_pos'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        Library form: liminf_phi_div_log_pos in
+        DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
+    - source: >-
+        Problems on infinite sumset configurations in the integers and beyond,
+        Conjecture 4.10, for all large N
+      lean: "DenseSetsWithoutLargeSumsets.exists_mul_log_le_phi_le_mul_log'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        c log N ≤ φ(δ, N) ≤ C log N for all large N. Library form:
+        exists_mul_log_le_phi_le_mul_log in
+        DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
+    - source: >-
+        Problems on infinite sumset configurations in the integers and beyond,
         Question 4.12
       lean: "DenseSetsWithoutLargeSumsets.tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero'"
       module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
-        The answer is negative. For δ_N = 1/log N see also
-        eventually_phi_logDensity_lt_log_div_log_log in
+        The answer is negative. Library form:
+        tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero in
+        DenseSetsWithoutLargeSumsets.SumsetThreshold.VanishingDensity.
+    - source: >-
+        Problems on infinite sumset configurations in the integers and beyond,
+        Question 4.12, the limit inferior
+      lean: "DenseSetsWithoutLargeSumsets.liminf_phi_div_log_eq_zero'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        liminf φ(δ_N, N)/log N = 0 for every δ_N → 0. Library form:
+        liminf_phi_div_log_eq_zero in
+        DenseSetsWithoutLargeSumsets.SumsetThreshold.VanishingDensity.
+    - source: >-
+        Problems on infinite sumset configurations in the integers and beyond,
+        Question 4.12, δ_N = 1/log N
+      lean: "DenseSetsWithoutLargeSumsets.eventually_phi_lt_log_div_log_log'"
+      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      status: "proved"
+      note: >-
+        φ(δ_N, N) < 4 log N / log log N for all large N. Library form:
+        eventually_phi_lt_log_div_log_log in
         DenseSetsWithoutLargeSumsets.SumsetThreshold.VanishingDensity.
     - source: "A polynomial bound in Freiman's theorem, in ZMod q"
       lean: "ChangFreimanRuzsa.exists_twoProperGAP_zmod_dim_le_freimanDim"
