@@ -109,6 +109,10 @@ def densityCoefficient (τ c : ℝ) : ℝ :=
 private lemma log_one_div_pos {x : ℝ} (hx : 0 < x) (hx' : x < 1) : 0 < Real.log (1 / x) :=
   Real.log_pos (one_lt_one_div hx hx')
 
+lemma le_log_one_div_one_sub {c : ℝ} (hc : c < 1) : c ≤ Real.log (1 / (1 - c)) := by
+  rw [one_div, Real.log_inv, le_neg]
+  linarith [Real.log_le_sub_one_of_pos (sub_pos.2 hc)]
+
 lemma densityCoefficient_gt_one {τ c : ℝ} (hτ_pos : 0 < τ)
     (hc_pos : 0 < c) (hc_lt : c < 1) :
     1 < densityCoefficient τ c := by

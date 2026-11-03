@@ -23,6 +23,9 @@ This file proves the uniform form. The proof is not the one of Hernández and He
 
 ## Main statements
 
+* `log_div_log_le_phi`: for `0 < γ ≤ 1` and `0 < c < 1`, every `n` with
+  `200 / (γ ^ 2 * c ^ 2) ≤ log n` and every `δ` with `n ^ (-(γ / 4)) ≤ δ ≤ 1 - c`,
+  `(1 - γ) * log n / log (1 / δ) ≤ φ(δ, n)`.
 * `eventually_forall_log_div_log_le_phi`: for `γ > 0` and `0 < c < 1`, for all large `n` and every
   `δ` with `n ^ (-(γ / 4)) ≤ δ ≤ 1 - c`, `(1 - γ) * log n / log (1 / δ) ≤ φ(δ, n)`.
 * `eventually_div_log_le_phi_div_log`: for fixed `0 < δ < 1`, `γ > 0` and all large `N`,
@@ -64,7 +67,7 @@ private lemma le_phi_of_le_log_div_log_add_one {γ c θ : ℝ} {n k : ℕ} {δ :
     (hL₃ : (2 / log (1 / (1 - c)) + 2) * 32 / (9 * θ) < log n)
     (hδ : (n : ℝ) ^ (-(γ / 4)) ≤ δ) (hδ' : (δ : ℝ) ≤ 1 - c) (hk : 1 ≤ k)
     (hkx : (k : ℝ) ≤ (1 - γ) * log n / log (1 / δ) + 1) :
-    k ≤ phi δ n := by
+    k ≤ φ δ n := by
   have hK : (1 : ℝ) ≤ k := mod_cast hk
   have hn : (0 : ℝ) < n := Nat.cast_pos.2 (Nat.pos_of_ne_zero fun h ↦ by norm_num [h] at hL₁)
   have hδ₀ : 0 < (δ : ℝ) := (rpow_pos_of_pos hn _).trans_le hδ
@@ -99,7 +102,7 @@ private lemma le_phi_of_le_log_div_log_add_one {γ c θ : ℝ} {n k : ℕ} {δ :
 `n ^ (-(γ / 4)) ≤ δ ≤ 1 - c`, we have `⌈(1 - γ) * log n / log (1 / δ)⌉ ≤ φ(δ, n)`. -/
 lemma eventually_forall_ceil_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) (hc : c < 1) :
     ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-(γ / 4)) ≤ δ → (δ : ℝ) ≤ 1 - c →
-      ⌈(1 - γ) * log n / log (1 / δ)⌉₊ ≤ phi δ n := by
+      ⌈(1 - γ) * log n / log (1 / δ)⌉₊ ≤ φ δ n := by
   have hℓ₀ := log_one_div_pos (sub_pos.2 hc) (sub_lt_self 1 hc₀)
   filter_upwards [tendsto_natCast_atTop_atTop.eventually (tendsto_log_atTop.eventually_ge_atTop 1),
     tendsto_natCast_atTop_atTop.eventually (tendsto_log_atTop.eventually_ge_atTop
@@ -114,12 +117,53 @@ lemma eventually_forall_ceil_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) 
       h₁ ((div_le_iff₀' (half_pos hγ)).1 h₂) h₃ hδ hδ' hk
       (Nat.ceil_lt_add_one (Nat.ceil_pos.1 hk).le).le
 
+/-- For `0 < γ ≤ 1` and `0 < c < 1`, for every `n` with `200 / (γ ^ 2 * c ^ 2) ≤ log n` and every
+`δ` with `n ^ (-(γ / 4)) ≤ δ ≤ 1 - c`, we have `(1 - γ) * log n / log (1 / δ) ≤ φ(δ, n)`. -/
+lemma log_div_log_le_phi {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1) (hc₀ : 0 < c) (hc : c < 1)
+    {n : ℕ} (hn : 200 / (γ ^ 2 * c ^ 2) ≤ log n) {δ : unitInterval}
+    (hδ : (n : ℝ) ^ (-(γ / 4)) ≤ δ) (hδ' : (δ : ℝ) ≤ 1 - c) :
+    (1 - γ) * log n / log (1 / δ) ≤ φ δ n := by
+  refine (Nat.le_ceil _).trans (Nat.cast_le.2 ?_)
+  rcases Nat.eq_zero_or_pos ⌈(1 - γ) * log n / log (1 / (δ : ℝ))⌉₊ with h₀ | hk
+  · exact h₀ ▸ Nat.zero_le _
+  have hγc₁ : γ * c ≤ 1 := (mul_le_of_le_one_left hc₀.le hγ').trans hc.le
+  have hℓ₀ := le_log_one_div_one_sub hc
+  have h₂₀₀ : 200 ≤ γ ^ 2 * c ^ 2 * log n := (div_le_iff₀' (by positivity)).1 hn
+  have hL : 0 < log n := (by positivity : (0 : ℝ) < 200 / (γ ^ 2 * c ^ 2)).trans_le hn
+  have hcL : γ ^ 2 * c * log n * c ≤ γ ^ 2 * c * log n * 1 :=
+    mul_le_mul_of_nonneg_left hc.le (by positivity)
+  have hθ := one_sub_inv_le_log_of_pos (by positivity : 0 < γ * c / 12)
+  rw [inv_div] at hθ
+  refine le_phi_of_le_log_div_log_add_one (θ := γ * c / 12) hc₀ hc (by positivity) (by linarith)
+    ?_ ?_ ?_ ?_ hδ hδ' hk (Nat.ceil_lt_add_one (Nat.ceil_pos.1 hk).le).le
+  · rw [div_le_iff₀ (hc₀.trans_le hℓ₀)]
+    linarith [mul_le_mul_of_nonneg_left hℓ₀ (by positivity : (0 : ℝ) ≤ γ / 12)]
+  · have h : (200 : ℝ) ≤ 200 / (γ ^ 2 * c ^ 2) :=
+      le_div_self (by norm_num) (by positivity)
+        ((mul_le_of_le_one_left (by positivity) (pow_le_one₀ hγ.le hγ')).trans
+          (pow_le_one₀ hc₀.le hc.le))
+    linarith
+  · have h : 12 / (γ * c) ≤ γ / 4 * log n - 1 / 2 := by
+      rw [div_le_iff₀ (by positivity)]
+      nlinarith
+    linarith
+  · calc (2 / log (1 / (1 - c)) + 2) * 32 / (9 * (γ * c / 12))
+        ≤ (2 / c + 2 / c) * 32 / (9 * (γ * c / 12)) := by
+          gcongr
+          exact le_div_self (by norm_num) hc₀ hc.le
+      _ = 512 / (3 * (γ * c ^ 2)) := by
+          field_simp
+          ring
+      _ < log n := by
+          rw [div_lt_iff₀ (by positivity)]
+          nlinarith [mul_le_mul_of_nonneg_right hγ' (by positivity : (0 : ℝ) ≤ γ * c ^ 2 * log n)]
+
 /-- The lower bound of Hernández and Hetzel in the uniform form of Corollary 1.2 of *Dense sets
 without large sumsets*: for `γ > 0` and `0 < c < 1`, for all large `n` and every `δ` with
 `n ^ (-(γ / 4)) ≤ δ ≤ 1 - c`, we have `(1 - γ) * log n / log (1 / δ) ≤ φ(δ, n)`. -/
 lemma eventually_forall_log_div_log_le_phi {γ c : ℝ} (hγ : 0 < γ) (hc₀ : 0 < c) (hc : c < 1) :
     ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-(γ / 4)) ≤ δ → (δ : ℝ) ≤ 1 - c →
-      (1 - γ) * log n / log (1 / δ) ≤ phi δ n := by
+      (1 - γ) * log n / log (1 / δ) ≤ φ δ n := by
   filter_upwards [eventually_forall_ceil_le_phi hγ hc₀ hc] with n hn δ hδ hδ'
     using (Nat.le_ceil _).trans (Nat.cast_le.2 (hn δ hδ hδ'))
 
@@ -129,7 +173,7 @@ variable {γ : ℝ} {δ : unitInterval}
 `(1 - γ) / log (1 / δ) ≤ φ(δ, N) / log N`. -/
 lemma eventually_div_log_le_phi_div_log (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1)
     (hγ : 0 < γ) :
-    ∀ᶠ N : ℕ in atTop, (1 - γ) / log (1 / δ) ≤ (phi δ N : ℝ) / log N := by
+    ∀ᶠ N : ℕ in atTop, (1 - γ) / log (1 / δ) ≤ (φ δ N : ℝ) / log N := by
   filter_upwards [eventually_forall_log_div_log_le_phi hγ (sub_pos.2 hδ_lt) (sub_lt_self 1 hδ_pos),
     tendsto_natCast_atTop_atTop.eventually
       ((tendsto_rpow_neg_atTop (by positivity : 0 < γ / 4)).eventually_le_const hδ_pos),
@@ -141,7 +185,7 @@ lemma eventually_div_log_le_phi_div_log (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ
 `1 - γ ≤ φ(δ, N) * log (1 / δ) / log N`. -/
 lemma eventually_le_phi_mul_log_div_log (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1)
     (hγ : 0 < γ) :
-    ∀ᶠ N : ℕ in atTop, 1 - γ ≤ (phi δ N : ℝ) * log (1 / δ) / log N := by
+    ∀ᶠ N : ℕ in atTop, 1 - γ ≤ (φ δ N : ℝ) * log (1 / δ) / log N := by
   filter_upwards [eventually_div_log_le_phi_div_log hδ_pos hδ_lt hγ, eventually_ge_atTop 2]
     with N hN hN₂
   rw [div_le_div_iff₀ (log_one_div_pos hδ_pos hδ_lt) (log_pos (mod_cast hN₂))] at hN

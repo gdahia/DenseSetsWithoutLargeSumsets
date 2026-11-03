@@ -19,6 +19,8 @@ upper bound `φ(δ, n) < (3 + γ) * log n / log (1 / δ)` for all large `n` and 
 ## Main statements
 
 * `eventually_forall_phi_lt_log_div_log`: the bound above.
+* `phi_lt_log_div_log`: the bound above for every `n ≥ exp (explicitLogThreshold γ c)` and every
+  `δ` with `n ^ (-(2 * explicitDensityExponent γ c)) < δ ≤ 1 - c`.
 * `limsup_phi_mul_log_div_log_le_three`: `limsup φ(δ, N) * log (1 / δ) / log N ≤ 3` for fixed
   `0 < δ < 1`.
 * `limsup_phi_div_log_le_three_div_log_one_div`: `limsup φ(δ, N) / log N ≤ 3 / log (1 / δ)` for
@@ -39,18 +41,29 @@ lemma eventually_forall_phi_lt_log_div_log (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1
     (hc_lt : c < 1) :
     ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval,
       (n : ℝ) ^ (-denseSubsetDensityExponent γ c) < δ → (δ : ℝ) ≤ 1 - c →
-        (phi δ n : ℝ) < (3 + γ) * log n / log (1 / δ) := by
+        (φ δ n : ℝ) < (3 + γ) * log n / log (1 / δ) := by
   filter_upwards [eventually_forall_exists_dense_subset_without_large_sumsets hγ_pos hγ_le hc_pos
     hc_lt] with n hn δ hδ hδ'
   exact Nat.lt_ceil.mp (phi_lt_of_existsDenseSetWithoutLargeSumsets
     (k := pairCardThreshold (3 + γ) n δ) (hn δ hδ hδ'))
+
+/-- For every `n ≥ exp (explicitLogThreshold γ c)` and every `δ` with
+`n ^ (-(2 * explicitDensityExponent γ c)) < δ ≤ 1 - c`, we have
+`φ(δ, n) < (3 + γ) * log n / log (1 / δ)`. -/
+lemma phi_lt_log_div_log (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hc_pos : 0 < c) (hc_lt : c < 1)
+    {n : ℕ} (hn : exp (explicitLogThreshold γ c) ≤ n)
+    (hδ : (n : ℝ) ^ (-(2 * explicitDensityExponent γ c)) < δ) (hδ' : (δ : ℝ) ≤ 1 - c) :
+    (φ δ n : ℝ) < (3 + γ) * log n / log (1 / δ) :=
+  Nat.lt_ceil.mp (phi_lt_of_existsDenseSetWithoutLargeSumsets
+    (existsDenseSetWithoutLargeSumsets_of_exp_explicitLogThreshold_le hγ_pos hγ_le hc_pos hc_lt
+      le_rfl hn hδ hδ'))
 
 /-- The bound `φ(δ n, n) < (3 + γ) * log n / log (1 / δ n)` along a sequence of densities. -/
 lemma eventually_phi_lt_log_div_log (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hc_pos : 0 < c)
     (hc_lt : c < 1) (δ : ℕ → unitInterval)
     (hδ_lower : ∀ᶠ n : ℕ in atTop, (n : ℝ) ^ (-denseSubsetDensityExponent γ c) < δ n)
     (hδ_upper : ∀ᶠ n : ℕ in atTop, (δ n : ℝ) ≤ 1 - c) :
-    ∀ᶠ n : ℕ in atTop, (phi (δ n) n : ℝ) < (3 + γ) * log n / log (1 / δ n) := by
+    ∀ᶠ n : ℕ in atTop, (φ (δ n) n : ℝ) < (3 + γ) * log n / log (1 / δ n) := by
   filter_upwards [eventually_forall_phi_lt_log_div_log hγ_pos hγ_le hc_pos hc_lt, hδ_lower,
     hδ_upper] with n hn h₁ h₂ using hn _ h₁ h₂
 
@@ -59,13 +72,13 @@ lemma log_one_div_nonneg (δ : unitInterval) : 0 ≤ log (1 / δ) := by
   exact neg_nonneg.2 (log_nonpos (unitInterval.nonneg δ) (unitInterval.le_one δ))
 
 lemma phi_mul_log_div_log_nonneg (δ : unitInterval) (N : ℕ) :
-    0 ≤ (phi δ N : ℝ) * log (1 / δ) / log N :=
+    0 ≤ (φ δ N : ℝ) * log (1 / δ) / log N :=
   div_nonneg (mul_nonneg (Nat.cast_nonneg _) (log_one_div_nonneg δ)) (log_natCast_nonneg N)
 
 /-- For fixed `0 < δ < 1` and all large `N`, `φ(δ, N) * log (1 / δ) / log N ≤ 3 + γ`. -/
 lemma eventually_phi_mul_log_div_log_le (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1)
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) :
-    ∀ᶠ N : ℕ in atTop, (phi δ N : ℝ) * log (1 / δ) / log N ≤ 3 + γ := by
+    ∀ᶠ N : ℕ in atTop, (φ δ N : ℝ) * log (1 / δ) / log N ≤ 3 + γ := by
   have hα := denseSubsetDensityExponent_pos hγ_pos (sub_pos.2 hδ_lt) (sub_lt_self 1 hδ_pos)
   filter_upwards [eventually_forall_phi_lt_log_div_log hγ_pos hγ_le (sub_pos.2 hδ_lt)
       (sub_lt_self 1 hδ_pos),
@@ -77,7 +90,7 @@ lemma eventually_phi_mul_log_div_log_le (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ
 
 /-- For fixed `0 < δ < 1`, `limsup φ(δ, N) * log (1 / δ) / log N ≤ 3`. -/
 lemma limsup_phi_mul_log_div_log_le_three (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
-    limsup (fun N : ℕ ↦ (phi δ N : ℝ) * log (1 / δ) / log N) atTop ≤ 3 := by
+    limsup (fun N : ℕ ↦ (φ δ N : ℝ) * log (1 / δ) / log N) atTop ≤ 3 := by
   refine le_of_forall_gt_imp_ge_of_dense ?_
   intro a ha
   refine limsup_le_of_le (isCoboundedUnder_le_of_le _ (phi_mul_log_div_log_nonneg δ)) ?_
@@ -88,19 +101,19 @@ lemma limsup_phi_mul_log_div_log_le_three (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (
 /-- For fixed `0 < δ < 1` and all large `N`, `φ(δ, N) / log N ≤ (3 + γ) / log (1 / δ)`. -/
 lemma eventually_phi_div_log_le (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) (hγ_pos : 0 < γ)
     (hγ_le : γ ≤ 1) :
-    ∀ᶠ N : ℕ in atTop, (phi δ N : ℝ) / log N ≤ (3 + γ) / log (1 / δ) := by
+    ∀ᶠ N : ℕ in atTop, (φ δ N : ℝ) / log N ≤ (3 + γ) / log (1 / δ) := by
   filter_upwards [eventually_phi_mul_log_div_log_le hδ_pos hδ_lt hγ_pos hγ_le] with N hN
   rwa [le_div_iff₀ (log_one_div_pos hδ_pos hδ_lt), div_mul_eq_mul_div]
 
 /-- For fixed `0 < δ < 1`, the ratio `φ(δ, N) / log N` is bounded above. -/
 lemma isBoundedUnder_le_phi_div_log (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
-    IsBoundedUnder (· ≤ ·) atTop fun N : ℕ ↦ (phi δ N : ℝ) / log N :=
+    IsBoundedUnder (· ≤ ·) atTop fun N : ℕ ↦ (φ δ N : ℝ) / log N :=
   isBoundedUnder_of_eventually_le (eventually_phi_div_log_le hδ_pos hδ_lt one_pos le_rfl)
 
 /-- For fixed `0 < δ < 1`, `limsup φ(δ, N) / log N ≤ 3 / log (1 / δ)`. -/
 theorem limsup_phi_div_log_le_three_div_log_one_div (hδ_pos : 0 < (δ : ℝ))
     (hδ_lt : (δ : ℝ) < 1) :
-    limsup (fun N : ℕ ↦ (phi δ N : ℝ) / log N) atTop ≤ 3 / log (1 / δ) := by
+    limsup (fun N : ℕ ↦ (φ δ N : ℝ) / log N) atTop ≤ 3 / log (1 / δ) := by
   have hℓ := log_one_div_pos hδ_pos hδ_lt
   refine le_of_forall_gt_imp_ge_of_dense ?_
   intro a ha

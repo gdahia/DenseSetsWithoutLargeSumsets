@@ -5,9 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
-public import DenseSetsWithoutLargeSumsets.SimpleBoundForVeryLargeSumsets
-public import DenseSetsWithoutLargeSumsets.CountingSumsetsOfModerateSize.Probability
-public import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.Constants
+public import DenseSetsWithoutLargeSumsets.ExplicitConstants
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.MainTheorem
 import DenseSetsWithoutLargeSumsets.RandomSetContainsNoSmallSumset.ThresholdEstimates
 
@@ -33,13 +31,14 @@ contains no sumset `A + B` with `|A|, |B| ≥ k`.
 ## Main statements
 
 * `eventually_pairEvent_probability_le`: Theorem 1.3, with the bound above on the probability.
-* `exists_forall_setBernoulli_real_pairEvent_le`: Theorem 1.3 with the exponent `α` quantified
-  and the random set distributed as `setBernoulli (Set.Icc 1 n) δ`.
 * `eventually_forall_exists_dense_subset_without_large_sumsets`: Theorem 1.1, for all large `n` and
   every `δ` with `n ^ (-α) < δ ≤ 1 - c`.
 * `dense_subset_without_large_sumsets`: Theorem 1.1 along a sequence of densities.
-* `exists_dense_subset_forall_add_not_subset`: Theorem 1.1 with the exponent `α` quantified, as
-  stated in `Challenge.lean`.
+* `exists_dense_subset_forall_add_not_subset`: Theorem 1.1 for every
+  `n ≥ exp (explicitLogThreshold γ c)` and every `δ` with
+  `n ^ (-explicitDensityExponent γ c) < δ ≤ 1 - c`.
+* `setBernoulli_real_pairEvent_le`: Theorem 1.3 for the same `n` and `δ`, with the random set
+  distributed as `setBernoulli (Set.Icc 1 n) δ`.
 -/
 
 @[expose] public section
@@ -227,22 +226,6 @@ theorem eventually_pairEvent_probability_le {γ c : ℝ} (hγ_pos : 0 < γ) (hγ
   · exact pairCardThreshold_ge_two_of_density_lower (by linarith)
       ((min_le_left _ _).trans (by linarith)) hn_two (by linarith) hδ_lower
 
-/-- **Theorem 1.3.** For `0 < γ ≤ 1` and `0 < c < 1` there is `α > 0` such that, for all large
-`n`, every `n ^ (-α) < δ ≤ 1 - c` and `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`, the `δ`-random subset
-of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]` and `|A|, |B| ≥ k` with probability at most
-`4 * k ^ 2 / n ^ (γ / (8 * (γ + 3)))`. -/
-theorem exists_forall_setBernoulli_real_pairEvent_le {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
-    (hc : 0 < c) (hc' : c < 1) :
-    ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : unitInterval, (n : ℝ) ^ (-α) < δ →
-      (δ : ℝ) ≤ 1 - c →
-        (ProbabilityTheory.setBernoulli (Set.Icc 1 n) δ).real
-            ((↑) '' {S : Finset ℕ | pairEvent n (pairCardThreshold (3 + γ) n δ) S}) ≤
-          4 * pairCardThreshold (3 + γ) n δ ^ 2 / n ^ (γ / (8 * (γ + 3))) := by
-  refine ⟨denseSubsetDensityExponent γ c, denseSubsetDensityExponent_pos hγ hc hc', ?_⟩
-  filter_upwards [eventually_pairEvent_probability_le hγ hγ' hc hc'] with n hn δ hδ hδ'
-  rw [← binomialFinsetSubset_real_eq_image (Set.finite_Icc 1 n)]
-  exact hn δ hδ hδ'
-
 private lemma three_le_rpow_neg_mul {n : ℕ} {α : ℝ} (hn : 9 ≤ n) (hα : α ≤ 1 / 2) :
     3 ≤ (n : ℝ) ^ (-α) * n := by
   have hn₉ : (9 : ℝ) ≤ n := mod_cast hn
@@ -301,21 +284,105 @@ theorem dense_subset_without_large_sumsets {γ c : ℝ} (hγ_pos : 0 < γ) (hγ_
   filter_upwards [eventually_forall_exists_dense_subset_without_large_sumsets hγ_pos hγ_le hc_pos
     hc_lt, hδ_lower, hδ_upper] with n hmain h₁ h₂ using hmain (δ n) h₁ h₂
 
-/-- **Theorem 1.1.** For `0 < γ ≤ 1` and `0 < c < 1` there is `α > 0` such that, for all large `n`
-and every `n ^ (-α) < δ ≤ 1 - c`, some `S ⊆ [n]` with `|S| ≥ δ n` contains no sumset `A + B` with
-`A, B ⊆ [n]` and `|A|, |B| ≥ (3 + γ) * log n / log (1 / δ)`. -/
+/-! ### Explicit forms -/
+
+/-- If `10 ^ 9 / (γ ^ 3 * c ^ 2) ≤ log n` and `δ ≤ 1 - c`, then
+`4 * k ^ 2 / n ^ (γ / (8 * (γ + 3))) < 1 / 4` for `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`. -/
+lemma four_mul_pairCardThreshold_sq_div_lt_quarter {γ c α : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
+    (hc : 0 < c) (hc' : c < 1) {n : ℕ} (hn₂ : 2 ≤ n) (hn : 10 ^ 9 / (γ ^ 3 * c ^ 2) ≤ log n)
+    {δ : unitInterval} (hδ : (n : ℝ) ^ (-α) < δ) (hδ' : (δ : ℝ) ≤ 1 - c) :
+    4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 / (n : ℝ) ^ pairEventDecayExponent γ < 1 / 4 := by
+  have hn₀ : (0 : ℝ) < n := by positivity
+  have hL : 0 < log n := log_pos (by exact_mod_cast hn₂)
+  have h₉ : 10 ^ 9 ≤ γ ^ 3 * c ^ 2 * log n := (div_le_iff₀' (by positivity)).1 hn
+  have hp := pairEventDecayExponent_pos hγ
+  have he := pow_div_factorial_le_exp _ (by positivity : 0 ≤ pairEventDecayExponent γ * log n) 3
+  rw [(by rfl : Nat.factorial 3 = 6), Nat.cast_ofNat] at he
+  rw [div_lt_iff₀ (by positivity)]
+  calc 4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 ≤ 4 * (6 / c * log n) ^ 2 := by
+        gcongr
+        exact (pairCardThreshold_le_densityCoefficient_mul_log (by linarith) hc hn₂
+          ((rpow_pos_of_pos hn₀ _).trans hδ) hδ').trans
+          (mul_le_mul_of_nonneg_right (densityCoefficient_le hγ' hc hc') hL.le)
+    _ = log n ^ 2 / c ^ 2 * 144 := by ring
+    _ < log n ^ 2 / c ^ 2 * (γ ^ 3 * c ^ 2 * log n / 786432) := by
+        gcongr
+        linarith
+    _ = (γ / 32 * log n) ^ 3 / 6 / 4 := by
+        field_simp
+        ring
+    _ ≤ (pairEventDecayExponent γ * log n) ^ 3 / 6 / 4 := by
+        gcongr
+        exact div_le_div_of_nonneg_left hγ.le (by positivity) (by linarith)
+    _ ≤ 1 / 4 * (n : ℝ) ^ pairEventDecayExponent γ := by
+        rw [rpow_def_of_pos hn₀, mul_comm (log n)]
+        linarith
+
+/-- Theorem 1.3 for `n ≥ exp (explicitLogThreshold γ c)` and every exponent
+`α ≤ 2 * explicitDensityExponent γ c`. -/
+lemma pairEvent_measure_le_of_exp_explicitLogThreshold_le {γ c α : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 1) (hc : 0 < c) (hc' : c < 1) (hα : α ≤ 2 * explicitDensityExponent γ c) {n : ℕ}
+    (hn : exp (explicitLogThreshold γ c) ≤ n) {δ : unitInterval} (hδ : (n : ℝ) ^ (-α) < δ)
+    (hδ' : (δ : ℝ) ≤ 1 - c) :
+    (binomialFinsetSubset (Set.Icc 1 n) δ).real
+        {S | pairEvent n (pairCardThreshold (3 + γ) n δ) S} ≤
+      4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 / (n : ℝ) ^ pairEventDecayExponent γ := by
+  have hn₉ := nine_le_of_exp_explicitLogThreshold_le hγ hγ' hc hc' hn
+  have hα₂ := hα.trans (two_mul_explicitDensityExponent_le_half hγ hγ' hc hc')
+  have hV : veryLargeSumsetThreshold γ c ≤ n := by
+    exact_mod_cast (veryLargeSumsetThreshold_le_exp_explicitLogThreshold hγ hγ' hc hc').trans hn
+  refine pairEvent_measure_le_three_ranges_of_bounds hγ hγ' hc
+    ((lowerGapThreshold_lt_exp_explicitLogThreshold hγ hγ' hc hc').trans_le hn)
+    (by rw [veryLargeSumsetStrictThreshold]; grind) hδ hδ'
+    (hα.trans (two_mul_explicitDensityExponent_le_lowerDensityExponent hγ hγ' hc hc'))
+    (hα.trans (two_mul_explicitDensityExponent_le_moderateSumsetDensityExponent hγ hγ' hc hc'))
+    hα₂ (by grind) ?_
+  exact pairCardThreshold_ge_two_of_density_lower (by linarith) (by linarith) (by grind)
+    (by linarith) hδ
+
+/-- Theorem 1.1 for `n ≥ exp (explicitLogThreshold γ c)` and every exponent
+`α ≤ 2 * explicitDensityExponent γ c`. -/
+lemma existsDenseSetWithoutLargeSumsets_of_exp_explicitLogThreshold_le {γ c α : ℝ} (hγ : 0 < γ)
+    (hγ' : γ ≤ 1) (hc : 0 < c) (hc' : c < 1) (hα : α ≤ 2 * explicitDensityExponent γ c) {n : ℕ}
+    (hn : exp (explicitLogThreshold γ c) ≤ n) {δ : unitInterval} (hδ : (n : ℝ) ^ (-α) < δ)
+    (hδ' : (δ : ℝ) ≤ 1 - c) :
+    existsDenseSetWithoutLargeSumsets n (pairCardThreshold (3 + γ) n δ) δ := by
+  have hn₉ := nine_le_of_exp_explicitLogThreshold_le hγ hγ' hc hc' hn
+  refine exists_dense_set_of_pair_probability_lt_quarter ?_
+    ((pairEvent_measure_le_of_exp_explicitLogThreshold_le hγ hγ' hc hc' hα hn hδ hδ').trans_lt
+      (four_mul_pairCardThreshold_sq_div_lt_quarter hγ hγ' hc hc' (by grind)
+        (div_le_log_of_exp_explicitLogThreshold_le hγ hγ' hc hc' hn) hδ hδ'))
+  exact (three_le_rpow_neg_mul hn₉ (hα.trans (two_mul_explicitDensityExponent_le_half hγ hγ' hc
+    hc'))).trans (mul_le_mul_of_nonneg_right hδ.le (Nat.cast_nonneg n))
+
+/-- **Theorem 1.1.** Let `0 < γ ≤ 1` and `0 < c < 1`. For every `n ≥ exp (explicitLogThreshold γ c)`
+and every `δ` with `n ^ (-explicitDensityExponent γ c) < δ ≤ 1 - c`, some `S ⊆ [n]` with
+`|S| ≥ δ n` contains no sumset `A + B` with `A, B ⊆ [n]` and
+`|A|, |B| ≥ (3 + γ) * log n / log (1 / δ)`. -/
 theorem exists_dense_subset_forall_add_not_subset {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1)
-    (hc : 0 < c) (hc' : c < 1) :
-    ∃ α : ℝ, 0 < α ∧ ∀ᶠ n : ℕ in atTop, ∀ δ : ℝ, (n : ℝ) ^ (-α) < δ → δ ≤ 1 - c →
-      ∃ S ⊆ Finset.Icc 1 n, δ * n ≤ #S ∧ ∀ A ⊆ Finset.Icc 1 n, ∀ B ⊆ Finset.Icc 1 n,
-        ⌈(3 + γ) * log n / log (1 / δ)⌉₊ ≤ #A → ⌈(3 + γ) * log n / log (1 / δ)⌉₊ ≤ #B →
-          ¬ A + B ⊆ S := by
-  refine ⟨denseSubsetDensityExponent γ c, denseSubsetDensityExponent_pos hγ hc hc', ?_⟩
-  filter_upwards [eventually_forall_exists_dense_subset_without_large_sumsets hγ hγ' hc hc']
-    with n hn δ hδ hδ'
-  obtain ⟨S, hS, hcard, hfree⟩ :=
-    hn ⟨δ, (rpow_nonneg n.cast_nonneg _).trans hδ.le, by linarith⟩ hδ hδ'
+    (hc : 0 < c) (hc' : c < 1) {n : ℕ} (hn : exp (explicitLogThreshold γ c) ≤ n) {δ : ℝ}
+    (hδ : (n : ℝ) ^ (-explicitDensityExponent γ c) < δ) (hδ' : δ ≤ 1 - c) :
+    ∃ S ⊆ Finset.Icc 1 n, δ * n ≤ #S ∧ ∀ A ⊆ Finset.Icc 1 n, ∀ B ⊆ Finset.Icc 1 n,
+      ⌈(3 + γ) * log n / log (1 / δ)⌉₊ ≤ #A → ⌈(3 + γ) * log n / log (1 / δ)⌉₊ ≤ #B →
+        ¬ A + B ⊆ S := by
+  obtain ⟨S, hS, hcard, hfree⟩ := existsDenseSetWithoutLargeSumsets_of_exp_explicitLogThreshold_le
+    (δ := ⟨δ, (rpow_nonneg n.cast_nonneg _).trans hδ.le, by linarith⟩) hγ hγ' hc hc'
+    (by linarith [explicitDensityExponent_pos (c := c) hγ]) hn hδ hδ'
   exact ⟨S, hS, hcard, fun A hA B hB hA' hB' hAB ↦ hfree ⟨A, B, hA, hB, hA', hB', hAB⟩⟩
+
+/-- **Theorem 1.3.** Let `0 < γ ≤ 1` and `0 < c < 1`, let `n ≥ exp (explicitLogThreshold γ c)`, let
+`n ^ (-explicitDensityExponent γ c) < δ ≤ 1 - c` and let `k = ⌈(3 + γ) * log n / log (1 / δ)⌉`.
+The `δ`-random subset of `[n]` contains a sumset `A + B` with `A, B ⊆ [n]` and `|A|, |B| ≥ k` with
+probability at most `4 * k ^ 2 / n ^ (γ / (8 * (γ + 3)))`. -/
+theorem setBernoulli_real_pairEvent_le {γ c : ℝ} (hγ : 0 < γ) (hγ' : γ ≤ 1) (hc : 0 < c)
+    (hc' : c < 1) {n : ℕ} (hn : exp (explicitLogThreshold γ c) ≤ n) {δ : unitInterval}
+    (hδ : (n : ℝ) ^ (-explicitDensityExponent γ c) < δ) (hδ' : (δ : ℝ) ≤ 1 - c) :
+    (ProbabilityTheory.setBernoulli (Set.Icc 1 n) δ).real
+        ((↑) '' {S : Finset ℕ | pairEvent n (pairCardThreshold (3 + γ) n δ) S}) ≤
+      4 * pairCardThreshold (3 + γ) n δ ^ 2 / n ^ (γ / (8 * (γ + 3))) := by
+  rw [← binomialFinsetSubset_real_eq_image (Set.finite_Icc 1 n)]
+  exact pairEvent_measure_le_of_exp_explicitLogThreshold_le hγ hγ' hc hc'
+    (by linarith [explicitDensityExponent_pos (c := c) hγ]) hn hδ hδ'
 
 end
 

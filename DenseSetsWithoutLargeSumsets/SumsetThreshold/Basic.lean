@@ -19,7 +19,7 @@ downwards and is bounded by `N`, so it has a largest element.
 ## Main definitions
 
 * `sumsetThresholdSet δ N`: the set of `k` with the property above.
-* `phi δ N`: its supremum, the function `φ(δ, N)`.
+* `φ δ N`: its supremum, the function `φ(δ, N)`.
 
 ## Main statements
 
@@ -42,14 +42,15 @@ noncomputable section
 def sumsetThresholdSet (δ : unitInterval) (N : ℕ) : Set ℕ :=
   {k | ∀ S : Finset ℕ, S ⊆ interval N → (δ : ℝ) * (N : ℝ) ≤ (S.card : ℝ) → pairEvent N k S}
 
-/-- `φ(δ, N)`, the largest integer `k` such that every `A ⊆ [N]` with `|A| ≥ δ N` contains a sumset
-`B + C` with `B, C ⊆ [N]` and `min {|B|, |C|} ≥ k`. It is stated with Mathlib notions only, and is
-`sSup (sumsetThresholdSet δ N)` by `phi_eq_sSup`. -/
-def phi (δ : unitInterval) (N : ℕ) : ℕ :=
+/-- The function `φ(δ, N)` of Kra, Moreira, Richter and Robertson: the largest integer `k` such that
+every `A ⊆ [N]` with `|A| ≥ δ N` contains a sumset `B + C` with `B, C ⊆ [N]` and
+`min {|B|, |C|} ≥ k`. It is stated with Mathlib notions only, and is
+`sSup (sumsetThresholdSet δ N)` by `phi_eq_sSup`. Lemma names spell it `phi`. -/
+def φ (δ : unitInterval) (N : ℕ) : ℕ :=
   sSup {k | ∀ S ⊆ Finset.Icc 1 N, (δ : ℝ) * N ≤ S.card → ∃ A B : Finset ℕ,
     A ⊆ Finset.Icc 1 N ∧ B ⊆ Finset.Icc 1 N ∧ k ≤ A.card ∧ k ≤ B.card ∧ A + B ⊆ S}
 
-lemma phi_eq_sSup (δ : unitInterval) (N : ℕ) : phi δ N = sSup (sumsetThresholdSet δ N) := rfl
+lemma phi_eq_sSup (δ : unitInterval) (N : ℕ) : φ δ N = sSup (sumsetThresholdSet δ N) := rfl
 
 variable {δ δ' : unitInterval} {N k l : ℕ}
 
@@ -75,26 +76,26 @@ lemma bddAbove_sumsetThresholdSet (δ : unitInterval) (N : ℕ) :
     BddAbove (sumsetThresholdSet δ N) :=
   ⟨N, fun _ hk ↦ le_of_mem_sumsetThresholdSet hk⟩
 
-/-- The supremum that defines `phi δ N` is attained. -/
-lemma phi_mem_sumsetThresholdSet (δ : unitInterval) (N : ℕ) : phi δ N ∈ sumsetThresholdSet δ N :=
+/-- The supremum that defines `φ δ N` is attained. -/
+lemma phi_mem_sumsetThresholdSet (δ : unitInterval) (N : ℕ) : φ δ N ∈ sumsetThresholdSet δ N :=
   Nat.sSup_mem ⟨0, zero_mem_sumsetThresholdSet δ N⟩ (bddAbove_sumsetThresholdSet δ N)
 
-lemma le_phi (hk : k ∈ sumsetThresholdSet δ N) : k ≤ phi δ N :=
+lemma le_phi (hk : k ∈ sumsetThresholdSet δ N) : k ≤ φ δ N :=
   le_csSup (bddAbove_sumsetThresholdSet δ N) hk
 
-lemma phi_le_self (δ : unitInterval) (N : ℕ) : phi δ N ≤ N :=
+lemma phi_le_self (δ : unitInterval) (N : ℕ) : φ δ N ≤ N :=
   le_of_mem_sumsetThresholdSet (phi_mem_sumsetThresholdSet δ N)
 
 /-- If `k ≤ φ(δ, N)`, then every `S ⊆ [N]` with `|S| ≥ δ N` contains a sumset `A + B` with
 `A, B ⊆ [N]` and `|A|, |B| ≥ k`. -/
-lemma pairEvent_of_le_phi (hk : k ≤ phi δ N) {S : Finset ℕ} (hS : S ⊆ interval N)
+lemma pairEvent_of_le_phi (hk : k ≤ φ δ N) {S : Finset ℕ} (hS : S ⊆ interval N)
     (hcard : (δ : ℝ) * (N : ℝ) ≤ (S.card : ℝ)) : pairEvent N k S :=
   sumsetThresholdSet_of_le hk (phi_mem_sumsetThresholdSet δ N) S hS hcard
 
 /-- `φ(δ, N) < k` if and only if some `S ⊆ [N]` with `|S| ≥ δ N` contains no sumset `A + B` with
 `A, B ⊆ [N]` and `|A|, |B| ≥ k`. -/
 lemma phi_lt_iff_existsDenseSetWithoutLargeSumsets :
-    phi δ N < k ↔ existsDenseSetWithoutLargeSumsets N k δ := by
+    φ δ N < k ↔ existsDenseSetWithoutLargeSumsets N k δ := by
   constructor
   · intro hlt
     by_contra hcon
@@ -114,10 +115,10 @@ lemma sumsetThresholdSet_mono (h : (δ : ℝ) ≤ (δ' : ℝ)) :
   hk S hS ((mul_le_mul_of_nonneg_right h N.cast_nonneg).trans hcard)
 
 /-- `φ(δ, N)` is monotone in `δ`. -/
-lemma phi_mono (h : (δ : ℝ) ≤ (δ' : ℝ)) : phi δ N ≤ phi δ' N :=
+lemma phi_mono (h : (δ : ℝ) ≤ (δ' : ℝ)) : φ δ N ≤ φ δ' N :=
   le_phi (sumsetThresholdSet_mono h (phi_mem_sumsetThresholdSet δ N))
 
-lemma phi_div_log_nonneg (δ : unitInterval) (N : ℕ) : 0 ≤ (phi δ N : ℝ) / Real.log N :=
+lemma phi_div_log_nonneg (δ : unitInterval) (N : ℕ) : 0 ≤ (φ δ N : ℝ) / Real.log N :=
   div_nonneg (Nat.cast_nonneg _) (Real.log_natCast_nonneg N)
 
 lemma log_one_div_pos {x : ℝ} (hx : 0 < x) (hx' : x < 1) : 0 < Real.log (1 / x) :=

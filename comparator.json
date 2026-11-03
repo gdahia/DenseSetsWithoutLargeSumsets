@@ -3,8 +3,7 @@
   "solution_module": "DenseSetsWithoutLargeSumsetsPalomar.Solution",
   "theorem_names": [
     "DenseSetsWithoutLargeSumsets.exists_dense_subset_forall_add_not_subset'",
-    "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc'",
-    "DenseSetsWithoutLargeSumsets.exists_forall_setBernoulli_real_pairEvent_le'",
+    "DenseSetsWithoutLargeSumsets.phi_div_log_mem_Icc'",
     "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log'",
     "DenseSetsWithoutLargeSumsets.limsup_phi_div_log_lt_top_and_liminf_phi_div_log_pos'",
     "DenseSetsWithoutLargeSumsets.liminf_phi_div_log_eq_zero'"

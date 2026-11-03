@@ -7,7 +7,8 @@ project:
     Lean 4 formalization of Dahia, Marciano and Souza's theorem that for 0 < δ < 1 and all
     large n there is S ⊆ {1, ..., n} with |S| ≥ δn that contains no sumset A + B with
     min{|A|, |B|} ≥ (3 + o(1)) log n / log(1/δ), for n^(-α) < δ ≤ 1 - c, together with the
-    bound for a δ-random subset that it follows from. It includes Corollary 1.2 of the paper on
+    bound for a δ-random subset that it follows from. The exponent α and the threshold on n are
+    explicit expressions in γ, c and the triangle removal constant. It includes Corollary 1.2 of the paper on
     the function φ(δ, N) of Kra, Moreira, Richter and Robertson:
     (1 - γ)/log(1/δ) ≤ φ(δ, n)/log n ≤ (3 + γ)/log(1/δ). The lower bound is that of Hernández
     and Hetzel, and is proved here from the Kővári-Sós-Turán theorem. Conjecture 4.10 of Kra,
@@ -114,8 +115,11 @@ related_formalizations:
     relationship: "builds-on"
     note: >-
       The statements use finite sets of natural numbers, pointwise sums, the unit interval,
-      logarithms and real powers, the distribution setBernoulli of a random subset, and limits
-      inferior and superior in the reals and the extended reals. The proofs use its Freiman isomorphisms, the Plünnecke-Ruzsa
+      logarithms and real powers, the constant triangleRemovalBound of the triangle removal
+      lemma in the threshold on n, and limits inferior and superior in the reals and the
+      extended reals; the library form of Theorem 1.3 uses the distribution setBernoulli of a
+      random subset. The proofs use its
+      Freiman isomorphisms, the Plünnecke-Ruzsa
       inequality, the binomial distribution, Bertrand's postulate and the Zarankiewicz
       function.
   - id: "https://github.com/gdahia/ChangFreimanRuzsa"
@@ -169,7 +173,8 @@ status:
     bound to the Kővári-Sós-Turán theorem is proved here. Question 4.11 of Kra,
     Moreira, Richter and Robertson, on the existence of the limit of φ(δ, N)/log N, is not
     addressed. The sorry counts refer to the library and Solution.lean; Challenge.lean has
-    one placeholder for each of its six statements.
+    one placeholder for each of its five statements. Theorem 1.3 is proved in the library and
+    is not stated in Challenge.lean.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -222,7 +227,15 @@ automation:
         standards, to stay on Lean v4.35.0 and to move to the latest compatible versions of the
         dependencies, and then to keep in Challenge.lean the main theorems of the paper and the
         results of Hernández and Hetzel needed for the questions of Kra, Moreira, Richter and
-        Robertson, in the form in which they were asked, with phi as its only definition.
+        Robertson, in the form in which they were asked, with phi as its only definition. A
+        follow-up asked to name the definition φ, to state the bounds as intervals and whether
+        α and the threshold on n could be made explicit. Later, one instruction to state α and
+        the threshold on n in Challenge.lean as simple expressions in the parameters of the
+        statements, to prove in the library that these looser bounds suffice, and to confirm the
+        form in a scratch file first. Later, one instruction to name α and the threshold on n
+        alpha and n₀ in Challenge.lean and Solution.lean for readability, with a follow-up to
+        keep the descriptive names in the library and a second to write α instead of alpha.
+        Then one instruction to leave Theorem 1.3 out of Challenge.lean and Solution.lean.
   spend_usd: "not tracked"
   notes: >-
     The proofs up to commit 5f4b915 were written by Codex agents directed by Gabriel Dahia.
@@ -250,29 +263,42 @@ automation:
     latest commits of the four dependencies and to the Mathlib commit that Tau Ceti v4.35.0
     pins, fixed one proof of CountingSetsWithSmallSumset for that commit upstream, adapted the
     proofs to the progressions of ChangFreimanRuzsa, now given by an origin and a bound, and to
-    the constants of LargeSumsetsFromSubsets, which no longer take proofs, and reduced Challenge.lean to Theorems 1.1 and 1.3 and Corollary 1.2 of the paper,
-    Corollary C of Hernández and Hetzel, Conjecture 4.10 and Question 4.12 as asked, stated
-    with Mathlib notions and phi, whose library definition it now shares. Every proof is
-    checked by Lean.
+    the constants of LargeSumsetsFromSubsets, which no longer take proofs, and reduced
+    Challenge.lean to Theorems 1.1 and 1.3 and Corollary 1.2 of the paper, Corollary C of
+    Hernández and Hetzel, Conjecture 4.10 and Question 4.12 as asked, stated with Mathlib
+    notions and φ, whose library definition it now shares. It then renamed the definition phi
+    to φ and stated the bounds on γ, c and δ in Challenge.lean as membership in intervals.
+    Later, the agent bounded the exponent and the thresholds of the proof by
+    α = γ / exp(exp(10^4/c)) and n ≥ exp(exp(10^5/c) / (γT)^16), with T the triangle removal
+    constant of Mathlib at γ^2 / exp(3·10^4/c), proved that this constant is monotone up to a
+    factor 3/4, made the little-o step and the conditions of the lower bound of Corollary 1.2
+    explicit, and replaced the existential statements of Theorems 1.1 and 1.3 and Corollary 1.2
+    by statements for all n above the threshold. Later, the agent defined α and the threshold
+    on n as α and n₀ in Challenge.lean and Solution.lean and restated Theorems 1.1 and 1.3
+    and Corollary 1.2 with them; Solution.lean reduces them to the library forms by unfolding.
+    It then removed Theorem 1.3 from Challenge.lean, Solution.lean and comparator.json, keeping
+    its library forms, and dropped the import of setBernoulli from Challenge.lean.
+    Every proof is checked by Lean.
 
 fidelity:
   divergences: >-
-    Theorem 1.1. The exponent α is denseSubsetDensityExponent γ c in the library and is
-    existentially quantified in Challenge.lean. The sets A and B range over subsets of
-    {1, ..., n}; the paper takes them in the positive integers, and a sumset of sets of
-    positive integers contained in S ⊆ {1, ..., n} has both summands in {1, ..., n}.
+    Theorem 1.1. The paper takes α small and n large. Here α = γ / exp(exp(10^4/c)) and the
+    statement holds for every n ≥ exp(exp(10^5/c) / (γT)^16), where T is the constant
+    triangleRemovalBound of the triangle removal lemma in Mathlib at γ^2 / exp(3·10^4/c). The
+    sets A and B range over subsets of {1, ..., n}; the paper takes them in the positive
+    integers, and a sumset of sets of positive integers contained in S ⊆ {1, ..., n} has both
+    summands in {1, ..., n}.
 
-    Corollary 1.2. φ(δ, N) is phi δ N for δ in the unit interval, defined as the supremum of
-    the set of admissible k, which is attained. The exponent α is existentially quantified.
-    The lower bound is quoted in the paper from Hernández and Hetzel, whose Corollary C is for
-    fixed δ; here it is stated for n^(-α) ≤ δ ≤ 1 - c, uniformly in δ.
+    Corollary 1.2. φ(δ, N) is φ δ N for δ in the unit interval, defined as the supremum of
+    the set of admissible k, which is attained. The exponent α and the threshold on n are those
+    of Theorem 1.1. The lower bound is quoted in the paper from Hernández and Hetzel, whose
+    Corollary C is for fixed δ; here it is stated for n^(-α) ≤ δ ≤ 1 - c, uniformly in δ.
 
     Theorem 1.3. The paper states that the probability tends to 0, with
     k = (3 + γ) log n / log(1/δ) and A, B ⊆ ℕ. Here k is rounded up, A and B range over subsets
     of {1, ..., n}, and the probability is at most 4 k^2 / n^(γ / (8 (γ + 3))). The random set
     has distribution setBernoulli (Set.Icc 1 n) δ, and the event is the image of a family of
-    finite sets. The exponent α is denseSubsetDensityExponent γ c in the library and is
-    existentially quantified in Challenge.lean.
+    finite sets. The exponent α and the threshold on n are those of Theorem 1.1.
 
     Conjecture 4.10 is stated by Kra, Moreira, Richter and Robertson for every δ > 0. It is
     false for δ = 1, where φ(1, N) = ⌊N/2⌋, and is formalized for 0 < δ < 1, as in Hernández
@@ -294,27 +320,29 @@ alignment:
       module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
-        Library forms: exists_dense_subset_forall_add_not_subset,
+        With α = γ / exp(exp(10^4/c)) and n ≥ exp(exp(10^5/c) / (γT)^16), defined in the
+        challenge as α γ c and n₀ γ c. Library forms:
+        exists_dense_subset_forall_add_not_subset, with α and the threshold named
+        explicitDensityExponent γ c and exp (explicitLogThreshold γ c), and, for all large n,
         eventually_forall_exists_dense_subset_without_large_sumsets and
         dense_subset_without_large_sumsets in
         DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets.
     - source: "Dense sets without large sumsets, Corollary 1.2"
-      lean: "DenseSetsWithoutLargeSumsets.exists_forall_phi_div_log_mem_Icc'"
+      lean: "DenseSetsWithoutLargeSumsets.phi_div_log_mem_Icc'"
       module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
       status: "proved"
       note: >-
-        Library form: exists_forall_phi_div_log_mem_Icc in
+        With α and the threshold on n of Theorem 1.1. Library form: phi_div_log_mem_Icc in
         DenseSetsWithoutLargeSumsets.SumsetThreshold.Growth.
     - source: "Dense sets without large sumsets, Theorem 1.3"
-      lean: "DenseSetsWithoutLargeSumsets.exists_forall_setBernoulli_real_pairEvent_le'"
-      module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"
+      lean: "DenseSetsWithoutLargeSumsets.setBernoulli_real_pairEvent_le"
+      module: "DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets"
       status: "proved"
       note: >-
-        With the explicit bound 4 k^2 / n^(γ / (8 (γ + 3))) for the probability, where
-        k = ⌈(3 + γ) log n / log(1/δ)⌉. Library forms:
-        exists_forall_setBernoulli_real_pairEvent_le and, with the explicit exponent,
-        eventually_pairEvent_probability_le in
-        DenseSetsWithoutLargeSumsets.DenseSubsetsWithoutLargeSumsets.
+        Proved in the library and not stated in Challenge.lean. With α and the threshold on n
+        of Theorem 1.1 and the explicit bound 4 k^2 / n^(γ / (8 (γ + 3))) for the probability,
+        where k = ⌈(3 + γ) log n / log(1/δ)⌉. The form for all large n is
+        eventually_pairEvent_probability_le.
     - source: "On growth rates of infinite and finite sumsets, Corollary C"
       lean: "DenseSetsWithoutLargeSumsets.one_div_log_one_div_le_liminf_phi_div_log'"
       module: "DenseSetsWithoutLargeSumsetsPalomar.Challenge"

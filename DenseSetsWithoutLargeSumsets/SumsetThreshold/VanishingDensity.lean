@@ -46,7 +46,7 @@ open Filter Real
 lemma eventually_phi_div_log_le_of_tendsto (δ : ℕ → unitInterval)
     (hδ : Tendsto (fun N : ℕ ↦ (δ N : ℝ)) atTop (nhds 0)) {y : unitInterval}
     (hy_pos : 0 < (y : ℝ)) (hy_lt : (y : ℝ) < 1) :
-    ∀ᶠ N : ℕ in atTop, (phi (δ N) N : ℝ) / log N ≤ 4 / log (1 / y) := by
+    ∀ᶠ N : ℕ in atTop, (φ (δ N) N : ℝ) / log N ≤ 4 / log (1 / y) := by
   filter_upwards [hδ.eventually_lt_const hy_pos,
     eventually_phi_div_log_le hy_pos hy_lt one_pos le_rfl] with N hN hy
   rw [(by norm_num : (3 + 1 : ℝ) = 4)] at hy
@@ -56,7 +56,7 @@ lemma eventually_phi_div_log_le_of_tendsto (δ : ℕ → unitInterval)
 /-- For every sequence of densities `δ_N → 0`, `φ(δ_N, N) / log N → 0`. -/
 theorem tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero (δ : ℕ → unitInterval)
     (hδ : Tendsto (fun N : ℕ ↦ (δ N : ℝ)) atTop (nhds 0)) :
-    Tendsto (fun N : ℕ ↦ (phi (δ N) N : ℝ) / log N) atTop (nhds 0) := by
+    Tendsto (fun N : ℕ ↦ (φ (δ N) N : ℝ) / log N) atTop (nhds 0) := by
   refine tendsto_order.mpr
     ⟨fun a ha ↦ .of_forall fun N ↦ ha.trans_le (phi_div_log_nonneg _ _), ?_⟩
   intro a ha
@@ -72,7 +72,7 @@ theorem tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero (δ : ℕ → unitInt
 `liminf φ(δ_N, N) / log N = 0`. -/
 theorem liminf_phi_div_log_eq_zero (δ : ℕ → unitInterval)
     (hδ : Tendsto (fun N : ℕ ↦ (δ N : ℝ)) atTop (nhds 0)) :
-    liminf (fun N : ℕ ↦ (phi (δ N) N : ℝ) / log N) atTop = 0 :=
+    liminf (fun N : ℕ ↦ (φ (δ N) N : ℝ) / log N) atTop = 0 :=
   (tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero δ hδ).liminf_eq
 
 /-! ### The sequence `δ_N = 1 / log N` -/
@@ -100,12 +100,12 @@ lemma tendsto_coe_logDensity :
 
 /-- `φ(1 / log N, N) / log N → 0`. -/
 lemma tendsto_phi_logDensity_div_log_atTop_nhds_zero :
-    Tendsto (fun N : ℕ ↦ (phi (logDensity N) N : ℝ) / log N) atTop (nhds 0) :=
+    Tendsto (fun N : ℕ ↦ (φ (logDensity N) N : ℝ) / log N) atTop (nhds 0) :=
   tendsto_phi_div_log_nhds_zero_of_tendsto_nhds_zero _ tendsto_coe_logDensity
 
 /-- The answer to the second part of Question 4.12: `liminf φ(1 / log N, N) / log N = 0`. -/
 theorem liminf_phi_logDensity_div_log_eq_zero :
-    liminf (fun N : ℕ ↦ (phi (logDensity N) N : ℝ) / log N) atTop = 0 :=
+    liminf (fun N : ℕ ↦ (φ (logDensity N) N : ℝ) / log N) atTop = 0 :=
   tendsto_phi_logDensity_div_log_atTop_nhds_zero.liminf_eq
 
 lemma eventually_log_lt_rpow {α : ℝ} (hα : 0 < α) : ∀ᶠ x : ℝ in atTop, log x < x ^ α := by
@@ -131,7 +131,7 @@ lemma eventually_coe_logDensity_le_half :
 
 /-- For all large `N`, `φ(1 / log N, N) < 4 * log N / log (log N)`. -/
 lemma eventually_phi_logDensity_lt_log_div_log_log :
-    ∀ᶠ N : ℕ in atTop, (phi (logDensity N) N : ℝ) < 4 * log N / log (log N) := by
+    ∀ᶠ N : ℕ in atTop, (φ (logDensity N) N : ℝ) < 4 * log N / log (log N) := by
   filter_upwards [eventually_phi_lt_log_div_log (γ := 1) (c := 1 / 2) one_pos le_rfl
       (by norm_num) (by norm_num) logDensity
       (eventually_rpow_neg_lt_coe_logDensity
@@ -144,7 +144,7 @@ lemma eventually_phi_logDensity_lt_log_div_log_log :
 `φ(δ_N, N) < 4 * log N / log (log N)` for all large `N`. -/
 theorem eventually_phi_lt_log_div_log_log (δ : ℕ → unitInterval)
     (hδ : ∀ᶠ N : ℕ in atTop, (δ N : ℝ) = 1 / log N) :
-    ∀ᶠ N : ℕ in atTop, (phi (δ N) N : ℝ) < 4 * log N / log (log N) := by
+    ∀ᶠ N : ℕ in atTop, (φ (δ N) N : ℝ) < 4 * log N / log (log N) := by
   filter_upwards [hδ, eventually_phi_logDensity_lt_log_div_log_log, eventually_ge_atTop 3]
     with N hδN hN hN₃
   rwa [(Subtype.ext (hδN.trans (coe_logDensity hN₃).symm) : δ N = logDensity N)]
