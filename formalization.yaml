@@ -236,6 +236,8 @@ automation:
         alpha and n₀ in Challenge.lean and Solution.lean for readability, with a follow-up to
         keep the descriptive names in the library and a second to write α instead of alpha.
         Then one instruction to leave Theorem 1.3 out of Challenge.lean and Solution.lean.
+        Later, one instruction to restyle some of the proofs of ExplicitConstants.lean to the
+        author's standards, with a follow-up to refactor the remaining big proof.
   spend_usd: "not tracked"
   notes: >-
     The proofs up to commit 5f4b915 were written by Codex agents directed by Gabriel Dahia.
@@ -278,6 +280,9 @@ automation:
     and Corollary 1.2 with them; Solution.lean reduces them to the library forms by unfolding.
     It then removed Theorem 1.3 from Challenge.lean, Solution.lean and comparator.json, keeping
     its library forms, and dropped the import of setBernoulli from Challenge.lean.
+    Later, the agent restyled the proofs of ExplicitConstants.lean, splitting the bounds on the
+    constants of Bollobás, Leader and Tiba and of Chang's theorem into shorter lemmas, and split
+    the bound on the threshold of Lemma 2.1 along the thresholds it is the maximum of.
     Every proof is checked by Lean.
 
 fidelity:
