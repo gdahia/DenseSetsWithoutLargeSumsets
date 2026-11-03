@@ -212,7 +212,7 @@ theorem eventually_pairEvent_probability_le {γ c : ℝ} (hγ_pos : 0 < γ) (hγ
     (hc_pos : 0 < c) (hc_lt : c < 1) :
     eventuallyForDensities (denseSubsetDensityExponent γ c) c fun n δ ↦
       let ℙ : Measure (Finset ℕ) := binomialFinsetSubset (Set.Icc 1 n) δ
-      ℙ.real (pairEvent n (pairCardThreshold (3 + γ) n δ)) ≤
+      ℙ.real {S | pairEvent n (pairCardThreshold (3 + γ) n δ) S} ≤
         4 * (pairCardThreshold (3 + γ) n δ : ℝ) ^ 2 /
           Real.rpow (n : ℝ) (pairEventDecayExponent γ) := by
   rw [eventuallyForDensities]

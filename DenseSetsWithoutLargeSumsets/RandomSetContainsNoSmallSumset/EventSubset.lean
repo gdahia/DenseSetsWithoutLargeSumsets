@@ -42,20 +42,20 @@ private lemma one_le_dim_of_subset_zmodGAPPreimageContainer {γ : ℝ} {n q k : 
     (hA₀P : A₀ ⊆ zmodGAPPreimageContainer n ψ P) (hA₀large : (1 - ε γ) * k ≤ #A₀) :
     1 ≤ P.dim := by
   by_contra! hdim
-  have h := (card_le_card hA₀P).trans (zmodGAPPreimageContainer_card_le_carrier P hψ)
-  rw [card_carrier_eq_one_of_dim_eq_zero P (by grind), ← Nat.cast_le (α := ℝ), Nat.cast_one] at h
+  have h := (card_le_card hA₀P).trans (zmodGAPPreimageContainer_card_le_card_toFinset P hψ)
+  rw [card_toFinset_eq_one_of_dim_eq_zero P (by grind), ← Nat.cast_le (α := ℝ), Nat.cast_one] at h
   have hε := ε_le_one_twelfth hγ_pos hγ_le
   linarith [mul_le_mul_of_nonneg_left (Nat.ofNat_le_cast (α := ℝ).2 hk) (by linarith : 0 ≤ 1 - ε γ)]
 
 private lemma mem_bltDimSmallWitnessPairs_of_le {Q : Finset ℕ} {A' B' : Finset ℤ} {D k : ℕ}
-    {C γ : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ) (hA'Q : A' ⊆ natCastImage Q)
-    (hB'Q : B' ⊆ natCastImage Q) (hA' : #A' ≤ lowerBltConstant C γ hC hε * Real.sqrt k)
-    (hB' : #B' ≤ lowerBltConstant C γ hC hε * Real.sqrt k) (hD : 1 ≤ D)
+    {C γ : ℝ} (hA'Q : A' ⊆ natCastImage Q)
+    (hB'Q : B' ⊆ natCastImage Q) (hA' : #A' ≤ lowerBltConstant C γ * Real.sqrt k)
+    (hB' : #B' ≤ lowerBltConstant C γ * Real.sqrt k) (hD : 1 ≤ D)
     (hlower : (1 - 3 * ε γ) * D * k ≤ #(A' + B')) :
     (A', B') ∈ bltDimSmallWitnessPairs Q D k C γ := by
   rw [bltDimSmallWitnessPairs, mem_filter, bltSmallWitnessPairs, mem_filter, mem_product,
     mem_powerset, mem_powerset]
-  exact ⟨⟨⟨hA'Q, hB'Q⟩, hC, hε, hA', hB'⟩, hD, hlower⟩
+  exact ⟨⟨⟨hA'Q, hB'Q⟩, hA', hB'⟩, hD, hlower⟩
 
 private lemma one_sub_mul_le_of_min_le {e C k N a b M : ℝ} (he : e ≤ 1 / 2) (hC : 0 < C)
     (hk : 0 ≤ k) (hN : N ≤ C * k) (ha : (1 - e) * k ≤ a) (hb : (1 - e) * k ≤ b)
@@ -94,7 +94,7 @@ lemma pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ C 
   have hψ := zmodModelEmbedding_iso hγ_pos C_pos hn
   obtain ⟨A', A'', B', B'', hA'A'', hA''A, hB'B'', hB''B, hA''card, hB''card, hA'card, hB'card,
       hsum⟩ :=
-    exists_medium_sized_subsets_with_large_sumset_subsets (σ := 2 * C) (ε := ε γ) (by positivity)
+    exists_subset_card_le_mul_sqrt_min_le_card_add (σ := 2 * C) (ε := ε γ) (by positivity)
       (ε_pos hγ_pos) (natCastImage_nonempty_of_card_eq hAcard hk)
       (natCastImage_nonempty_of_card_eq hBcard hk)
   have hA₀large := bltLargePreimage_large_of_blt hAcard hA''A hA''card
@@ -122,8 +122,7 @@ lemma pairSumsetIsSubset_event_subset_zmodGAPPreimageDimSmallWitnessPairs {γ C 
     (mem_properGAPsZModOfDim _).2 ⟨hPproper, rfl, hPcard⟩⟩, ?_⟩
   refine Set.mem_iUnion₂.2 ⟨(A', B'), ?_,
     natCastImage_add_subset (hA'A''.trans hA''A) (hB'B''.trans hB''B) hABS⟩
-  refine mem_bltDimSmallWitnessPairs_of_le (by positivity) (ε_pos hγ_pos) ?_ ?_ hA'card hB'card
-    hdim₁ ?_
+  refine mem_bltDimSmallWitnessPairs_of_le ?_ ?_ hA'card hB'card hdim₁ ?_
   · exact hA'A''.trans (hA₀.superset.trans (natCastImage_mono hA₀P))
   · exact hB'B''.trans (hB₀.superset.trans (natCastImage_mono hB₀P))
   · exact hlower.trans (one_sub_mul_le_of_min_le (ε_lt_one_half hγ_pos hγ_le).le C_pos

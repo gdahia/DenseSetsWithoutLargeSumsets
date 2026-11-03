@@ -66,8 +66,8 @@ lemma small_sumset_pair_probability_le_fingerprint_sum {γ C c : ℝ} {n : ℕ}
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ)) (hδ_upper : (δ : ℝ) < 1)
     (hδ_upper_c : (δ : ℝ) ≤ 1 - c) :
     (smallSumsetMeasure n δ).real
-        (pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
-          (C * pairCardThreshold (3 + γ) n δ)) ≤
+        {S | pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
+          (C * pairCardThreshold (3 + γ) n δ) S} ≤
       ∑ P ∈ lowerModelGAPs δ hγ_pos C_pos hn,
         ∑ p ∈ bltDimSmallWitnessPairs
             (zmodGAPPreimageContainer n (zmodModelEmbedding hγ_pos C_pos hn) P)
@@ -97,7 +97,7 @@ private lemma sum_sum_pow_le_two_mul_div {γ C c : ℝ} {n : ℕ} {δ : unitInte
   have hC_two : 0 < 2 * C := by positivity
   refine (dim_fingerprint_sum_le_gap_dim_sum (zmodModelEmbedding hγ_pos C_pos hn)
     (zmodModelQ_prime hγ_pos C_pos hn).pos (zmodModelEmbedding_iso hγ_pos C_pos hn).bijOn.injOn
-    hC_two (ε_pos hγ_pos) (unitInterval_pos_of_density_lower hn hδ_lower) hδ_upper).trans ?_
+    (unitInterval_pos_of_density_lower hn hδ_lower) hδ_upper).trans ?_
   refine (sum_le_card_nsmul _ _ ((n : ℝ) ^ (-(ε γ / 2))) ?_).trans ?_
   · intro d hd
     exact mod_cast lower_gap_dim_summand_le hγ_pos hγ_le C_pos hC_one hc_pos hc_lt hn hn_gap
@@ -117,8 +117,8 @@ lemma small_sumset_pair_probability_le {γ C c : ℝ} {n : ℕ} {δ : unitInterv
     (hδ_lower : (n : ℝ) ^ (-lowerDensityExponent C γ) < (δ : ℝ))
     (hδ_upper : (δ : ℝ) ≤ 1 - c) :
     (smallSumsetMeasure n δ).real
-        (pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
-          (C * pairCardThreshold (3 + γ) n δ)) ≤
+        {S | pairSumsetIsSubset n (pairCardThreshold (3 + γ) n δ) 0
+          (C * pairCardThreshold (3 + γ) n δ) S} ≤
       2 * (pairCardThreshold (3 + γ) n δ : ℝ) / (n : ℝ) ^ (ε γ / 2) := by
   have hn := (lowerSizeThreshold_le_lowerGapThreshold C γ c).trans_lt hn_gap
   have hc_lt : c < 1 := by linarith [unitInterval_pos_of_density_lower hn hδ_lower]

@@ -5,7 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
-public import ChangFreimanRuzsa.CyclicFreimanDimension
+public import ChangFreimanRuzsa.FreimanDim
 public import DenseSetsWithoutLargeSumsets.Common
 public import LargeSumsetsFromSubsets.MediumSizedSubsets
 import Mathlib.NumberTheory.Bertrand
@@ -74,75 +74,39 @@ def κ (C : ℝ) : ℝ := 6 * C ^ (2 : ℕ)
 def changExponent (C : ℝ) : ℝ := freimanDimExponent (κ C)
 
 /-- The constant of the Bollobás–Leader–Tiba theorem for `σ = 2 * C` and the error `ε γ`. -/
-def lowerBltConstant (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
-  bltConstant (2 * C) (ε γ) hC hε
-
-/-- The constant `lowerBltConstant C γ` as a function of `C` and `γ` alone. It is `1` when
-`2 * C` or `ε γ` is not positive. -/
-def lowerBltConstantDefault (C γ : ℝ) : ℝ :=
-  if hC : 0 < 2 * C then
-    if hε : 0 < ε γ then lowerBltConstant C γ hC hε else 1
-  else 1
-
-lemma lowerBltConstantDefault_eq (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    lowerBltConstantDefault C γ = lowerBltConstant C γ hC hε := by
-  simp [lowerBltConstantDefault, hC, hε]
+def lowerBltConstant (C γ : ℝ) : ℝ := bltConstant (2 * C) (ε γ)
 
 /-- The maximum of `exp (changExponent C)` and `4 * lowerBltConstant C γ`. -/
-def lowerConstant (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
-  max (Real.exp (changExponent C)) (4 * lowerBltConstant C γ hC hε)
+def lowerConstant (C γ : ℝ) : ℝ := max (Real.exp (changExponent C)) (4 * lowerBltConstant C γ)
 
-/-- The constant `lowerConstant C γ` as a function of `C` and `γ` alone. -/
-def lowerConstantDefault (C γ : ℝ) : ℝ :=
-  max (Real.exp (changExponent C)) (4 * lowerBltConstantDefault C γ)
+lemma one_le_lowerBltConstant {C : ℝ} (hC : 0 < 2 * C) (γ : ℝ) : 1 ≤ lowerBltConstant C γ :=
+  one_le_bltConstant hC.le _
 
-lemma lowerConstantDefault_eq (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    lowerConstantDefault C γ = lowerConstant C γ hC hε := by
-  simp [lowerConstantDefault, lowerConstant, lowerBltConstantDefault_eq C γ hC hε]
-
-lemma one_le_lowerBltConstant {C γ : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    1 ≤ lowerBltConstant C γ hC hε :=
-  one_le_bltConstant hC hε
-
-lemma lowerBltConstant_le_lowerConstant {C γ : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    lowerBltConstant C γ hC hε ≤ lowerConstant C γ hC hε := by
+lemma lowerBltConstant_le_lowerConstant {C : ℝ} (hC : 0 < 2 * C) (γ : ℝ) :
+    lowerBltConstant C γ ≤ lowerConstant C γ := by
   refine le_trans ?_ (le_max_right _ _)
-  linarith [one_le_lowerBltConstant hC hε]
+  linarith [one_le_lowerBltConstant hC γ]
 
-lemma one_le_lowerConstant {C γ : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    1 ≤ lowerConstant C γ hC hε :=
-  (one_le_lowerBltConstant hC hε).trans (lowerBltConstant_le_lowerConstant hC hε)
+lemma one_le_lowerConstant {C : ℝ} (hC : 0 < 2 * C) (γ : ℝ) : 1 ≤ lowerConstant C γ :=
+  (one_le_lowerBltConstant hC γ).trans (lowerBltConstant_le_lowerConstant hC γ)
 
-lemma lowerConstant_eq (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    lowerConstant C γ hC hε =
-      max (Real.exp (freimanDimExponent (κ C))) (4 * lowerBltConstant C γ hC hε) :=
+lemma lowerConstant_eq (C γ : ℝ) :
+    lowerConstant C γ = max (Real.exp (freimanDimExponent (κ C))) (4 * lowerBltConstant C γ) :=
   rfl
 
-lemma lowerConstant_pos (C γ : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : 0 < lowerConstant C γ hC hε :=
+lemma lowerConstant_pos (C γ : ℝ) : 0 < lowerConstant C γ :=
   (Real.exp_pos (changExponent C)).trans_le (le_max_left _ _)
 
 /-- The scale `8 / ε γ` of the logarithmic condition on `n`. -/
 def lowerLogScale (γ : ℝ) : ℝ := 8 / ε γ
 
-/-- The scale `8 * lowerBltConstantDefault C γ * √14 / ε γ`. -/
-def lowerSqrtScaleDefault (C γ : ℝ) : ℝ :=
-  8 * lowerBltConstantDefault C γ * Real.sqrt 14 / ε γ
-
-/-- The scale `8 * lowerBltConstantDefault C γ * √K / ε γ` of the square root condition on `n`,
-where `K = densityCoefficient (3 + γ) c`. -/
-def lowerGapSqrtScaleDefault (C γ c : ℝ) : ℝ :=
-  8 * lowerBltConstantDefault C γ *
-    Real.sqrt (densityCoefficient (3 + γ) c) / ε γ
+/-- The scale `8 * lowerBltConstant C γ * √14 / ε γ`. -/
+def lowerSqrtScale (C γ : ℝ) : ℝ := 8 * lowerBltConstant C γ * Real.sqrt 14 / ε γ
 
 /-- The scale `8 * lowerBltConstant C γ * √K / ε γ` of the square root condition on `n`, where
 `K = densityCoefficient (3 + γ) c`. -/
-def lowerGapSqrtScale (C γ c : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) : ℝ :=
-  8 * lowerBltConstant C γ hC hε *
-    Real.sqrt (densityCoefficient (3 + γ) c) / ε γ
-
-lemma lowerGapSqrtScaleDefault_eq (C γ c : ℝ) (hC : 0 < 2 * C) (hε : 0 < ε γ) :
-    lowerGapSqrtScaleDefault C γ c = lowerGapSqrtScale C γ c hC hε := by
-  simp [lowerGapSqrtScaleDefault, lowerGapSqrtScale, lowerBltConstantDefault_eq C γ hC hε]
+def lowerGapSqrtScale (C γ c : ℝ) : ℝ :=
+  8 * lowerBltConstant C γ * Real.sqrt (densityCoefficient (3 + γ) c) / ε γ
 
 lemma lowerLogScale_pos {γ : ℝ} (hε : 0 < ε γ) : 0 < lowerLogScale γ := by
   rw [lowerLogScale]
@@ -150,8 +114,8 @@ lemma lowerLogScale_pos {γ : ℝ} (hε : 0 < ε γ) : 0 < lowerLogScale γ := b
 
 lemma lowerGapSqrtScale_pos {C γ c : ℝ} (hC : 0 < 2 * C) (hε : 0 < ε γ)
     (hK : 0 < densityCoefficient (3 + γ) c) :
-    0 < lowerGapSqrtScale C γ c hC hε := by
-  have := one_le_lowerBltConstant hC hε
+    0 < lowerGapSqrtScale C γ c := by
+  have := one_le_lowerBltConstant hC γ
   rw [lowerGapSqrtScale]
   positivity
 
@@ -160,9 +124,8 @@ quantities, so that `n` above it satisfies four conditions on `log n`. -/
 def lowerAnalyticThreshold (C γ : ℝ) : ℝ :=
   Real.exp <| max (4 * Real.log (56 : ℝ) + 1) <|
     max (2 * changExponent C) <|
-      max (2 * lowerLogScale γ * Real.log (42 * lowerConstantDefault C γ * lowerLogScale γ))
-        ((4 * lowerSqrtScaleDefault C γ * Real.log (84 * lowerConstantDefault C γ *
-          lowerSqrtScaleDefault C γ)) ^
+      max (2 * lowerLogScale γ * Real.log (42 * lowerConstant C γ * lowerLogScale γ))
+        ((4 * lowerSqrtScale C γ * Real.log (84 * lowerConstant C γ * lowerSqrtScale C γ)) ^
           (2 : ℕ))
 
 /-- The exponent `α`. The densities considered are those larger than `n ^ (-α)`. -/
@@ -202,10 +165,10 @@ def lowerGapThreshold (C γ c : ℝ) : ℝ :=
     ((2 * densityCoefficient (3 + γ) c * Real.exp (changExponent C)) ^ (2 : ℕ)) <|
     Real.exp <| max
       (2 * lowerLogScale γ * Real.log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
-      ((4 * lowerGapSqrtScaleDefault C γ c * Real.log
-        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
-          lowerGapSqrtScaleDefault C γ c)) ^ (2 : ℕ))
+        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ * lowerLogScale γ))
+      ((4 * lowerGapSqrtScale C γ c * Real.log
+        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ *
+          lowerGapSqrtScale C γ c)) ^ (2 : ℕ))
 
 lemma lowerSizeThreshold_le_lowerGapThreshold (C γ c : ℝ) :
     lowerSizeThreshold C γ ≤ lowerGapThreshold C γ c :=

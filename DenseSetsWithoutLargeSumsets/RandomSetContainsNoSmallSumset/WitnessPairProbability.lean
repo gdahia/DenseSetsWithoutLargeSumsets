@@ -71,15 +71,14 @@ private lemma pow_le_exp_neg_mul_log_one_div {δ : unitInterval} {m : ℕ} {L : 
   exact Real.rpow_le_rpow_of_exponent_ge hδ_pos hδ_lt.le hL
 
 private lemma sum_bltDimSmallWitnessPairs_pow_le (P : Finset ℕ) (D k : ℕ)
-    (C γ : ℝ) {δ : unitInterval} (hC : 0 < 2 * C) (hε : 0 < ε γ)
-    (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
+    (C γ : ℝ) {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
     ∑ p ∈ bltDimSmallWitnessPairs P D k C γ, (δ : ℝ) ^ #(p.1 + p.2) ≤
-      (((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
+      (((⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ + 1) *
           (#(natCastImage P) + 1) ^
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ) *
-        ((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
+            ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ : ℝ) *
+        ((⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ + 1) *
           (#(natCastImage P) + 1) ^
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
+            ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
         Real.exp (-((1 - 3 * ε γ) * (D : ℝ) * (k : ℝ)) * Real.log (1 / δ)) := by
   have h : ∀ p ∈ bltDimSmallWitnessPairs P D k C γ, (δ : ℝ) ^ #(p.1 + p.2) ≤
       Real.exp (-((1 - 3 * ε γ) * (D : ℝ) * (k : ℝ)) * Real.log (1 / δ)) := by
@@ -89,7 +88,7 @@ private lemma sum_bltDimSmallWitnessPairs_pow_le (P : Finset ℕ) (D k : ℕ)
   refine (sum_le_card_nsmul _ _ _ h).trans ?_
   rw [nsmul_eq_mul]
   gcongr
-  exact mod_cast bltDimSmallWitnessPairs_card_le P D k C γ hC hε
+  exact mod_cast bltDimSmallWitnessPairs_card_le P D k C γ
 
 /-- The sum of `δ ^ |A' + B'|` over the proper progressions `P` of dimension `1 ≤ d ≤ k` with at
 most `s` points in `ZMod q` and over the pairs `(A', B')` in `bltDimSmallWitnessPairs` of the
@@ -98,8 +97,7 @@ preimage of `P` under `ψ`. For each `d` it is at most the number of progression
 `m = ⌈lowerBltConstant C γ * √k⌉₊`. -/
 lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
     (hqpos : 0 < q) (hψinj : Set.InjOn ψ (interval n : Set ℕ))
-    {C γ : ℝ} {δ : unitInterval} (hC : 0 < 2 * C) (hε : 0 < ε γ)
-    (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
+    {C γ : ℝ} {δ : unitInterval} (hδ_pos : 0 < (δ : ℝ)) (hδ_lt : (δ : ℝ) < 1) :
     ∑ P ∈ (by
         classical
         exact (Finset.Icc 1 k).biUnion (fun d ↦ properGAPsZModOfDim d s hqpos) :
@@ -108,12 +106,12 @@ lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
           (δ : ℝ) ^ #(p.1 + p.2) ≤
       ∑ d ∈ Finset.Icc 1 k,
         (#(properGAPsZModOfDim d s hqpos) : ℝ) *
-          (((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
+          (((⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ + 1) *
               (s + 1) ^
-                ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ) *
-            ((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
+                ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ : ℝ) *
+            ((⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ + 1) *
               (s + 1) ^
-                ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
+                ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ : ℝ)) *
           Real.exp (-((1 - 3 * ε γ) * (d : ℝ) * (k : ℝ)) * Real.log (1 / δ)) := by
   classical
   rw [sum_biUnion]
@@ -123,8 +121,8 @@ lemma dim_fingerprint_sum_le_gap_dim_sum {q n k s : ℕ} (ψ : ℕ → ZMod q)
     refine sum_le_card_nsmul _ _ _ ?_
     intro P hP
     obtain ⟨-, rfl, hPs⟩ := (mem_properGAPsZModOfDim hqpos).1 hP
-    have hcard := (zmodGAPPreimageContainer_card_le_carrier P hψinj).trans hPs
-    refine (sum_bltDimSmallWitnessPairs_pow_le _ _ k C γ hC hε hδ_pos hδ_lt).trans ?_
+    have hcard := (zmodGAPPreimageContainer_card_le_card_toFinset P hψinj).trans hPs
+    refine (sum_bltDimSmallWitnessPairs_pow_le _ _ k C γ hδ_pos hδ_lt).trans ?_
     rw [natCastImage_card]
     gcongr
   · intro d _ d' _ hdd'

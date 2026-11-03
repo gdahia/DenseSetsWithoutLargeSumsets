@@ -13,31 +13,32 @@ maxSynthPendingDepth = 3
 [[require]]
 name = "CountingSetsWithSmallSumset"
 git = "https://github.com/gdahia/CountingSetsWithSmallSumset"
-rev = "3d2269518ae8d6b2ba971e2a9cd93325ed4d1ab4"
+rev = "5f8eb1c48e91ce4131810cf4179bb60979727d64"
 
 # Source of Chang's theorem in `ZMod q`. It brings in APAP and Tau Ceti.
 [[require]]
 name = "ChangFreimanRuzsa"
 git = "https://github.com/gdahia/ChangFreimanRuzsa"
-rev = "6f9048bf2bc94d071eaa881835d7893932e5fd37"
+rev = "7637419edd2df78b5e085ee07a147166281b43ad"
 
 # Source of Theorem 2 of Bollobás, Leader and Tiba.
 [[require]]
 name = "LargeSumsetsFromSubsets"
 git = "https://github.com/gdahia/LargeSumsetsFromSubsets"
-rev = "b00aa43ebcae410e563db9024da1df0a8c074774"
+rev = "59e447a48e3a6430f41ab59b038c660734a115c4"
 
 # Source of Ruzsa's lower bound for sumsets in several dimensions.
 [[require]]
 name = "SumOfSetsInSeveralDimensions"
 git = "https://github.com/gdahia/SumOfSetsInSeveralDimensions"
-rev = "1f8da867debcce675e07cac515ea9598c1245a92"
+rev = "3e3daad85c81610605c39c48b8f68eec41e57319"
 
-# Last, so that its pins of the shared dependencies take precedence on `lake update`.
+# Last, so that its pins of the shared dependencies take precedence on `lake update`. Pinned to
+# the commit TauCeti v4.35.0 pins, since Palomar requires TauCeti's exact manifest closure.
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "v4.35.0"
+rev = "074063781836922cb02701cd12943c9f51731afa"
 
 # The proof development; `Solution.lean` imports it.
 [[lean_lib]]

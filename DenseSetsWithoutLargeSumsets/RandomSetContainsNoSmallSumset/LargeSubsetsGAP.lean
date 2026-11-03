@@ -117,10 +117,10 @@ private lemma freimanDim_le_two_mul_ceil_sub_one {q : ℕ} {K : ℝ} {X : Finset
   push_cast
   linarith [freimanDim_le_two_mul_sub_one_of_card_add_le hX hXX, Nat.le_ceil K]
 
-private lemma card_carrier_le_ceil_changCarrierBound {C : ℝ} {q k : ℕ} {X : Finset (ZMod q)}
+private lemma card_toFinset_le_ceil_changCarrierBound {C : ℝ} {q k : ℕ} {X : Finset (ZMod q)}
     {P : GAP (ZMod q)} (hXcard : #X ≤ 2 * k)
-    (hPcard : (#P.carrier : ℝ) ≤ changCarrierBound #X (κ C)) :
-    #P.carrier ≤ ⌈changCarrierBound (2 * k) (κ C)⌉₊ := by
+    (hPcard : (#P.toFinset : ℝ) ≤ changCarrierBound #X (κ C)) :
+    #P.toFinset ≤ ⌈changCarrierBound (2 * k) (κ C)⌉₊ := by
   refine (Nat.cast_le (α := ℝ)).1 ((hPcard.trans ?_).trans (Nat.le_ceil _))
   unfold changCarrierBound
   gcongr
@@ -197,15 +197,17 @@ lemma largeSubsets_exists_zmodGAPPreimageContainer {γ C c : ℝ} {n : ℕ}
   have hXupper := exp_mul_card_image_union_le (ψ := zmodModelEmbedding hγ_pos C_pos hn) hγ_pos
     hc_pos hc_lt hn_gap (zmodModelQ_lower hγ_pos C_pos hn) hδ_lower hδ_upper_c hAcard hBcard
     hA₀A hB₀B
-  obtain ⟨P, hP, hXP, -, hPdim, hPcard⟩ :=
-    exists_twoProperGAP_zmod_dim_le_freimanDim _ hq (two_le_κ_of_one_le hC) hXX
-      (mul_bohrGAPDim_le_of_exp_lt (two_le_κ_of_one_le hC) hXlower) hXupper
+  obtain ⟨P, hP, hXP, hPdim, hPcard⟩ :=
+    exists_tProperGAP_zmod_dim_le_freimanDim _ hq le_rfl (two_le_κ_of_one_le hC) hXX
+      (mul_bohrGAPDim_le_of_exp_lt (two_le_κ_of_one_le hC) hXlower) (by simpa using hXupper)
+  rw [GAP.two_nsmul] at hP
+  rw [tProperExponent_two, add_zero] at hPcard
   have hdim := freimanDim_le_two_mul_ceil_sub_one
     (card_pos.1 (mod_cast (Real.exp_pos _).trans hXlower)) hXX
-  refine ⟨P, (mem_properGAPsZModUpToDim hq.pos).2 ⟨hP.proper, ?_, ?_⟩, ?_, ?_, hPdim, hdim⟩
+  refine ⟨P, (mem_properGAPsZModUpToDim hq.pos).2 ⟨hP.of_add_self, ?_, ?_⟩, ?_, ?_, hPdim, hdim⟩
   · exact (hPdim.trans hdim).trans (two_mul_ceil_κ_sub_one_le_pairCardThreshold hγ_pos hC
       (one_lt_nat_of_lowerSizeThreshold_lt hn) hδ_lower hδ_upper)
-  · exact card_carrier_le_ceil_changCarrierBound
+  · exact card_toFinset_le_ceil_changCarrierBound
       (card_image_union_le_two_mul hAcard hBcard hA₀A hB₀B) hPcard
   · intro a ha
     exact mem_filter.2 ⟨hA₀A.trans hAint ha, hXP (mem_union_left _ (mem_image_of_mem _ ha))⟩

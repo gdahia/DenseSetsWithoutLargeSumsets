@@ -110,10 +110,10 @@ lemma one_lt_densityCoefficient {γ c : ℝ} (hγ_pos : 0 < γ)
 
 private lemma one_le_lowerGapSqrtScale {C γ c : ℝ} (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1)
     (hC : 0 < 2 * C) (hε : 0 < ε γ) (hc_pos : 0 < c) (hc_lt : c < 1) :
-    1 ≤ lowerGapSqrtScale C γ c hC hε := by
+    1 ≤ lowerGapSqrtScale C γ c := by
   rw [lowerGapSqrtScale, le_div_iff₀ hε]
   linarith [ε_le_one_twelfth hγ_pos hγ_le, one_le_mul_of_one_le_of_one_le
-    (one_le_lowerBltConstant hC hε)
+    (one_le_lowerBltConstant hC γ)
     (one_le_sqrt.2 (one_lt_densityCoefficient hγ_pos hc_pos hc_lt).le)]
 
 lemma κ_ge_six_of_one_le {C : ℝ} (hC : 1 ≤ C) : 6 ≤ κ C := by
@@ -286,28 +286,25 @@ private lemma max_lt_log_of_lowerGapThreshold_lt {C γ c : ℝ} {n : ℕ}
     (hn : lowerGapThreshold C γ c < n) :
     max
       (2 * lowerLogScale γ * log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ * lowerLogScale γ))
-      ((4 * lowerGapSqrtScaleDefault C γ c * log
-        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstantDefault C γ *
-          lowerGapSqrtScaleDefault C γ c)) ^ 2) < log n := by
+        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ * lowerLogScale γ))
+      ((4 * lowerGapSqrtScale C γ c * log
+        (2 * max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ *
+          lowerGapSqrtScale C γ c)) ^ 2) < log n := by
   have h : exp _ < (n : ℝ) := (le_max_of_le_right (le_max_right _ _)).trans_lt hn
   exact (lt_log_iff_exp_lt ((exp_pos _).trans h)).2 h
 
 /-- If `n` is larger than `lowerGapThreshold C γ c`, then
 `lowerLogScale γ * log (M * L * log n) ≤ log n` for `M = max 42 (3 * K)`,
 `K = densityCoefficient (3 + γ) c` and `L = lowerConstant C γ`. -/
-lemma lowerLogScale_log_bound_of_gap {C γ c : ℝ} {n : ℕ}
-    (hC : 0 < 2 * C) (hε : 0 < ε γ)
+lemma lowerLogScale_log_bound_of_gap {C γ c : ℝ} {n : ℕ} (hε : 0 < ε γ)
     (hn : lowerGapThreshold C γ c < n) :
     lowerLogScale γ * log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC hε *
-          log (n : ℝ)) ≤
+        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ * log (n : ℝ)) ≤
       log (n : ℝ) := by
   have hn_old := (lowerSizeThreshold_le_lowerGapThreshold C γ c).trans_lt hn
   apply mul_log_mul_le_self
-    (mul_pos (lt_max_of_lt_left (by norm_num)) (lowerConstant_pos C γ hC hε))
+    (mul_pos (lt_max_of_lt_left (by norm_num)) (lowerConstant_pos C γ))
     (lowerLogScale_pos hε) (by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn_old])
-  rw [← lowerConstantDefault_eq C γ hC hε]
   exact ((le_max_left _ _).trans_lt (max_lt_log_of_lowerGapThreshold_lt hn)).le
 
 /-- If `n` is larger than `lowerGapThreshold C γ c`, then
@@ -317,17 +314,15 @@ lemma lowerGapSqrtScale_log_bound {C γ c : ℝ} {n : ℕ}
     (hγ_pos : 0 < γ) (hγ_le : γ ≤ 1) (hC : 0 < 2 * C) (hε : 0 < ε γ)
     (hc_pos : 0 < c) (hc_lt : c < 1)
     (hn : lowerGapThreshold C γ c < n) :
-    lowerGapSqrtScale C γ c hC hε * log
-        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ hC hε *
-          log (n : ℝ)) ≤
+    lowerGapSqrtScale C γ c * log
+        (max 42 (3 * densityCoefficient (3 + γ) c) * lowerConstant C γ * log (n : ℝ)) ≤
       √(log (n : ℝ)) := by
   have hn_old := (lowerSizeThreshold_le_lowerGapThreshold C γ c).trans_lt hn
   refine mul_log_mul_le_sqrt ?_ (one_le_lowerGapSqrtScale hγ_pos hγ_le hC hε hc_pos hc_lt)
     (by linarith [fifteen_lt_log_of_lowerAnalyticThreshold hn_old]) ?_
-  · nlinarith [le_max_left 42 (3 * densityCoefficient (3 + γ) c), one_le_lowerConstant hC hε]
+  · nlinarith [le_max_left 42 (3 * densityCoefficient (3 + γ) c), one_le_lowerConstant hC γ]
   · apply le_sqrt_of_sq_le
-    rw [← mul_assoc 2, ← lowerConstantDefault_eq C γ hC hε,
-      ← lowerGapSqrtScaleDefault_eq C γ c hC hε]
+    rw [← mul_assoc 2]
     exact ((le_max_right _ _).trans_lt (max_lt_log_of_lowerGapThreshold_lt hn)).le
 
 end

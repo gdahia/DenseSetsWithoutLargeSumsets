@@ -30,7 +30,7 @@ families and bounds the number of pairs.
 
 ## Main statements
 
-* `zmodGAPPreimageContainer_card_le_carrier`: if `ψ` is injective on `[n]`, then
+* `zmodGAPPreimageContainer_card_le_card_toFinset`: if `ψ` is injective on `[n]`, then
   `zmodGAPPreimageContainer n ψ P` has at most `|P|` elements.
 * `bltDimSmallWitnessPairs_card_le`: with `m = ⌈lowerBltConstant C γ * √k⌉₊`, there are at most
   `((m + 1) * (|Q| + 1) ^ m) ^ 2` pairs in `bltDimSmallWitnessPairs Q D k C γ`.
@@ -48,11 +48,11 @@ noncomputable section
 /-- The elements of `[n]` that `ψ` maps into the progression `P`. -/
 def zmodGAPPreimageContainer {q : ℕ} (n : ℕ) (ψ : ℕ → ZMod q)
     (P : GAP (ZMod q)) : Finset ℕ :=
-  (interval n).filter fun x ↦ ψ x ∈ P.carrier
+  (interval n).filter fun x ↦ ψ x ∈ P.toFinset
 
-lemma zmodGAPPreimageContainer_card_le_carrier {q n : ℕ} {ψ : ℕ → ZMod q}
+lemma zmodGAPPreimageContainer_card_le_card_toFinset {q n : ℕ} {ψ : ℕ → ZMod q}
     (P : GAP (ZMod q)) (hψinj : Set.InjOn ψ (interval n : Set ℕ)) :
-    #(zmodGAPPreimageContainer n ψ P) ≤ #P.carrier := by
+    #(zmodGAPPreimageContainer n ψ P) ≤ #P.toFinset := by
   rw [zmodGAPPreimageContainer,
     ← card_image_of_injOn (hψinj.mono (coe_subset.2 (filter_subset _ _)))]
   exact card_le_card (image_subset_iff.2 fun x hx ↦ (mem_filter.1 hx).2)
@@ -87,9 +87,8 @@ lemma natCastImage_add_subset {A B S : Finset ℕ} {A' B' : Finset ℤ}
 def bltSmallWitnessPairs (P : Finset ℕ) (k : ℕ) (C γ : ℝ) :
     Finset (Finset ℤ × Finset ℤ) :=
   ((natCastImage P).powerset ×ˢ (natCastImage P).powerset).filter fun p ↦
-    ∃ (hC : 0 < 2 * C) (hε : 0 < ε γ),
-      (p.1.card : ℝ) ≤ lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ) ∧
-        (p.2.card : ℝ) ≤ lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)
+    (p.1.card : ℝ) ≤ lowerBltConstant C γ * Real.sqrt (k : ℝ) ∧
+      (p.2.card : ℝ) ≤ lowerBltConstant C γ * Real.sqrt (k : ℝ)
 
 /-- The pairs `(A', B')` in `bltSmallWitnessPairs P k C γ` with
 `|A' + B'| ≥ (1 - 3 * ε γ) * D * k`, where `D ≥ 1`. For `D = 0` the family is empty. -/
@@ -110,7 +109,7 @@ def properGAPsZModUpToDim {q : ℕ} (D s : ℕ) (hq : 0 < q) :
   exact (Finset.range (D + 1)).biUnion fun d ↦ properGAPsZModOfDim d s hq
 
 lemma mem_properGAPsZModUpToDim {q D s : ℕ} (hq : 0 < q) {P : GAP (ZMod q)} :
-    P ∈ properGAPsZModUpToDim D s hq ↔ P.Proper ∧ P.dim ≤ D ∧ #P.carrier ≤ s := by
+    P ∈ properGAPsZModUpToDim D s hq ↔ P.Proper ∧ P.dim ≤ D ∧ #P.toFinset ≤ s := by
   simp only [properGAPsZModUpToDim, mem_biUnion, mem_range, mem_properGAPsZModOfDim]
   grind
 
@@ -130,24 +129,23 @@ private lemma card_powerset_filter_card_le {α : Type*} (U : Finset α) (M : ℕ
 
 /-- With `m = ⌈lowerBltConstant C γ * √k⌉₊`, there are at most `((m + 1) * (|P| + 1) ^ m) ^ 2`
 pairs in `bltDimSmallWitnessPairs P D k C γ`. -/
-lemma bltDimSmallWitnessPairs_card_le (P : Finset ℕ) (D k : ℕ) (C γ : ℝ)
-    (hC : 0 < 2 * C) (hε : 0 < ε γ) :
+lemma bltDimSmallWitnessPairs_card_le (P : Finset ℕ) (D k : ℕ) (C γ : ℝ) :
     #(bltDimSmallWitnessPairs P D k C γ) ≤
-      (((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
+      (((⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ + 1) *
           (#(natCastImage P) + 1) ^
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊) *
-        ((⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊ + 1) *
+            ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊) *
+        ((⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊ + 1) *
           (#(natCastImage P) + 1) ^
-            ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊)) := by
+            ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊)) := by
   classical
   refine (card_le_card (t :=
     ((natCastImage P).powerset.filter fun A ↦
-      #A ≤ ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊) ×ˢ
+      #A ≤ ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊) ×ˢ
     ((natCastImage P).powerset.filter fun A ↦
-      #A ≤ ⌈lowerBltConstant C γ hC hε * Real.sqrt (k : ℝ)⌉₊)) ?_).trans ?_
+      #A ≤ ⌈lowerBltConstant C γ * Real.sqrt (k : ℝ)⌉₊)) ?_).trans ?_
   · intro p hp
     rw [bltDimSmallWitnessPairs, mem_filter, bltSmallWitnessPairs, mem_filter, mem_product] at hp
-    obtain ⟨⟨hp, _, _, h₁, h₂⟩, -⟩ := hp
+    obtain ⟨⟨hp, h₁, h₂⟩, -⟩ := hp
     rw [mem_product, mem_filter, mem_filter]
     exact ⟨⟨hp.1, Nat.cast_le.1 (h₁.trans (Nat.le_ceil _))⟩,
       ⟨hp.2, Nat.cast_le.1 (h₂.trans (Nat.le_ceil _))⟩⟩

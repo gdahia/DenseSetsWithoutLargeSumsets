@@ -43,8 +43,13 @@ def sumsetThresholdSet (δ : unitInterval) (N : ℕ) : Set ℕ :=
   {k | ∀ S : Finset ℕ, S ⊆ interval N → (δ : ℝ) * (N : ℝ) ≤ (S.card : ℝ) → pairEvent N k S}
 
 /-- `φ(δ, N)`, the largest integer `k` such that every `A ⊆ [N]` with `|A| ≥ δ N` contains a sumset
-`B + C` with `B, C ⊆ [N]` and `min {|B|, |C|} ≥ k`. -/
-def phi (δ : unitInterval) (N : ℕ) : ℕ := sSup (sumsetThresholdSet δ N)
+`B + C` with `B, C ⊆ [N]` and `min {|B|, |C|} ≥ k`. It is stated with Mathlib notions only, and is
+`sSup (sumsetThresholdSet δ N)` by `phi_eq_sSup`. -/
+def phi (δ : unitInterval) (N : ℕ) : ℕ :=
+  sSup {k | ∀ S ⊆ Finset.Icc 1 N, (δ : ℝ) * N ≤ S.card → ∃ A B : Finset ℕ,
+    A ⊆ Finset.Icc 1 N ∧ B ⊆ Finset.Icc 1 N ∧ k ≤ A.card ∧ k ≤ B.card ∧ A + B ⊆ S}
+
+lemma phi_eq_sSup (δ : unitInterval) (N : ℕ) : phi δ N = sSup (sumsetThresholdSet δ N) := rfl
 
 variable {δ δ' : unitInterval} {N k l : ℕ}
 
