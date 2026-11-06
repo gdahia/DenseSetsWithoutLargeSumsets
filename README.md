@@ -1,13 +1,14 @@
 # Dense sets without large sumsets
 
-Lean 4 formalization of Gabriel Dahia, João Pedro Marciano and Victor Souza,
-[*Dense sets without large sumsets*](https://arxiv.org/abs/2607.15269): for $0 < \delta < 1$ and
-all large $n$ there is $S \subseteq \{1, \dots, n\}$ with $|S| \ge \delta n$ that contains no sumset
-$A + B$ with $\min\{|A|, |B|\} \ge (3 + o(1)) \log n / \log(1 / \delta)$. The formalization also
-covers the the lower bound of Felipe Hernández and Luke Hetzel function and the resolution of
-Conjecture 4.10 and the negative answer to Question 4.12 of Kra, Moreira, Richter and Robertson,
-[*Problems on infinite sumset configurations in the integers and beyond*](https://arxiv.org/abs/2311.06197),
-Bull. Amer. Math. Soc. 62 (2025), 537–574.
+Lean 4 formalization of Gabriel Dahia, João Pedro Marciano and Victor Souza, [*Dense sets without
+large sumsets*](https://arxiv.org/abs/2607.15269): for $0 < \delta < 1$ and all large $n$ there is
+$S \subseteq \lbrace1, \dots, n\rbrace$ with $\left\lvert S\right\rvert \ge \delta n$ that contains
+no sumset $A + B$ with
+$\min\lbrace\left\lvert A\right\rvert, \left\lvert B\right\rvert\rbrace \ge (3 + o(1)) \log n / \log(1 / \delta)$.
+The formalization also covers the the lower bound of Felipe Hernández and Luke Hetzel function and
+the resolution of Conjecture 4.10 and the negative answer to Question 4.12 of Kra, Moreira, Richter
+and Robertson, [*Problems on infinite sumset configurations in the integers and
+beyond*](https://arxiv.org/abs/2311.06197), Bull. Amer. Math. Soc. 62 (2025), 537–574.
 
 ## Results
 
@@ -20,9 +21,10 @@ Question 4.12 of Kra, Moreira, Richter and Robertson.
 **Theorem 1** (`exists_dense_subset_forall_add_not_subset'`). For every $0 < \gamma \le 1$ and
 $0 < c < 1$, there exist $\alpha > 0$ and $n_0 \in \mathbb{N}$ such that the following holds.
 If $n \ge n_0$ and $n^{-\alpha} < \delta \le 1 - c$, then some $S \subseteq [n]$ with
-$|S| \ge \delta n$ contains no sumset $A + B$ with $A, B \subseteq [n]$ and
+$\left\lvert S\right\rvert \ge \delta n$ contains no sumset $A + B$ with $A, B \subseteq [n]$ and
 
-$$\min\{|A|, |B|\} \ge \frac{(3 + \gamma) \log n}{\log(1 / \delta)}.$$
+$$\min\lbrace\left\lvert A\right\rvert, \left\lvert B\right\rvert\rbrace \ge
+\frac{(3 + \gamma) \log n}{\log(1 / \delta)}.$$
 
 **Theorem 2** (`phi_div_log_mem_Icc'`). Let $\gamma$, $c$, $\alpha$ and $n_0$ be as in Theorem 1.
 If $n \ge n_0$ and $n^{-\alpha} \le \delta \le 1 - c$, then
