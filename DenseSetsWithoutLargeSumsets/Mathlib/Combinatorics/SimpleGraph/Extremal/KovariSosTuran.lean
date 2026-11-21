@@ -102,7 +102,7 @@ lemma le_card_filter [Nonempty W] [Nonempty α]
       fun ⟨hsubset, hcard⟩ ↦ ⟨⟨hsubset.trans (h_nbhd w), hcard⟩, hsubset⟩⟩
   rw [div_eq_inv_mul, mul_sum] at h_avg
   have h_jensen := descPochhammer_eval_div_factorial_le_sum_choose
-    (by positivity) (fun w : W ↦ G.degree (.inr w)) _ (fun _ _ ↦ by positivity) (by simp) h_avg
+    (fun w : W ↦ G.degree (.inr w)) _ (fun _ _ ↦ by positivity) (by simp) h_avg
   rw [← mul_sum, ← div_eq_inv_mul] at h_jensen
   rw [hcard_filter, Nat.cast_sum]
   apply (mul_le_mul_of_nonneg_left h_jensen (by positivity)).trans_eq

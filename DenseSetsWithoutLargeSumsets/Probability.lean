@@ -113,7 +113,7 @@ lemma binomialFinsetSubset_real_eq_image {Ω : Set ℕ} (hΩ : Ω.Finite) (p : u
   apply measureReal_congr
   filter_upwards [setBernoulli_ae_subset] with S hS
   have hfin := hΩ.subset hS
-  refine propext ⟨fun h ↦ ⟨hfin.toFinset, by simpa [hfin] using h, hfin.coe_toFinset⟩, ?_⟩
+  refine ⟨fun h ↦ ⟨hfin.toFinset, by simpa [hfin] using h, hfin.coe_toFinset⟩, ?_⟩
   rintro ⟨T, hT, rfl⟩
   simpa using hT
 
